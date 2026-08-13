@@ -32,4 +32,5 @@ jobs:
           publish_branch: gh-pages
           publish_dir: ./public
           cname: ''
-          force_orphan: false
+          force_orphan: true
+          clean: true
