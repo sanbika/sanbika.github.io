@@ -1,4 +1,10 @@
 [[main]]
+  identifier = "search"
+  name = "搜索"
+  url = "/search/"
+  weight = 5
+
+[[main]]
   identifier = "posts"
   name = "文章"
   url = "/posts/"
@@ -21,9 +27,3 @@
   name = "RSS"
   url = "/index.xml"
   weight = 40
-
-[[main]]
-  identifier = "search"
-  name = "搜索"
-  url = "/search/"
-  weight = 5
