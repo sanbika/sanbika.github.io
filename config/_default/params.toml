@@ -1,0 +1,27 @@
+[params]
+  env = "auto"
+  defaultTheme = "auto"
+  ShowReadingTime = true
+  ShowShareButtons = false
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+  enableSearch = true
+  searchLimit = 10
+
+# 评论（Giscus）
+[params.comments]
+  enabled = true
+  provider = "giscus"
+  [params.comments.giscus]
+    repo = "sanbika/sanbika.github.io"
+    repoId = "PLACEHOLDER_REPO_ID"
+    category = "General"
+    categoryId = "PLACEHOLDER_CATEGORY_ID"
+    mapping = "pathname"
+    lightTheme = "light"
+    darkTheme = "dark_dimmed"
+    reactionsEnabled = true
+
+# Google Analytics（占位）
+[params.analytics.google]
+  id = "G-PLACEHOLDER"

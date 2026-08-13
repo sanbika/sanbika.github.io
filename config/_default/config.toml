@@ -1,0 +1,30 @@
+baseURL = "https://sanbika.github.io/"
+title = "sanbika 的小站"
+theme = "PaperMod"
+
+defaultContentLanguage = "zh-cn"
+defaultContentLanguageInSubdir = false
+
+enableRobotsTXT = true
+
+[outputs]
+  home = ["HTML", "RSS"]
+  section = ["HTML", "RSS"]
+
+[params]
+  env = "auto"
+  description = "sanbika 的个人主页与博客"
+  author = "sanbika"
+  avatar = "images/avatar.png"
+  enableSearch = true
+  DateFormat = "2006-01-02"
+  ShowReadingTime = true
+  ShowShareButtons = false
+
+[[params.socialIcons]]
+  name = "github"
+  url = "https://github.com/sanbika"
+
+[[params.socialIcons]]
+  name = "rss"
+  url = "/index.xml"

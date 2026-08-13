@@ -1,0 +1,23 @@
+[[main]]
+  identifier = "posts"
+  name = "文章"
+  url = "/posts/"
+  weight = 10
+
+[[main]]
+  identifier = "projects"
+  name = "项目"
+  url = "/projects/"
+  weight = 20
+
+[[main]]
+  identifier = "about"
+  name = "关于"
+  url = "/about/"
+  weight = 30
+
+[[main]]
+  identifier = "rss"
+  name = "RSS"
+  url = "/index.xml"
+  weight = 40
