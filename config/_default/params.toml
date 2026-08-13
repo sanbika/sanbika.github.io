@@ -14,9 +14,9 @@
   provider = "giscus"
   [params.comments.giscus]
     repo = "sanbika/sanbika.github.io"
-    repoId = "PLACEHOLDER_REPO_ID"
+    repoId = "R_kgDOT2zk8Q"
     category = "General"
-    categoryId = "PLACEHOLDER_CATEGORY_ID"
+    categoryId = "DIC_kwDOT2zk8c4DDQPs"
     mapping = "pathname"
     lightTheme = "light"
     darkTheme = "dark_dimmed"
