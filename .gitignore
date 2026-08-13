@@ -1,0 +1,7 @@
+public/
+resources/_gen/
+.hugo_build.lock
+.DS_Store
+
+# 开发与设计文档不进入 commit
+docs/superpowers/
