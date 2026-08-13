@@ -1,13 +1,13 @@
 [zh-cn]
   languageName = "中文"
   weight = 1
-  title = "sanbika 的小站"
+  title = "浆果丛林"
   [zh-cn.params]
-    description = "sanbika 的个人主页与博客（中文）"
+    description = "浆果丛林 —— 个人主页与博客"
 
 [en]
   languageName = "English"
   weight = 2
-  title = "sanbika's Site"
+  title = "Berry Jungle"
   [en.params]
-    description = "sanbika's personal site and blog"
+    description = "Berry Jungle — personal site and blog"

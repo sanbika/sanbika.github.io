@@ -1,4 +1,4 @@
-# sanbika 的小站
+# 浆果丛林 / Berry Jungle
 
 个人博客与个人主页。基于 [Hugo](https://gohugo.io/) + [PaperMod](https://github.com/adityatelange/hugo-PaperMod) 主题，托管在 GitHub Pages 上。
 

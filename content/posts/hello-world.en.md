@@ -9,7 +9,7 @@ weight: 1
 comments: true
 ---
 
-This is the first post on `sanbika's site`.
+This is the first post on `Berry Jungle`.
 
 ## Sections
 
