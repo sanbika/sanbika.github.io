@@ -22,6 +22,6 @@
     darkTheme = "dark_dimmed"
     reactionsEnabled = true
 
-# Google Analytics（占位）
+# Google Analytics
 [params.analytics.google]
-  id = "G-PLACEHOLDER"
+  id = "G-R7BQ8WQQ38"
