@@ -6,6 +6,7 @@ tags: ["Hugo", "博客"]
 categories: ["技术笔记"]
 description: "本站的第一篇文章，介绍搭建过程。"
 weight: 1
+comments: true
 ---
 
 这是 `sanbika 的小站` 的第一篇文章。

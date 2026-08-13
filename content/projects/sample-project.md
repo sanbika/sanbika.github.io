@@ -6,6 +6,7 @@ description: "这是一个示范项目页面，演示 front matter 字段。"
 tech: ["Hugo", "TypeScript", "Python"]
 github: "https://github.com/sanbika/sanbika.github.io"
 weight: 1
+comments: true
 ---
 
 # 示范项目

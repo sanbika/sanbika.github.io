@@ -6,6 +6,7 @@ tags: ["Hugo", "Blog"]
 categories: ["Tech Notes"]
 description: "First post on this site, explaining the setup."
 weight: 1
+comments: true
 ---
 
 This is the first post on `sanbika's site`.

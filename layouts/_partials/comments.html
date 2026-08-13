@@ -1,0 +1,38 @@
+{{- if and .Site.Params.comments.giscus.repoId .Site.Params.comments.giscus.categoryId -}}
+<script src="https://giscus.app/client.js"
+        data-repo="{{ .Site.Params.comments.giscus.repo }}"
+        data-repo-id="{{ .Site.Params.comments.giscus.repoId }}"
+        data-category="{{ .Site.Params.comments.giscus.category }}"
+        data-category-id="{{ .Site.Params.comments.giscus.categoryId }}"
+        data-mapping="{{ .Site.Params.comments.giscus.mapping }}"
+        data-strict="0"
+        data-reactions-enabled="{{ if .Site.Params.comments.giscus.reactionsEnabled }}1{{ else }}0{{ end }}"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="light"
+        data-lang="zh-CN"
+        data-light-theme="{{ .Site.Params.comments.giscus.lightTheme }}"
+        data-dark-theme="{{ .Site.Params.comments.giscus.darkTheme }}"
+        crossorigin="anonymous"
+        async>
+</script>
+
+<script>
+  function setGiscusTheme() {
+    const iframe = document.querySelector('iframe.giscus-frame');
+    if (!iframe) return;
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark'
+      ? '{{ .Site.Params.comments.giscus.darkTheme }}'
+      : '{{ .Site.Params.comments.giscus.lightTheme }}';
+    iframe.contentWindow.postMessage(
+      { giscus: { setConfig: { theme } } },
+      'https://giscus.app'
+    );
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    const observer = new MutationObserver(setGiscusTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    setGiscusTheme();
+  });
+</script>
+{{- end -}}
