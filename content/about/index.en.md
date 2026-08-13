@@ -20,4 +20,4 @@ Brief self-introduction here.
 - GitHub: [@sanbika](https://github.com/sanbika)
 - Email: <your email>
 
-![Avatar](/images/avatar.png)
+![Avatar](/images/avatar.jpg)

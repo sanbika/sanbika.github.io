@@ -20,4 +20,4 @@ comments: true
 - GitHub: [@sanbika](https://github.com/sanbika)
 - Email: <你的邮箱>
 
-![Avatar](/images/avatar.png)
+![Avatar](/images/avatar.jpg)
