@@ -1,0 +1,14 @@
+感觉页面看起来还是有一点奇怪，然后国际化中英的处理好像有些英文被遗漏了，你觉得怎么处理合适呢？
+
+---
+
+Task: 侦察目标：Hugo + PaperMod 站点（浆果丛林 / Berry Jungle）的两类问题，彻底度 medium-thorough。
+
+背景：最近提交做了「按语言分菜单（menus.zh-cn.toml + menus.en.toml）+ 英文搜索页」「站点改名」等改动。用户反馈：① 页面看起来还是有点奇怪；② 国际化中英切换时疑似有英文遗漏（即中文界面上出现英文，或英文界面上残留中文/未翻译文案）。
+
+请调查：
+1. 站点结构：列出 hugo.toml/config 目录结构、languages 配置、menus.zh-cn.toml / menus.en.toml 的完整内容、content/ 目录两种语言的内容组织方式（是否 content/en/ 镜像）。
+2. i18n 资源：项目自有 i18n/*.toml（如自定义 key），以及主题 PaperMod 自带的 i18n 文件里 zh-cn 的覆盖情况；列出站点用到的 UI 文案 key（如 search、archive、footer、translations、readMore 等）在中英两种语言下分别来自哪里。
+3. 硬编码文案扫描：layouts/ 下自定义 partial/模板（含 giscus、GA、搜索、header/footer 覆盖）中是否有硬编码中文或英文字符串、未走 i18n 的情形；content 两语言页面 front matter（title/description/menu 名）是否有语言串用的情况（例如英文菜单名配中文页面）。
+4. 页面"奇怪"的线索：菜单定义与主题渲染是否匹配（PaperMod 的 menu 结构 identifier/name/weight/url/pre/post）、站点名/页头页脚在两种语言下的显示、语言切换按钮配置、任何可能导致布局或菜单重复/错乱的配置点。
+5. 输出：文件清单（带行号）+ 关键配置/代码摘录 + 按上述 4 点分类的结论清单 + 每个问题的"从哪里开始改"。不要修改任何文件。
