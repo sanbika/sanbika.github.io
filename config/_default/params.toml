@@ -1,14 +1,37 @@
 [params]
   env = "auto"
   defaultTheme = "auto"
+  description = "sanbika 的个人主页与博客"
+  author = "sanbika"
+  avatar = "images/avatar.jpg"
+  DateFormat = "2006-01-02"
   ShowReadingTime = true
   ShowShareButtons = false
   ShowPostNavLinks = true
   ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
   enableSearch = true
-  searchLimit = 10
   mainSections = ["posts"]
   displayFullLangName = true
+  disableSpecial1stPost = true
+
+# 站点资源（favicon / 主题色）
+[params.assets]
+  theme_color = "#9B1D20"
+  favicon = "favicon.ico"
+  favicon16x16 = "favicon-16x16.png"
+  favicon32x32 = "favicon-32x32.png"
+  apple_touch_icon = "apple-touch-icon.png"
+  safari_pinned_tab = "safari-pinned-tab.svg"
+
+# 社交图标（首页 home-info 自动展示）
+[[params.socialIcons]]
+  name = "github"
+  url = "https://github.com/sanbika"
+
+[[params.socialIcons]]
+  name = "rss"
+  url = "/index.xml"
 
 # 评论（Giscus）
 [params.comments]

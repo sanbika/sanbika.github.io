@@ -13,20 +13,9 @@ enableRobotsTXT = true
   taxonomy = ["HTML", "RSS"]
   term = ["HTML", "RSS"]
 
-[params]
-  env = "auto"
-  description = "sanbika 的个人主页与博客"
-  author = "sanbika"
-  avatar = "images/avatar.jpg"
-  enableSearch = true
-  DateFormat = "2006-01-02"
-  ShowReadingTime = true
-  ShowShareButtons = false
-
-[[params.socialIcons]]
-  name = "github"
-  url = "https://github.com/sanbika"
-
-[[params.socialIcons]]
-  name = "rss"
-  url = "/index.xml"
+[markup]
+  [markup.highlight]
+    noClasses = false
+    lineNos = false
+    codeFences = true
+    guessSyntax = false

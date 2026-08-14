@@ -5,8 +5,6 @@ draft: false
 comments: true
 ---
 
-# 你好，我是 sanbika
-
 这里写一段自我介绍。Markdown 全部支持：列表、引用、代码块、表格。
 
 ## 工作与兴趣

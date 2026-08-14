@@ -1,0 +1,55 @@
+/* ---------------------------------------------------------------------------
+ * Site-level overrides for PaperMod
+ * Kept intentionally small: brand color, CJK font stack, headline rhythm,
+ * and a slightly narrower reading width for CJK content.
+ * --------------------------------------------------------------------------- */
+
+/* --- Brand color (Cranberry red) --------------------------------------------
+ * Light mode:  #9B1D20  (deep cranberry)
+ * Dark mode:   #E15D68  (lighter, AA-readable on PaperMod dark background)
+ * ------------------------------------------------------------------------- */
+:root {
+  --primary: #9B1D20;
+  --main-width: 760px;
+}
+
+:root[data-theme="dark"] {
+  --primary: #E15D68;
+}
+
+/* --- CJK font stack --------------------------------------------------------
+ * Applies to body and inline code so Chinese/Japanese/Korean text renders
+ * with native system fallbacks (PingFang SC on macOS, Microsoft YaHei on
+ * Windows, Source Han Sans SC where installed, etc.).
+ * ------------------------------------------------------------------------- */
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    'Source Han Sans SC', sans-serif;
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family:
+    'Sarasa Mono SC', 'JetBrains Mono', Menlo, Consolas,
+    'PingFang SC', 'Microsoft YaHei', monospace;
+}
+
+/* --- Headline rhythm --------------------------------------------------------
+ * PaperMod default line-height is ~1.2; CJK titles look cramped at that
+ * density, so loosen h1–h3 to 1.4. Body paragraph spacing is nudged slightly
+ * for consistent vertical rhythm between CJK and Latin text.
+ * ------------------------------------------------------------------------- */
+h1,
+h2,
+h3 {
+  line-height: 1.4;
+}
+
+.post-content p,
+.first-entry .entry-content p {
+  margin-bottom: 1.1em;
+}

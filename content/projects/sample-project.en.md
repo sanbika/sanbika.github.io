@@ -9,8 +9,6 @@ weight: 1
 comments: true
 ---
 
-# Sample Project
-
 Write a detailed project description here.
 
 ## Goals

@@ -5,8 +5,6 @@ draft: false
 comments: true
 ---
 
-# Hi, I'm sanbika
-
 Brief self-introduction here.
 
 ## Work & Interests

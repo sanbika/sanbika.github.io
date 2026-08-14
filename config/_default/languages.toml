@@ -1,13 +1,23 @@
 [zh-cn]
-  languageName = "中文"
+  label = "中文"
   weight = 1
   title = "浆果丛林"
   [zh-cn.params]
     description = "浆果丛林 —— 个人主页与博客"
+    [zh-cn.params.homeInfoParams]
+      Title = "你好，我是 sanbika 👋"
+      Content = """欢迎来到 **浆果丛林** —— 这里记录我在工程与日常中的一些小探索。
+主要写 Hugo / 静态站、命令行工具，以及偶尔的随笔。
+希望这些笔记对你也有用，欢迎通过下方链接找我聊聊。"""
 
 [en]
-  languageName = "English"
+  label = "English"
   weight = 2
   title = "Berry Jungle"
   [en.params]
     description = "Berry Jungle — personal site and blog"
+    [en.params.homeInfoParams]
+      Title = "Hi, I'm sanbika 👋"
+      Content = """Welcome to **Berry Jungle** — a small log of my explorations in engineering and everyday tools.
+Mostly notes on Hugo / static sites, command-line utilities, and the occasional essay.
+Hope you find something useful here — feel free to reach out via the links below."""
