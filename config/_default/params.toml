@@ -7,6 +7,8 @@
   ShowBreadCrumbs = true
   enableSearch = true
   searchLimit = 10
+  mainSections = ["posts"]
+  displayFullLangName = true
 
 # 评论（Giscus）
 [params.comments]

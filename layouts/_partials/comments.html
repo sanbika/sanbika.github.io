@@ -10,7 +10,7 @@
         data-emit-metadata="0"
         data-input-position="bottom"
         data-theme="light"
-        data-lang="zh-CN"
+        data-lang="{{ cond (eq .Lang "en") "en" "zh-CN" }}"
         data-light-theme="{{ .Site.Params.comments.giscus.lighttheme }}"
         data-dark-theme="{{ .Site.Params.comments.giscus.darktheme }}"
         crossorigin="anonymous"
