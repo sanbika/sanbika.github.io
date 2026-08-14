@@ -3,14 +3,8 @@
   "checkpoint_id": "01M00E0K74NSQGTGY8DEZHH8WW",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 1,
-  "files_touched": [
-    "config/_default/params.toml",
-    "content/projects/sample-project.en.md",
-    "content/search.md",
-    "i18n/zh-cn.yaml",
-    "layouts/_partials/comments.html"
-  ],
+  "checkpoints_count": 2,
+  "files_touched": null,
   "sessions": [
     {
       "metadata": "/0/metadata.json",
@@ -21,10 +15,10 @@
     }
   ],
   "token_usage": {
-    "input_tokens": 22969,
+    "input_tokens": 40453,
     "cache_creation_tokens": 0,
-    "cache_read_tokens": 18752,
-    "output_tokens": 9536,
+    "cache_read_tokens": 88512,
+    "output_tokens": 3085,
     "api_call_count": 6
   }
 }
