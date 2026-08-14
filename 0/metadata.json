@@ -1,0 +1,68 @@
+{
+  "cli_version": "0.9.0",
+  "checkpoint_id": "01M00HDXW91HBK8ENV32ERH169",
+  "session_id": "01a000cc-b8e8-73dd-a84c-2760a9c7c191",
+  "strategy": "manual-commit",
+  "created_at": "2026-08-14T16:24:38.237320042Z",
+  "branch": "main",
+  "checkpoints_count": 4,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Pi",
+  "model": "glm-5.2",
+  "turn_id": "f933723b22ea",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 125297,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 300544,
+    "output_tokens": 21322,
+    "api_call_count": 23
+  },
+  "session_metrics": {
+    "turn_count": 6
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 4347,
+      "user_lines_removed": 0,
+      "agent_lines_added": 25,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".codegraph/.gitignore": 5,
+        ".pi/.gitignore": 1,
+        ".pi/.pisquad/.gitignore": 1,
+        ".pi/.pisquad/state.json": 10,
+        ".pi/agents/archivist.md": 54,
+        ".pi/agents/planner.md": 38,
+        ".pi/agents/reviewer.md": 36,
+        ".pi/agents/scout.md": 51,
+        ".pi/agents/worker.md": 25,
+        ".pi/extensions/codegraph/.gitignore": 1,
+        ".pi/extensions/codegraph/README.md": 40,
+        ".pi/extensions/codegraph/index.ts": 324,
+        ".pi/extensions/codegraph/package-lock.json": 1838,
+        ".pi/extensions/codegraph/package.json": 8,
+        ".pi/extensions/entire/index.ts": 127,
+        ".pi/extensions/subagent/agents.ts": 140,
+        ".pi/extensions/subagent/index.ts": 1125,
+        ".pi/extensions/wikilink-lint/index.ts": 93,
+        ".pi/extensions/wikilink-lint/lint.ts": 109,
+        ".pi/skills/project-docs/SKILL.md": 20,
+        ".pi/skills/workflow/SKILL.md": 36,
+        ".pi/skills/workflow/orchestration.md": 78,
+        "codegraph.json": 3,
+        "docs/README.md": 27,
+        "docs/architecture/README.md": 10,
+        "docs/architecture/decisions/README.md": 18,
+        "docs/architecture/overview.md": 15,
+        "docs/conventions/README.md": 16,
+        "docs/current-state.md": 31,
+        "docs/glossary.md": 9,
+        "docs/prds/README.md": 27,
+        "docs/tasks/README.md": 31
+      }
+    }
+  ]
+}
