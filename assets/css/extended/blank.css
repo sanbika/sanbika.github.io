@@ -18,21 +18,6 @@
   --primary: #9B9BF5;
 }
 
-/* --- Pixel-draw color for the quest card frame ------------------------------
- * --pix shares the brand palette with --primary but stays a distinct token so
- * the pixel border can be retuned (slightly darker/lighter, or per-card hue)
- * without affecting the rest of the site. Light uses the brand purple; dark
- * uses the lighter AA-readable brand purple so the dashed pattern stays
- * visible against PaperMod's near-black card background.
- * ------------------------------------------------------------------------- */
-:root {
-  --pix: #5B5BD6;
-}
-
-:root[data-theme="dark"] {
-  --pix: #9B9BF5;
-}
-
 /* --- CJK font stack --------------------------------------------------------
  * Applies to body and inline code so Chinese/Japanese/Korean text renders
  * with native system fallbacks (PingFang SC on macOS, Microsoft YaHei on
@@ -107,48 +92,54 @@ h3 {
 }
 
 /* --- Home Spark "quest card" ------------------------------------------------
- * Reads site.Data.daily_spark via layouts/index.html. The card is styled
- * like a game-quest ticket: a brand-color strip header ("地球ONLINE · 每日任务"
- * / "EARTH ONLINE · DAILY QUEST") carries the date + task id, then a clean
- * body holds the badge / title / task / meta. The whole frame is wrapped
- * in a pixel-art dashed border via border-image — a single dashed language
- * for the whole card, no internal perforation between strip and body.
- * Light/dark mode is handled by reading --primary (overridden to brand
- * purple at the top of this file) and --theme / --secondary from PaperMod's
- * theme-vars.css, so no dark-mode selectors are needed for the card itself.
+ * Reads site.Data.daily_spark via layouts/index.html. A clean, modern card:
+ * a thin secondary-color label row at the top (brand + localized date +
+ * #MMDD id), a 1px border separator, then a kicker / title / task / meta
+ * body. Rounded corners (var(--radius)), 1px var(--border) frame,
+ * var(--theme) background. On hover the border tints to --primary and the
+ * background nudges toward a barely-there indigo (4% / 6% alpha in light /
+ * dark mode) — the entire affordance is restrained color, no motion.
+ * border-color / background-color transition at 0.25s ease. Light/dark
+ * handled by reading --primary / --secondary / --border / --theme / --radius
+ * from PaperMod's theme-vars.css; the hover background needs an explicit
+ * rgba pair because the tint should not be derived from --theme (which
+ * is white in light / dark gray in dark, two very different bases).
  * ------------------------------------------------------------------------- */
 
-/* Card frame: pixel-art dashed border via border-image. The plain
- * `border: 2px solid transparent` reserves 2px on each side for the
- * border-image to draw into (without it, the dashed pattern would push
- * the strip + body 2px inwards on hover-only and jiggle the layout).
- * border-radius is forced to 0 because border-image and border-radius
- * don't compose — a rounded card would clip the pixel dashes into
- * unreadable corners. The dashed pattern (6px dash + 5px gap) flips
- * to a solid var(--pix) on hover; no transition, no transform, so
- * prefers-reduced-motion doesn't need a special case.
+/* Card frame: rounded, 1px outline, themed background. overflow: hidden
+ * keeps the strip's border-bottom flush with the rounded corners (a child
+ * element's border would otherwise extend past the parent's radius).
+ * transition covers the hover color shifts only — no transform / motion
+ * is involved, so prefers-reduced-motion is a non-issue here.
  */
 .home-spark {
-  border: 2px solid transparent;
-  border-image: repeating-linear-gradient(
-    90deg,
-    var(--pix) 0 6px,
-    transparent 6px 11px
-  ) 2;
-  border-radius: 0;
+  position: relative;
   overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--theme);
+  transition: border-color 0.25s ease, background-color 0.25s ease;
 }
 
+/* Hover tint: border shifts to brand purple; background picks up a
+ * barely-there indigo so the card "lifts" subtly without becoming loud.
+ * Kept extremely restrained (4% alpha light / 6% alpha dark) — at this
+ * density it's a tone-on-tone warmth, not a fill.
+ */
 .home-spark:hover {
-  border-image: linear-gradient(var(--pix), var(--pix)) 2;
+  border-color: var(--primary);
+  background: rgba(91, 91, 214, 0.04);
 }
 
-/* Strip header: solid brand color background, white-in-light / dark-in-dark
- * text via var(--theme) so dark mode auto-flips without an override. Square
- * corners to match the pixel frame; the dashed perforation that used to sit
- * between strip and body is gone — the pixel border on the card itself is
- * the only dashed language now, so two dashed rules on one card would just
- * compete.
+[data-theme="dark"] .home-spark:hover {
+  background: rgba(155, 155, 245, 0.06);
+}
+
+/* Strip header: a plain typography row, not a solid brand bar. Brand
+ * label on the left ("地球ONLINE · 每日任务" / "EARTH ONLINE · DAILY
+ * QUEST", uppercased on English pages), localized date + #MMDD id on
+ * the right. A 1px border-bottom separates it from the body; the card's
+ * overflow: hidden keeps that line flush with the rounded corners.
  */
 .home-spark__strip {
   display: flex;
@@ -156,19 +147,21 @@ h3 {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 0.4em 1em;
-  padding: 0.7em 1.2em;
-  background: var(--primary);
-  color: var(--theme);
-  font-size: 0.78em;
-  font-weight: 600;
+  padding: 0.85em 1.2em;
+  font-size: 0.75em;
   letter-spacing: 0.08em;
-  border-radius: 0;
+  color: var(--secondary);
+  border-bottom: 1px solid var(--border);
 }
 
 .home-spark__strip-brand {
   /* "地球ONLINE · 每日任务" / "EARTH ONLINE · DAILY QUEST" — fixed label
    * so the brand always shows up top, regardless of which quest loads. */
   white-space: normal;
+}
+
+.home-spark__strip-brand:lang(en) {
+  text-transform: uppercase;
 }
 
 /* Right group: localized date + task id (e.g. #0815 from MMDD). tabular-nums
@@ -182,37 +175,37 @@ h3 {
   letter-spacing: 0.06em;
 }
 
-.home-spark__id {
-  opacity: 0.85;
-}
-
-/* Body: var(--gap) padding matches the surrounding grid rhythm; the only
- * colored surface here is the brand-color badge chip, all other text
- * inherits page foreground.
+/* Body: var(--gap) padding matches the surrounding grid rhythm. Explicit
+ * margins (no flex gap) so the kicker sits close to the title, the title
+ * + task + meta share a comfortable rhythm, and the spec's "small
+ * margin-bottom" on the kicker lands as written.
  */
 .home-spark__body {
   padding: var(--gap);
-  display: flex;
-  flex-direction: column;
-  gap: 0.8em;
 }
 
-/* Type chip: text-only label, no background fill. The brand-color 1px
- * border plus the card's pixel frame form a coherent two-tier outline;
- * text color picks --primary (brand purple) so the chip reads as "tagged
- * with the brand", not as a generic grey label. Square corners to match
- * the rest of the card.
+/* Kicker: the tag (e.g. "创造" / "Creating") becomes a small brand-purple
+ * badge above the title — a translucent chip with rounded corners, not
+ * an outlined pill. Light / dark each get an explicit rgba so the tint
+ * reads on both backgrounds (a single --primary mix wouldn't, because
+ * the chip sits on --theme which is white in light, dark gray in dark).
+ * Colors are hard-coded to the brand swatches for the same reason.
  */
-.home-spark__badge {
-  align-self: flex-start;
+.home-spark__kicker {
   display: inline-block;
-  padding: 0.12em 0.55em;
-  border: 1px solid var(--pix);
-  border-radius: 0;
-  font-size: 0.78em;
+  margin: 0 0 0.35em;
+  padding: 0.15em 0.6em;
+  border-radius: 4px;
+  background: rgba(91, 91, 214, 0.14);
+  color: #5B5BD6;
+  font-size: 0.8em;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--primary);
+  letter-spacing: 0.05em;
+}
+
+[data-theme="dark"] .home-spark__kicker {
+  background: rgba(155, 155, 245, 0.18);
+  color: #9B9BF5;
 }
 
 /* Title: zh gets 「」 quotes via the template, en stays bare. Brand-color
@@ -220,7 +213,7 @@ h3 {
  * a single orphan character.
  */
 .home-spark__title {
-  margin: 0;
+  margin: 0 0 0.5em;
   font-size: 1.55em;
   font-weight: 700;
   line-height: 1.3;
@@ -230,7 +223,7 @@ h3 {
 }
 
 .home-spark__task {
-  margin: 0;
+  margin: 0 0 0.5em;
   color: var(--secondary);
   font-size: 1.02em;
   line-height: 1.65;
@@ -249,11 +242,18 @@ h3 {
 /* Empty-state card: keeps the strip frame but trims the right side
  * (no date / no id without a real quest). Title is slightly smaller so
  * it doesn't shout "your daily is missing" any louder than the copy.
- * Pixel border + square corners come from the shared .home-spark rules
- * above — this class only tweaks the title size.
+ * Rounded frame + themed background come from the shared .home-spark
+ * rules above — this class only tweaks the title size.
  */
 .home-spark--empty .home-spark__title {
   font-size: 1.3em;
+}
+
+.home-spark--empty .home-spark__task {
+  /* No __meta follows in the empty state, so the shared 0.5em margin-bottom
+   * would leave an off-rhythm gap at the bottom of the card. Collapse it
+   * so the body's padding-bottom is the only spacing below the task. */
+  margin-bottom: 0;
 }
 
 /* --- Spark check-in block ---------------------------------------------------
