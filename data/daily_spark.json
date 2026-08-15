@@ -1,0 +1,15 @@
+{
+  "date": "2026-08-15",
+  "tag": {
+    "zh": "生活",
+    "en": "Life"
+  },
+  "zh": {
+    "title": "给植物擦叶子",
+    "task": "选一盆绿植，用湿布轻轻擦亮每片叶子，顺便观察叶脉和气孔。"
+  },
+  "en": {
+    "title": "Wipe Plant Leaves",
+    "task": "Pick one houseplant, gently wipe each leaf with a damp cloth and notice the veins up close."
+  }
+}

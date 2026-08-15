@@ -53,3 +53,51 @@ h3 {
 .first-entry .entry-content p {
   margin-bottom: 1.1em;
 }
+
+/* --- Daily Spark card ------------------------------------------------------
+ * Sits below home-info on the homepage. Renders site.Data.daily_spark
+ * (written by .github/workflows/daily-spark.yml). Uses theme tokens so it
+ * tracks light/dark mode automatically.
+ * ------------------------------------------------------------------------- */
+.daily-spark {
+  margin-top: 1.6em;
+  padding: 1em 1.2em;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.daily-spark__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1em;
+  margin-bottom: 0.6em;
+  color: var(--secondary);
+  font-size: 0.85em;
+  letter-spacing: 0.02em;
+}
+.daily-spark__label { font-weight: 600; }
+.daily-spark__date { font-variant-numeric: tabular-nums; }
+.daily-spark__body { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6em 0.8em; }
+.daily-spark__tag {
+  display: inline-block;
+  padding: 0.12em 0.7em;
+  border: 1px solid var(--primary);
+  border-radius: 999px;
+  color: var(--primary);
+  font-size: 0.78em;
+  font-weight: 600;
+  line-height: 1.6;
+}
+.daily-spark__title {
+  margin: 0;
+  font-size: 1.05em;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.daily-spark__task {
+  margin: 0;
+  flex-basis: 100%;
+  color: var(--secondary);
+  font-size: 0.95em;
+  line-height: 1.55;
+}

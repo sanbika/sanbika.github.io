@@ -1,0 +1,80 @@
+name: Generate Daily Spark
+
+on:
+  schedule:
+    - cron: '10 16 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: daily-spark
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Sync with main
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main
+
+      - name: Generate daily spark
+        env:
+          MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
+          MINIMAX_BASE_URL: ${{ vars.MINIMAX_BASE_URL || 'https://api.minimaxi.com' }}
+          MINIMAX_MODEL: ${{ vars.MINIMAX_MODEL || 'MiniMax-M2' }}
+        run: python3 scripts/daily_spark.py
+
+      - name: Stage spark files
+        run: |
+          git add data/daily_spark.json data/daily_spark_history.json
+          git status --short
+
+      - name: Check for changes
+        id: check
+        run: |
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push
+        id: push
+        if: steps.check.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          DATE=$(TZ=Asia/Shanghai date +%Y-%m-%d)
+          git commit -m "chore: daily spark ${DATE}"
+          if git push origin HEAD:main; then
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "[daily-spark] push failed, retrying once after rebase..." >&2
+          git pull --rebase origin main
+          git push origin HEAD:main && echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger Hugo deploy
+        if: steps.push.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run hugo.yml --ref main
