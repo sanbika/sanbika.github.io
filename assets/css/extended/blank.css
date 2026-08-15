@@ -91,76 +91,126 @@ h3 {
   top: calc(var(--header-height, 60px) + var(--gap) + 0.5rem);
 }
 
-/* --- Home Spark hero card ---------------------------------------------------
- * Reads site.Data.daily_spark via layouts/index.html. Theme tokens only,
- * so the card inherits PaperMod's light/dark palette automatically.
+/* --- Home Spark "quest card" ------------------------------------------------
+ * Reads site.Data.daily_spark via layouts/index.html. The card is styled
+ * like a game-quest ticket: a brand-color strip header ("地球ONLINE · 每日任务"
+ * / "EARTH ONLINE · DAILY QUEST") carries the date + task id, then a
+ * perforated dashed rule separates it from the body (badge / title /
+ * task / meta / accept CTA). Light/dark mode is handled by reading
+ * --primary (overridden to brand purple at the top of this file) and
+ * --theme / --border / --secondary from PaperMod's theme-vars.css, so
+ * no dark-mode selectors are needed for the card itself.
  * ------------------------------------------------------------------------- */
+
+/* Card frame: border + radius, no explicit background (inherits page bg
+ * so the strip's brand color is the only saturated block). overflow:hidden
+ * clips the strip's top corners to the card's --radius without forcing
+ * two more border-radius declarations on the strip itself. The hover lift
+ * is a transform + box-shadow + border-color swap, with the transform
+ * disabled under prefers-reduced-motion.
+ */
 .home-spark {
-  padding: 1.4em 1.5em 1.6em;
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-/* Hero meta row: eyebrow label + tag pill on the left, localized date on
- * the right. flex-wrap so eyebrow + pill stay together on narrow widths.
+.home-spark:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-color: var(--primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-spark:hover {
+    transform: none;
+  }
+}
+
+/* Strip header: solid brand color background, white-in-light / dark-in-dark
+ * text via var(--theme) so dark mode auto-flips without an override. The
+ * dashed border-bottom is the "ticket perforation" separating header
+ * from body — visible on the saturated strip in both color modes.
  */
-.home-spark__head {
+.home-spark__strip {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 0.6em 1em;
-  margin-bottom: 1em;
-  color: var(--secondary);
-  font-size: 0.82em;
-  letter-spacing: 0.02em;
-}
-
-.home-spark__head-left {
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.6em;
-  min-width: 0;
-}
-
-/* Kicker label (the fixed "今日小火花" / "Daily Spark" brand line).
- * English pages uppercase via :lang() so CJK stays untouched.
- */
-.home-spark__eyebrow {
-  font-size: 0.95em;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: none;
-  color: var(--secondary);
-}
-
-.home-spark__eyebrow:lang(en) {
-  text-transform: uppercase;
-}
-
-.home-spark__tag {
-  display: inline-block;
-  padding: 0.14em 0.8em;
-  border: 1px solid var(--primary);
-  border-radius: 999px;
-  color: var(--primary);
+  gap: 0.4em 1em;
+  padding: 0.7em 1.2em;
+  background: var(--primary);
+  color: var(--theme);
   font-size: 0.78em;
   font-weight: 600;
-  line-height: 1.6;
+  letter-spacing: 0.08em;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.4);
 }
 
-.home-spark__date {
+.home-spark__strip-brand {
+  /* "地球ONLINE · 每日任务" / "EARTH ONLINE · DAILY QUEST" — fixed label
+   * so the brand always shows up top, regardless of which quest loads. */
+  white-space: normal;
+}
+
+/* Right group: localized date + task id (e.g. #0815 from MMDD). tabular-nums
+ * keeps the digits aligned so the id feels "machine-stamped".
+ */
+.home-spark__strip-right {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.7em;
   font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
 }
 
-/* The daily challenge title (e.g. 水果拼盘大作战). text-wrap: balance
- * evens out ragged lines on long Chinese titles; the -webkit- prefix
- * covers older Safari and is harmlessly ignored where unsupported.
+.home-spark__id {
+  opacity: 0.85;
+}
+
+/* Body: var(--gap) padding matches the surrounding grid rhythm; the only
+ * colored surface here is the badge (a soft pill in --theme), all other
+ * text inherits page foreground.
+ */
+.home-spark__body {
+  padding: var(--gap);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+}
+
+/* Type pill: emoji + label. background: var(--theme) keeps it "clean"
+ * (same as page bg) so the border alone provides the pill shape; on dark
+ * mode --theme flips to PaperMod's near-black, keeping the outline-only
+ * look intact without an explicit override.
+ */
+.home-spark__badge {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.18em 0.7em;
+  background: var(--theme);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.82em;
+  font-weight: 600;
+  color: var(--secondary);
+}
+
+.home-spark__badge-emoji {
+  font-size: 1.05em;
+  line-height: 1;
+}
+
+/* Title: zh gets 「」 quotes via the template, en stays bare. Brand-color
+ * text wraps with text-wrap: balance so long Chinese titles don't end on
+ * a single orphan character.
  */
 .home-spark__title {
-  margin: 0 0 0.4em;
-  font-size: 1.6em;
+  margin: 0;
+  font-size: 1.55em;
   font-weight: 700;
   line-height: 1.3;
   color: var(--primary);
@@ -171,10 +221,53 @@ h3 {
 .home-spark__task {
   margin: 0;
   color: var(--secondary);
-  font-size: 1.05em;
+  font-size: 1.02em;
   line-height: 1.65;
 }
 
+/* Meta row: a single inline line ("⏱ time"). Plain inline flow is
+ * enough — no flex, no separator ::after, no item wrapper class.
+ */
+.home-spark__meta {
+  margin: 0;
+  color: var(--secondary);
+  font-size: 0.85em;
+  letter-spacing: 0.02em;
+}
+
+/* CTA: pill-shaped outline button. Hover fills with brand color; text
+ * uses var(--theme) (white in light, near-black in dark) so dark mode
+ * gets dark text on the lighter #9B9BF5 background for AA contrast
+ * instead of unreadable white-on-light-purple.
+ */
+.home-spark__cta {
+  align-self: flex-start;
+  display: inline-block;
+  padding: 0.5em 1.3em;
+  margin-top: 0.2em;
+  border: 1px solid var(--primary);
+  border-radius: 999px;
+  color: var(--primary);
+  font-size: 0.9em;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.home-spark__cta:hover {
+  background: var(--primary);
+  color: var(--theme);
+}
+
+.home-spark__cta:focus-visible {
+  outline: 2px dashed var(--primary);
+  outline-offset: 2px;
+}
+
+/* Empty-state card: keeps the new strip frame but trims the right side
+ * (no date / no id without a real quest). Title is slightly smaller so
+ * it doesn't shout "your daily is missing" any louder than the copy.
+ */
 .home-spark--empty .home-spark__title {
   font-size: 1.3em;
 }
@@ -271,7 +364,9 @@ h3 {
  * Below 768px the sidebar stacks under the main column.
  * sticky is also disabled: a single-column page has nowhere for the
  * sidebar to "stick" relative to, and inherited top offsets would leave
- * a visible gap above the cards.
+ * a visible gap above the cards. The quest card's strip header and meta
+ * row already use flex-wrap; nothing extra is needed there — the items
+ * just fall to a second line as the column narrows.
  * ------------------------------------------------------------------------- */
 @media (max-width: 768px) {
   .home-layout {

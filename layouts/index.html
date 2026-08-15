@@ -3,8 +3,8 @@
   Layout:
     .home-layout
       .home-main
-        .home-spark     (Daily Spark hero, with placeholder fallback)
-        .spark-checkin  (Giscus per-day check-in thread)
+        .home-spark     (Daily Spark "quest card" with strip header + body)
+        .spark-checkin  (Giscus per-day check-in thread, id="checkin")
       .home-side
         .home-side__card  (Recent Posts, top 5)
         .home-side__card  (social icons)
@@ -32,53 +32,81 @@
 {{- $headline := cond (eq $langKey "en") "Daily Spark" "地球Online · 今日隐藏任务" -}}
 {{- $checkinLabel := cond (eq $langKey "en") "Check in Today" "今日打卡" -}}
 {{- $recentLabel := cond (eq $langKey "en") "Recent Posts" "最近文章" -}}
+{{- /* Strip + meta copy is constant per language; compute once so both
+       the data and the empty-state branches reuse the same strings. */ -}}
+{{- $stripLabel := cond (eq $langKey "en") "EARTH ONLINE · DAILY QUEST" "地球ONLINE · 每日任务" -}}
+{{- $timeLabel := cond (eq $langKey "en") "15-30 min" "约15-30分钟" -}}
+{{- $ctaLabel := cond (eq $langKey "en") "Accept Quest ↓" "接取任务 ↓" -}}
 
 <div class="home-layout">
   <div class="home-main">
     {{- if $sparkOK -}}
       {{- $tag := index $spark.tag $langKey -}}
-      {{- $title := index (index $spark $langKey) "title" -}}
+      {{- $titleRaw := index (index $spark $langKey) "title" -}}
       {{- $task := index (index $spark $langKey) "task" -}}
-      {{- /* time.ParseInLocation("2006-01-02") — see blank.css for the formatted display rules. */ -}}
       {{- $dateParsed := time $spark.date -}}
 
+      {{- /* 任务编号：日期去横线取末 4 位（YYYY-MM-DD → MMDD）。
+             跨语言/构建结果一致，方便玩家「存档位」感。 */ -}}
+      {{- $idRaw := replace $spark.date "-" "" -}}
+      {{- $idLast4 := substr $idRaw 4 4 -}}
+
+      {{- /* emoji 按 tag.zh 类别映射；标签文字本身走 $langKey（en 页用 "Life/Learning/..."），
+             emoji 统一不变以保持视觉锚点。 */ -}}
+      {{- $emojiMap := dict "生活" "🏠" "学习" "📚" "创造" "🎨" "运动" "🏃" -}}
+      {{- $emoji := index $emojiMap $spark.tag.zh -}}
+
+      {{- /* zh 用「」包裹标题；en 保持裸标题（英文带引号会很怪）。 */ -}}
+      {{- $titleDisplay := cond (eq $langKey "en") $titleRaw (printf "「%s」" $titleRaw) -}}
+
       <section class="home-spark" aria-label="{{ $headline }}">
-        <header class="home-spark__head">
-          <span class="home-spark__head-left">
-            <span class="home-spark__eyebrow">{{ $headline }}</span>
-            <span class="home-spark__tag">{{ $tag }}</span>
+        <header class="home-spark__strip">
+          <span class="home-spark__strip-brand">{{ $stripLabel }}</span>
+          <span class="home-spark__strip-right">
+            <time class="home-spark__date" datetime="{{ $spark.date }}">
+              {{- if eq $langKey "en" -}}
+              {{ $dateParsed.Format "Jan 2" }}
+              {{- else -}}
+              {{ printf "%d月%d日" $dateParsed.Month $dateParsed.Day }}
+              {{- end -}}
+            </time>
+            <span class="home-spark__id">#{{ $idLast4 }}</span>
           </span>
-          <time class="home-spark__date" datetime="{{ $spark.date }}">
-            {{- if eq $langKey "en" -}}
-            {{ $dateParsed.Format "Jan 2" }}
-            {{- else -}}
-            {{ printf "%d月%d日" $dateParsed.Month $dateParsed.Day }}
-            {{- end -}}
-          </time>
         </header>
-        <h2 class="home-spark__title">{{ $title }}</h2>
-        <p class="home-spark__task">{{ $task }}</p>
+        <div class="home-spark__body">
+          <span class="home-spark__badge">
+            <span class="home-spark__badge-emoji" aria-hidden="true">{{ $emoji }}</span>
+            {{ $tag }}
+          </span>
+          <h2 class="home-spark__title">{{ $titleDisplay }}</h2>
+          <p class="home-spark__task">{{ $task }}</p>
+          <p class="home-spark__meta"><span aria-hidden="true">⏱</span> {{ $timeLabel }}</p>
+          <a class="home-spark__cta" href="#checkin">{{ $ctaLabel }}</a>
+        </div>
       </section>
     {{- else -}}
+      {{- /* 空态：套用新 strip 结构（仅品牌在左，无日期/编号），正文保留旧文案。 */ -}}
       <section class="home-spark home-spark--empty" aria-label="{{ $headline }}">
-        <header class="home-spark__head">
-          <span class="home-spark__eyebrow">{{ $headline }}</span>
+        <header class="home-spark__strip">
+          <span class="home-spark__strip-brand">{{ $stripLabel }}</span>
         </header>
-        <h2 class="home-spark__title">
-          {{- if eq $langKey "en" -}}No quest today{{- else -}}今日任务未刷新{{- end -}}
-        </h2>
-        <p class="home-spark__task">
-          {{- if eq $langKey "en" -}}
-          The quest system is taking a day off — check back tomorrow.
-          {{- else -}}
-          今日任务打盹中，明天再来接单。
-          {{- end -}}
-        </p>
+        <div class="home-spark__body">
+          <h2 class="home-spark__title">
+            {{- if eq $langKey "en" -}}No quest today{{- else -}}今日任务未刷新{{- end -}}
+          </h2>
+          <p class="home-spark__task">
+            {{- if eq $langKey "en" -}}
+            The quest system is taking a day off — check back tomorrow.
+            {{- else -}}
+            今日任务打盹中，明天再来接单。
+            {{- end -}}
+          </p>
+        </div>
       </section>
     {{- end -}}
 
     {{- if $sparkOK -}}
-    <section class="spark-checkin" aria-label="{{ $checkinLabel }}">
+    <section class="spark-checkin" id="checkin" aria-label="{{ $checkinLabel }}">
       <h3 class="spark-checkin__heading">{{ $checkinLabel }}</h3>
       {{- partial "spark_comments.html" (dict "page" . "date" $spark.date) -}}
     </section>
