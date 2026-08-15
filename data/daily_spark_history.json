@@ -13,5 +13,20 @@
       "title": "Fruit Arrangement Art",
       "task": "Arrange at least 3 seasonal fruits into a creative pattern, snap a photo"
     }
+  },
+  {
+    "date": "2026-08-16",
+    "tag": {
+      "zh": "生活",
+      "en": "Life"
+    },
+    "zh": {
+      "title": "发现日常角落",
+      "task": "在家附近找一个从未注意过的角落或小路，用手机记录5个有趣的细节"
+    },
+    "en": {
+      "title": "Discover hidden corners",
+      "task": "Walk to an unexplored spot near your home and capture 5 interesting details you've never noticed before with your phone"
+    }
   }
 ]

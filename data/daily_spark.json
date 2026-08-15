@@ -1,15 +1,15 @@
 {
-  "date": "2026-08-15",
+  "date": "2026-08-16",
   "tag": {
-    "zh": "创造",
-    "en": "Creating"
+    "zh": "生活",
+    "en": "Life"
   },
   "zh": {
-    "title": "水果拼盘大作战",
-    "task": "找出家里至少3种当季水果，发挥想象力摆一个有趣的拼盘，拍照留念"
+    "title": "发现日常角落",
+    "task": "在家附近找一个从未注意过的角落或小路，用手机记录5个有趣的细节"
   },
   "en": {
-    "title": "Fruit Arrangement Art",
-    "task": "Arrange at least 3 seasonal fruits into a creative pattern, snap a photo"
+    "title": "Discover hidden corners",
+    "task": "Walk to an unexplored spot near your home and capture 5 interesting details you've never noticed before with your phone"
   }
 }
