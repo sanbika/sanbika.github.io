@@ -160,3 +160,30 @@ tag 的 zh 固定为 生活/学习/创造/运动 之一，en 对应 Life/Learnin
 【5. 验证】hugo -d /tmp/spark-verify：① 中英首页 home-info 内都渲染出 daily-spark 卡片且文案随语言切换；② 无数据场景（临时移走 data 文件再构建）不报错；③ CSS bundle 含 daily-spark；④ 构建无新警告。通过后提交：`feat: 首页「今日小火花」每日挑战卡片（MiniMax + Actions 自动生成）`。不推送。
 
 【汇报】① 文件清单；② 验证结果；③ 需要用户做的：在仓库 Settings→Secrets→Actions 添加 MINIMAX_API_KEY（可选 vars：MINIMAX_BASE_URL / MINIMAX_MODEL），然后手动 Run workflow 一次验证；④ 潜在风险（cron 延迟、生成失败时卡片停留昨日、GitHub 60 天不活跃会停用 schedule 等）。
+
+---
+
+可以看到了，但是这个可以和之前添加的评论功能结合起来吗？而且首页感觉可以不用放自我介绍一类的了，文章列表也不想放在下面，是不是可以有什么侧列表？帮我重新调整下布局和样式。
+
+---
+
+Task: 仓库：/home/sankabox/code/sanbika.github.io（Hugo 0.164 + PaperMod 双语：zh-cn 根路径 / en 在 /en/，品牌色 #db5079/#ef7fa4）。任务：首页改版。铁律：不碰 themes/、docs/；构建只写 /tmp；所有新建/改动的文本文件末尾补换行符。
+
+【目标布局】首页不再显示 home-info 自我介绍与文章列表；改为：主列 = 「今日小火花」大卡片（hero）+ 下方 Giscus 每日打卡评论区；侧栏 = 最近文章（前5篇）+ 社交图标。手机端（<768px）侧栏堆叠到主列下方。
+
+【1. layouts/index.html（新建，站点级覆盖，只影响首页，/posts/ 等列表页不受影响）】
+- 先读 themes/PaperMod/layouts/list.html 与 baseof.html，沿用相同的 define "main" 结构；
+- 结构：`<div class="home-layout">` 内两列 `<div class="home-main">` 与 `<aside class="home-side">`；
+- 主列：读 site.Data.daily_spark（沿用现有字段 date/tag/zh/en），无数据时渲染占位卡片（不报错）；hero 卡片含：tag 胶囊（品牌色）、日期（右上或 tag 旁）、大号标题（zh/en 按 .Lang 选）、任务句；文案双语：「今日小火花」/「Daily Spark」、「今日打卡」/「Check in Today」（用 cond (eq .Lang "en") 模式，不建 i18n key）；
+- 主列 hero 下方：`{{- partial "spark_comments.html" (dict "page" . "date" $spark.date) -}}`（$spark 无数据时 date 用今天字符串，保证评论区仍在）；
+- 侧栏：「最近文章 / Recent Posts」标题 + 前5篇（where site.RegularPages "Type" "in" site.Params.mainSections，取前5，标题+日期，日期格式 DateFormat），每项链到 .Permalink；下方社交图标：读现有 site.Params.socialIcons，图标 SVG 复用主题渲染方式（先读 themes/PaperMod 里 social_icons 相关 partial，站点级只能新建文件不能改主题，可拷贝其 svg 引用方式或用 name 文本+链接的简化呈现，保持美观）；
+【2. layouts/_partials/spark_comments.html（新建）】
+- 先读现有 layouts/_partials/comments.html，逐字参考其 Giscus 配置（repo/repoId/category/categoryId、light/dark 主题、data-lang 的双语 cond、暗色切换 JS 如有）；唯一区别：data-mapping="specific"、data-term="spark-{{ .date }}"（每天独立话题）；partial 接收 dict（page/date），内部用 $page := .page 取 .Lang；
+- 不动原 comments.html（文章页评论零回归）。
+【3. 配置清理】
+- config/_default/languages.toml：删除 [zh-cn.params.homeInfoParams] 与 [en.params.homeInfoParams] 两段（含 Title/Content）；
+- params.toml：删 disableSpecial1stPost（首页已自定义，死配置）；
+【4. 文件清理】删除 layouts/_partials/home_info.html（覆盖不再使用，首页已不走它）与 layouts/_partials/daily_spark.html（逻辑并入 index.html hero）；
+【5. assets/css/extended/blank.css】
+- 删除旧 .daily-spark 卡片样式块，新增：.home-layout（两列 grid，主列 minmax(0,1fr)、侧栏约 280px，gap 用 --gap；<768px 改单列且侧栏在后）；.home-spark hero（用 --border/--radius/--secondary/--primary 等主题变量，暗色自动适配，标题字号明显大于正文，克制优雅）；.spark-checkin 区块（上方细分隔+小标题）；.home-side 卡片化（border/radius，列表项紧凑 hover 变色）；社交图标行内排布；总量约 60-80 行，不写死背景色（暗色靠变量）。
+【6. 验证】hugo -d /tmp/home-redesign：① 中英首页均无 home-info、无文章列表旧样式，渲染 hero+侧栏，文案随语言；② 无 data 场景（临时移走 data/daily_spark.json 再构建）不报错且有占位；③ /posts/ 列表页、文章页、about、projects、search 全部不受影响（抽查 HTML）；④ CSS bundle 含 home-layout/home-spark；⑤ 无新警告。提交：`feat: 首页改版——每日小火花主位+每日打卡评论+侧栏文章列表`。不推送。汇报：文件清单（含删除）、验证结果、社交图标最终采用的方案。
