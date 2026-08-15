@@ -3,7 +3,7 @@
   "checkpoint_id": "01M02FR3J96Z418061VT91687K",
   "session_id": "01a000cc-b8e8-73dd-a84c-2760a9c7c191",
   "strategy": "manual-commit",
-  "created_at": "2026-08-15T10:33:44.654045326Z",
+  "created_at": "2026-08-15T10:41:16.051149925Z",
   "branch": "main",
   "checkpoints_count": 1,
   "save_step_count": 1,
@@ -13,60 +13,13 @@
   "turn_id": "3c7b681f6cd6",
   "compact_transcript_start": 0,
   "token_usage": {
-    "input_tokens": 422261,
+    "input_tokens": 425430,
     "cache_creation_tokens": 0,
-    "cache_read_tokens": 2736576,
-    "output_tokens": 68072,
-    "api_call_count": 74
+    "cache_read_tokens": 2811392,
+    "output_tokens": 68438,
+    "api_call_count": 75
   },
   "session_metrics": {
     "turn_count": 21
-  },
-  "prompt_attributions": [
-    {
-      "checkpoint_number": 2,
-      "user_lines_added": 4443,
-      "user_lines_removed": 7,
-      "agent_lines_added": 158,
-      "agent_lines_removed": 0,
-      "user_added_per_file": {
-        ".codegraph/.gitignore": 5,
-        ".pi/.gitignore": 1,
-        ".pi/.pisquad/.gitignore": 1,
-        ".pi/.pisquad/state.json": 10,
-        ".pi/agents/archivist.md": 54,
-        ".pi/agents/planner.md": 38,
-        ".pi/agents/reviewer.md": 36,
-        ".pi/agents/scout.md": 51,
-        ".pi/agents/worker.md": 25,
-        ".pi/extensions/codegraph/.gitignore": 1,
-        ".pi/extensions/codegraph/README.md": 40,
-        ".pi/extensions/codegraph/index.ts": 324,
-        ".pi/extensions/codegraph/package-lock.json": 1838,
-        ".pi/extensions/codegraph/package.json": 8,
-        ".pi/extensions/entire/index.ts": 127,
-        ".pi/extensions/subagent/agents.ts": 140,
-        ".pi/extensions/subagent/index.ts": 1125,
-        ".pi/extensions/wikilink-lint/index.ts": 93,
-        ".pi/extensions/wikilink-lint/lint.ts": 109,
-        ".pi/skills/project-docs/SKILL.md": 20,
-        ".pi/skills/workflow/SKILL.md": 36,
-        ".pi/skills/workflow/orchestration.md": 78,
-        "codegraph.json": 3,
-        "docs/README.md": 27,
-        "docs/architecture/README.md": 10,
-        "docs/architecture/decisions/README.md": 18,
-        "docs/architecture/overview.md": 15,
-        "docs/conventions/README.md": 19,
-        "docs/conventions/frontend-styling.md": 7,
-        "docs/current-state.md": 117,
-        "docs/glossary.md": 9,
-        "docs/prds/README.md": 27,
-        "docs/tasks/README.md": 31
-      },
-      "user_removed_per_file": {
-        "docs/conventions/frontend-styling.md": 7
-      }
-    }
-  ]
+  }
 }
