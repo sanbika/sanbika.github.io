@@ -1,0 +1,108 @@
+这个git仓库需要改一下账号和邮箱，刚才的commit不要提交，作者是错的
+
+---
+
+user.name sanbika, 使用GitHub的私密代理邮箱。
+
+---
+
+需要
+
+---
+
+保存好了
+
+---
+
+前端样式上你还有什么优化建议吗
+
+---
+
+Task: 侦察目标：Hugo + PaperMod 双语站点（浆果丛林 / Berry Jungle）的**前端样式现状与优化空间**，彻底度 medium。用户想要一份样式优化建议，我需要你把现状和可调项摸清。只读侦察，不要修改任何文件，构建只能输出到 /tmp。
+
+请调查：
+1. 当前样式相关配置全景：config/_default/params.toml 与 config.toml 里所有 PaperMod 外观参数（profileMode/homeInfoParams、ShowReadingTime、ShowBreadCrumbs、ShowToc、ShowPostNavLinks、ShowCodeCopyButtons、defaultTheme/dark mode、label（logo/图标/文字）、socialIcons、footer 配置等），列出「已开启 / 未开启但主题支持」的清单。
+2. 自定义样式资产：assets/css/extended/ 或 layouts 里的自定义 CSS 是否存在；主题 PaperMod 的 assets/css 结构（core/vars/chroma 之类）里默认字体、行高、内容宽度（.post-content max-width）、中文排版相关设置；当前有没有任何中文专属排版处理（font-family 栈、中英混排间距）。
+3. 首页形态：当前是 list 布局还是 homeInfo/profile？content/_index.md 是否存在、里面配了什么；posts 列表展示样式（摘要/封面/hiddenFromHomePage）。
+4. 内容页观感：hello-world.md / about / projects 的 front matter 里影响样式的字段（cover、ShowToc、tocopen、summary 等）是否缺失；代码高亮配置（markup.highlight / chroma style）有没有设置。
+5. 构建 /tmp 用只读方式检查（hugo -d /tmp/style-audit 允许，因为不写仓库）：抽查首页/文章页/关于页渲染后的 HTML 里 body class（dark/auto）、.main-container 宽度、是否引用 extended css、Google Fonts 或本地字体加载情况。
+6. 输出：① 现状摘要（当前站点长什么样的配置画像）；② 「未用上的 PaperMod 开箱功能」清单；③ 中文/双语排版的具体可改进点（字体栈、字重、行高、标点）；④ 性能/体验类可改进点（字体加载、暗色模式默认值、动画开关）；⑤ 每项给「改动落点」（哪个文件加什么）。不要给主观美学空话，要配置级、可执行的项。
+
+---
+
+用蔓越莓红吧
+
+---
+
+Task: 仓库：/home/sankabox/code/sanbika.github.io（Hugo 0.164 + PaperMod 双语站：zh-cn 默认在根路径、en 在 /en/）。执行一轮前端样式优化。铁律：只改站点级文件（config/、content/、assets/、layouts/、i18n/、static/），严禁碰 themes/ 子模块和 docs/；构建只输出到 /tmp。
+
+【品牌色】蔓越莓红：亮色模式主色 #9B1D20，暗色模式提亮为 #E15D68（保证暗背景可读，你可用目测微调 ±5% 亮度）。
+
+【改动清单】
+A. 中文排版（新建 assets/css/extended/blank.css，PaperMod 官方扩展点）：
+   1) body 字体栈补 CJK：-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue','PingFang SC','Hiragino Sans GB','Microsoft YaHei','Source Han Sans SC',sans-serif；code/pre 补 'Sarasa Mono SC','JetBrains Mono',Menlo,Consolas,monospace；
+   2) 标题行高：h1-h3 line-height 1.4；正文段落间距微调（margin-bottom 1.1em 左右）；
+   3) :root 覆盖 --primary 为蔓越莓红，暗色 [data-theme=dark] 同步覆盖（PaperMod 变量在 theme-vars.css，你先读它确认变量名与暗色选择器再写）；
+   4) 可选微调 --main-width 至 760px（中文行宽）；改动保持克制，不要大改主题视觉。
+B. 首页 homeInfoParams：在 config/_default/languages.toml 里加 [zh-cn.params.homeInfoParams] 与 [en.params.homeInfoParams]（分语言文案）。中文 Title：'你好，我是 sanbika 👋'，Content 两三句简短欢迎语（用 Markdown，风格参照 about 页开头，可从 about 正文提炼）；英文镜像。同时 params.toml 加 disableSpecial1stPost = true（文章列表不再单篇 hero）。注意 socialIcons 已在 config.toml，homeInfo 会自动展示。
+C. 双重 H1 清理：删除正文首个 H1（front matter title 已渲染）：content/about/index.md、content/about/index.en.md、content/projects/sample-project.md、content/projects/sample-project.en.md。
+D. 代码高亮修复：config/_default/config.toml 加 [markup.highlight] noClasses = false（lineNos 可 false），让主题 chroma CSS 生效。
+E. params.toml：加 ShowCodeCopyButtons = true；删 searchLimit = 10（PaperMod 不读该字段）。
+F. 配置收敛：把 config.toml [params] 里的字段（description/author/avatar/DateFormat/socialIcons 等）全部移入 params.toml，config.toml 只留非 params 项（baseURL/title/theme/语言/outputs），消除两处 [params] 重复。
+G. languages.toml：languageName 改为 label（Hugo 0.158+ 新键名，消除弃用警告），两种语言都改。
+H. 品牌色 meta：params.toml 加 [params.assets] theme_color = '#9B1D20'（确认 PaperMod 键名大小写，Hugo TOML 会转小写）。
+I. favicon 404：检查本机是否有 ImageMagick/rsvg 等工具；若有，从 static/images/avatar.jpg 生成 favicon-16x16.png、favicon-32x32.png、apple-touch-icon.png(180x180)、safari-pinned-tab.svg（可直接用 avatar 转换，或简单纯色蔓越莓方块+字母也行）；若无工具则跳过并在汇报中说明。
+J. 不要动：giscus data-lang（现有双语映射正确）、config/production/、主题任何文件、搜索逻辑。
+
+【验证】构建到 /tmp/style-verify（hugo -d，允许 --gc），逐项确认：① CSS bundle 里能搜到 PingFang/蔓越莓红色值；② about/projects 页面只有一个 H1；③ 代码块不再有 inline style，改为 class；④ 首页两种语言都渲染 home-info 卡片、无 first-entry hero；⑤ 构建无 languageName 弃用警告；⑥ /en/ 与中文首页都正常；⑦ favicon 引用的文件全部存在（若做了 I）。全部通过后提交（中文提交信息，风格如：feat: 前端样式优化（中文排版/首页简介/代码高亮/品牌色））。
+
+【汇报】① 改动文件清单；② 每项验证结果；③ 跳过/未完成项及原因（尤其 favicon 工具情况）；④ 需要用户后续替换的占位（如首页简介文案可自行润色）。
+
+---
+
+ok
+
+---
+
+不太对，蔓越莓红#db5079
+
+---
+
+Task: 仓库：/home/sankabox/code/sanbika.github.io。用户反馈品牌色不对：蔓越莓红应为 #db5079（不是我之前用的 #9B1D20）。执行颜色替换。
+
+【规则】
+- 亮色模式主色：#9B1D20 → #db5079
+- 暗色模式主色：#E15D68 → #ef7fa4（在 #db5079 基础上提亮约 15% 保证暗背景可读，构建后你可目测微调）
+- theme_color meta（#9B1D20）→ #db5079
+- 先 grep 全仓（排除 themes/、docs/、.git/）所有 #9B1D20 / #E15D68 / 9b1d20 / e15d68（大小写都要查），一处不漏全部替换，包括 assets/css/extended/blank.css、config/_default/params.toml、static/safari-pinned-tab.svg（若里面用了品牌色）等。
+- 严禁碰 themes/、docs/。
+
+【验证】hugo -d /tmp/color-verify 构建，确认 CSS bundle 里只有新色值（#db5079/#ef7fa4）无旧色值残留；theme-color meta 为 #db5079；无新增警告。
+
+【提交】提交信息如：fix: 品牌色改为 #db5079（暗色 #ef7fa4）。提交后不推送，由主进程处理。汇报：替换了哪些文件、各几处、验证结果。
+
+---
+
+你觉得亮色模式换#f0a0a6好还是维持当前的颜色好？
+
+---
+
+先维持现状吧，我现在在纠结写什么内容上去
+
+---
+
+想写读书笔记之类的，之后如果做了什么项目应该也会放
+
+---
+
+没有打算区分太多，感觉读书笔记也是一种post，而且有时候我可能直接用英文写，不用太在意。
+
+---
+
+Task: 仓库：/home/sankabox/code/sanbika.github.io。小任务：更新首页 homeInfoParams 简介文案，体现「读书笔记 + 项目，中英文随缘」的定位。只改 config/_default/languages.toml 里 [zh-cn.params.homeInfoParams] 和 [en.params.homeInfoParams] 的 Content（Title 保持现状不动），严禁碰其他文件（尤其 themes/、docs/、不改代码结构）。
+
+文案（可在道循原意下微调字词，保持简短 1-2 句）：
+- 中文 Content：这里是我的自留地 —— 写写读书笔记，记录做过的项目，偶尔折腾些新东西。中英文随缘。
+- 英文 Content：My corner on the web — reading notes, side projects, and whatever I happen to tinker with.
+
+注意 TOML 多行字符串语法与现文件保持一致（会合并为单段渲染）。验证：hugo -d /tmp/homeinfo-check 构建通过，两个首页渲染出新文案。提交信息如：chore: 首页简介定稿（读书笔记与项目方向）。不推送。汇报改动与验证结果。
