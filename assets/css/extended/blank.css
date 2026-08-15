@@ -18,6 +18,21 @@
   --primary: #9B9BF5;
 }
 
+/* --- Pixel-draw color for the quest card frame ------------------------------
+ * --pix shares the brand palette with --primary but stays a distinct token so
+ * the pixel border can be retuned (slightly darker/lighter, or per-card hue)
+ * without affecting the rest of the site. Light uses the brand purple; dark
+ * uses the lighter AA-readable brand purple so the dashed pattern stays
+ * visible against PaperMod's near-black card background.
+ * ------------------------------------------------------------------------- */
+:root {
+  --pix: #5B5BD6;
+}
+
+:root[data-theme="dark"] {
+  --pix: #9B9BF5;
+}
+
 /* --- CJK font stack --------------------------------------------------------
  * Applies to body and inline code so Chinese/Japanese/Korean text renders
  * with native system fallbacks (PingFang SC on macOS, Microsoft YaHei on
@@ -94,44 +109,46 @@ h3 {
 /* --- Home Spark "quest card" ------------------------------------------------
  * Reads site.Data.daily_spark via layouts/index.html. The card is styled
  * like a game-quest ticket: a brand-color strip header ("地球ONLINE · 每日任务"
- * / "EARTH ONLINE · DAILY QUEST") carries the date + task id, then a
- * perforated dashed rule separates it from the body (badge / title /
- * task / meta / accept CTA). Light/dark mode is handled by reading
- * --primary (overridden to brand purple at the top of this file) and
- * --theme / --border / --secondary from PaperMod's theme-vars.css, so
- * no dark-mode selectors are needed for the card itself.
+ * / "EARTH ONLINE · DAILY QUEST") carries the date + task id, then a clean
+ * body holds the badge / title / task / meta. The whole frame is wrapped
+ * in a pixel-art dashed border via border-image — a single dashed language
+ * for the whole card, no internal perforation between strip and body.
+ * Light/dark mode is handled by reading --primary (overridden to brand
+ * purple at the top of this file) and --theme / --secondary from PaperMod's
+ * theme-vars.css, so no dark-mode selectors are needed for the card itself.
  * ------------------------------------------------------------------------- */
 
-/* Card frame: border + radius, no explicit background (inherits page bg
- * so the strip's brand color is the only saturated block). overflow:hidden
- * clips the strip's top corners to the card's --radius without forcing
- * two more border-radius declarations on the strip itself. The hover lift
- * is a transform + box-shadow + border-color swap, with the transform
- * disabled under prefers-reduced-motion.
+/* Card frame: pixel-art dashed border via border-image. The plain
+ * `border: 2px solid transparent` reserves 2px on each side for the
+ * border-image to draw into (without it, the dashed pattern would push
+ * the strip + body 2px inwards on hover-only and jiggle the layout).
+ * border-radius is forced to 0 because border-image and border-radius
+ * don't compose — a rounded card would clip the pixel dashes into
+ * unreadable corners. The dashed pattern (6px dash + 5px gap) flips
+ * to a solid var(--pix) on hover; no transition, no transform, so
+ * prefers-reduced-motion doesn't need a special case.
  */
 .home-spark {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 2px solid transparent;
+  border-image: repeating-linear-gradient(
+    90deg,
+    var(--pix) 0 6px,
+    transparent 6px 11px
+  ) 2;
+  border-radius: 0;
   overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .home-spark:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  border-color: var(--primary);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .home-spark:hover {
-    transform: none;
-  }
+  border-image: linear-gradient(var(--pix), var(--pix)) 2;
 }
 
 /* Strip header: solid brand color background, white-in-light / dark-in-dark
- * text via var(--theme) so dark mode auto-flips without an override. The
- * dashed border-bottom is the "ticket perforation" separating header
- * from body — visible on the saturated strip in both color modes.
+ * text via var(--theme) so dark mode auto-flips without an override. Square
+ * corners to match the pixel frame; the dashed perforation that used to sit
+ * between strip and body is gone — the pixel border on the card itself is
+ * the only dashed language now, so two dashed rules on one card would just
+ * compete.
  */
 .home-spark__strip {
   display: flex;
@@ -145,7 +162,7 @@ h3 {
   font-size: 0.78em;
   font-weight: 600;
   letter-spacing: 0.08em;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.4);
+  border-radius: 0;
 }
 
 .home-spark__strip-brand {
@@ -170,8 +187,8 @@ h3 {
 }
 
 /* Body: var(--gap) padding matches the surrounding grid rhythm; the only
- * colored surface here is the badge (a soft pill in --theme), all other
- * text inherits page foreground.
+ * colored surface here is the brand-color badge chip, all other text
+ * inherits page foreground.
  */
 .home-spark__body {
   padding: var(--gap);
@@ -180,28 +197,22 @@ h3 {
   gap: 0.8em;
 }
 
-/* Type pill: emoji + label. background: var(--theme) keeps it "clean"
- * (same as page bg) so the border alone provides the pill shape; on dark
- * mode --theme flips to PaperMod's near-black, keeping the outline-only
- * look intact without an explicit override.
+/* Type chip: text-only label, no background fill. The brand-color 1px
+ * border plus the card's pixel frame form a coherent two-tier outline;
+ * text color picks --primary (brand purple) so the chip reads as "tagged
+ * with the brand", not as a generic grey label. Square corners to match
+ * the rest of the card.
  */
 .home-spark__badge {
   align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4em;
-  padding: 0.18em 0.7em;
-  background: var(--theme);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  font-size: 0.82em;
+  display: inline-block;
+  padding: 0.12em 0.55em;
+  border: 1px solid var(--pix);
+  border-radius: 0;
+  font-size: 0.78em;
   font-weight: 600;
-  color: var(--secondary);
-}
-
-.home-spark__badge-emoji {
-  font-size: 1.05em;
-  line-height: 1;
+  letter-spacing: 0.04em;
+  color: var(--primary);
 }
 
 /* Title: zh gets 「」 quotes via the template, en stays bare. Brand-color
@@ -225,8 +236,8 @@ h3 {
   line-height: 1.65;
 }
 
-/* Meta row: a single inline line ("⏱ time"). Plain inline flow is
- * enough — no flex, no separator ::after, no item wrapper class.
+/* Meta row: a single inline line ("约15-30分钟" / "15-30 min"). Plain
+ * inline flow is enough — no flex, no separator ::after, no wrapper.
  */
 .home-spark__meta {
   margin: 0;
@@ -235,38 +246,11 @@ h3 {
   letter-spacing: 0.02em;
 }
 
-/* CTA: pill-shaped outline button. Hover fills with brand color; text
- * uses var(--theme) (white in light, near-black in dark) so dark mode
- * gets dark text on the lighter #9B9BF5 background for AA contrast
- * instead of unreadable white-on-light-purple.
- */
-.home-spark__cta {
-  align-self: flex-start;
-  display: inline-block;
-  padding: 0.5em 1.3em;
-  margin-top: 0.2em;
-  border: 1px solid var(--primary);
-  border-radius: 999px;
-  color: var(--primary);
-  font-size: 0.9em;
-  font-weight: 600;
-  text-decoration: none;
-  transition: background-color 0.15s ease, color 0.15s ease;
-}
-
-.home-spark__cta:hover {
-  background: var(--primary);
-  color: var(--theme);
-}
-
-.home-spark__cta:focus-visible {
-  outline: 2px dashed var(--primary);
-  outline-offset: 2px;
-}
-
-/* Empty-state card: keeps the new strip frame but trims the right side
+/* Empty-state card: keeps the strip frame but trims the right side
  * (no date / no id without a real quest). Title is slightly smaller so
  * it doesn't shout "your daily is missing" any louder than the copy.
+ * Pixel border + square corners come from the shared .home-spark rules
+ * above — this class only tweaks the title size.
  */
 .home-spark--empty .home-spark__title {
   font-size: 1.3em;
