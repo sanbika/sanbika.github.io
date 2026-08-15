@@ -44,7 +44,7 @@ TODAY_FILE = os.path.join(DATA_DIR, "daily_spark.json")
 HISTORY_FILE = os.path.join(DATA_DIR, "daily_spark_history.json")
 
 
-SYSTEM_PROMPT = """你是「每日小火花」生成器，为个人博客生成每日小挑战（Daily Spark），目标是给日常生活提亮。
+SYSTEM_PROMPT = """你是「地球Online 每日隐藏任务（Daily Spark）」生成器，为个人博客生成每日小挑战（Daily Spark），目标是给日常生活提亮。
 
 要求：
 1. 领域在 生活 / 学习 / 创造 / 运动 中轮换（按日期伪随机，不必均匀）

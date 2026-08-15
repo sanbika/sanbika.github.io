@@ -29,7 +29,7 @@
     (isset $spark "en") (isset (index $spark "en") "title") (isset (index $spark "en") "task")
     (isset (index $spark "tag") "zh") (isset (index $spark "tag") "en") -}}
 {{- $langKey := cond (eq .Lang "en") "en" "zh" -}}
-{{- $headline := cond (eq $langKey "en") "Daily Spark" "今日小火花" -}}
+{{- $headline := cond (eq $langKey "en") "Daily Spark" "地球Online · 今日隐藏任务" -}}
 {{- $checkinLabel := cond (eq $langKey "en") "Check in Today" "今日打卡" -}}
 {{- $recentLabel := cond (eq $langKey "en") "Recent Posts" "最近文章" -}}
 
@@ -65,13 +65,13 @@
           <span class="home-spark__eyebrow">{{ $headline }}</span>
         </header>
         <h2 class="home-spark__title">
-          {{- if eq $langKey "en" -}}No Spark Today{{- else -}}今日暂无小火花{{- end -}}
+          {{- if eq $langKey "en" -}}No quest today{{- else -}}今日任务未刷新{{- end -}}
         </h2>
         <p class="home-spark__task">
           {{- if eq $langKey "en" -}}
-          No spark today — check back tomorrow.
+          The quest system is taking a day off — check back tomorrow.
           {{- else -}}
-          今天还没有小火花，明天再来看吧。
+          今日任务打盹中，明天再来接单。
           {{- end -}}
         </p>
       </section>
