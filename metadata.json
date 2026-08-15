@@ -3,7 +3,7 @@
   "checkpoint_id": "01M02HETGMG1RBE1VTXVAWGEX8",
   "strategy": "manual-commit",
   "branch": "main",
-  "checkpoints_count": 2,
+  "checkpoints_count": 1,
   "files_touched": null,
   "sessions": [
     {
@@ -15,10 +15,10 @@
     }
   ],
   "token_usage": {
-    "input_tokens": 439904,
+    "input_tokens": 443547,
     "cache_creation_tokens": 0,
-    "cache_read_tokens": 3377920,
-    "output_tokens": 75717,
-    "api_call_count": 82
+    "cache_read_tokens": 3726976,
+    "output_tokens": 77252,
+    "api_call_count": 86
   }
 }
