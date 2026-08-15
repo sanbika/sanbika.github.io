@@ -45,6 +45,10 @@
     lightTheme = "light"
     darkTheme = "dark_dimmed"
     reactionsEnabled = true
+    # 首页「每日打卡」评论专用 Giscus 分类：与文章评论的 General 分离
+    [params.comments.spark]
+      category = "daily-spark"
+      categoryid = "DIC_kwDOT2zk8c4DDbVZ"
 
 # Google Analytics
 [params.analytics.google]
