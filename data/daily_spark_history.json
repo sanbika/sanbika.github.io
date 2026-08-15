@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "date": "2026-08-15",
+    "tag": {
+      "zh": "创造",
+      "en": "Creating"
+    },
+    "zh": {
+      "title": "水果拼盘大作战",
+      "task": "找出家里至少3种当季水果，发挥想象力摆一个有趣的拼盘，拍照留念"
+    },
+    "en": {
+      "title": "Fruit Arrangement Art",
+      "task": "Arrange at least 3 seasonal fruits into a creative pattern, snap a photo"
+    }
+  }
+]
