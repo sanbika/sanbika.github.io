@@ -13,7 +13,6 @@
   enableSearch = true
   mainSections = ["posts"]
   displayFullLangName = true
-  disableSpecial1stPost = true
 
 # 站点资源（favicon / 主题色）
 [params.assets]
@@ -24,7 +23,7 @@
   apple_touch_icon = "apple-touch-icon.png"
   safari_pinned_tab = "safari-pinned-tab.svg"
 
-# 社交图标（首页 home-info 自动展示）
+# 社交图标（首页侧栏（layouts/index.html）引用）
 [[params.socialIcons]]
   name = "github"
   url = "https://github.com/sanbika"

@@ -1,0 +1,90 @@
+{{- /*
+  Site-level home page override.
+  Layout:
+    .home-layout
+      .home-main
+        .home-spark     (Daily Spark hero, with placeholder fallback)
+        .spark-checkin  (Giscus per-day check-in thread)
+      .home-side
+        .home-side__card  (Recent Posts, top 5)
+        .home-side__card  (social icons)
+  Only affects the home page (Hugo resolves home kind → index.html first);
+  /posts/, /about/, etc. continue to use themes/PaperMod/layouts/list.html.
+*/ -}}
+
+{{- define "main" -}}
+{{- $spark := hugo.Data.daily_spark -}}
+{{- /*
+  $sparkOK requires every nested field the template indexes below:
+    .date, .tag, .tag.zh, .tag.en,
+    .zh.title, .zh.task, .en.title, .en.task.
+  Without these guards a malformed data file produces blank tags or
+  panics. We also hide the .spark-checkin section entirely when invalid,
+  so the empty hero state doesn't render an orphan Giscus thread.
+*/ -}}
+{{- $sparkOK := and $spark
+    (isset $spark "date")
+    (isset $spark "tag")
+    (isset $spark "zh") (isset (index $spark "zh") "title") (isset (index $spark "zh") "task")
+    (isset $spark "en") (isset (index $spark "en") "title") (isset (index $spark "en") "task")
+    (isset (index $spark "tag") "zh") (isset (index $spark "tag") "en") -}}
+{{- $langKey := cond (eq .Lang "en") "en" "zh" -}}
+{{- $headline := cond (eq $langKey "en") "Daily Spark" "今日小火花" -}}
+{{- $checkinLabel := cond (eq $langKey "en") "Check in Today" "今日打卡" -}}
+{{- $recentLabel := cond (eq $langKey "en") "Recent Posts" "最近文章" -}}
+
+<div class="home-layout">
+  <div class="home-main">
+    {{- if $sparkOK -}}
+      {{- $tag := index $spark.tag $langKey -}}
+      {{- $title := index (index $spark $langKey) "title" -}}
+      {{- $task := index (index $spark $langKey) "task" -}}
+
+      <section class="home-spark" aria-label="{{ $headline }}">
+        <header class="home-spark__head">
+          <span class="home-spark__tag">{{ $tag }}</span>
+          <time class="home-spark__date" datetime="{{ $spark.date }}">{{ $spark.date }}</time>
+        </header>
+        <h2 class="home-spark__title">{{ $headline }}</h2>
+        <p class="home-spark__sub">{{ $title }}</p>
+        <p class="home-spark__task">{{ $task }}</p>
+      </section>
+    {{- else -}}
+      <section class="home-spark home-spark--empty" aria-label="{{ $headline }}">
+        <h2 class="home-spark__title">{{ $headline }}</h2>
+        <p class="home-spark__task">
+          {{- if eq $langKey "en" -}}
+          No spark today — check back tomorrow.
+          {{- else -}}
+          今天还没有小火花，明天再来看吧。
+          {{- end -}}
+        </p>
+      </section>
+    {{- end -}}
+
+    {{- if $sparkOK -}}
+    <section class="spark-checkin" aria-label="{{ $checkinLabel }}">
+      <h3 class="spark-checkin__heading">{{ $checkinLabel }}</h3>
+      {{- partial "spark_comments.html" (dict "page" . "date" $spark.date) -}}
+    </section>
+    {{- end -}}
+  </div>
+
+  <aside class="home-side" aria-label="{{ cond (eq $langKey "en") "sidebar" "侧栏" }}">
+    <section class="home-side__card" aria-label="{{ $recentLabel }}">
+      <h3 class="home-side__heading">{{ $recentLabel }}</h3>
+      {{- $posts := where site.RegularPages "Type" "in" site.Params.mainSections -}}
+      {{- range first 5 $posts -}}
+      <a class="home-side__link" href="{{ .Permalink }}">
+        <span class="home-side__title">{{ .Title }}</span>
+        <time class="home-side__date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format site.Params.DateFormat }}</time>
+      </a>
+      {{- end -}}
+    </section>
+
+    <section class="home-side__card home-side__social" aria-label="social">
+      {{- partial "social_icons.html" (dict "align" "start") -}}
+    </section>
+  </aside>
+</div>
+{{- end -}}

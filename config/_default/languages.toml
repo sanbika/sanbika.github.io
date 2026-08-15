@@ -4,9 +4,6 @@
   title = "浆果丛林"
   [zh-cn.params]
     description = "浆果丛林 —— 个人主页与博客"
-    [zh-cn.params.homeInfoParams]
-      Title = "你好，我是 sanbika 👋"
-      Content = """这里是我的自留地 —— 写写读书笔记，记录做过的项目，偶尔折腾些新东西。中英文随缘。"""
 
 [en]
   label = "English"
@@ -14,6 +11,3 @@
   title = "Berry Jungle"
   [en.params]
     description = "Berry Jungle — personal site and blog"
-    [en.params.homeInfoParams]
-      Title = "Hi, I'm sanbika 👋"
-      Content = """My corner on the web — reading notes, side projects, and whatever I happen to tinker with."""

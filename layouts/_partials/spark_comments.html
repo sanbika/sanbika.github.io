@@ -1,0 +1,58 @@
+{{- /*
+  Giscus comment thread for the home-page daily spark check-in section.
+  Mirrors layouts/_partials/comments.html (used by article single pages) but
+  adapted for the home-page context, which has no implicit .Date and no
+  implicit .Permalink:
+
+    * Caller passes (dict "page" . "date" $spark.date); we bind those to
+      $page and $date up front instead of relying on the current page.
+    * data-mapping is hard-coded to "specific" so each calendar day maps to
+      its own discussion topic rather than sharing the article-path thread.
+    * data-term is hard-coded to "spark-{{ $date }}" (e.g. "spark-2026-08-15"),
+      giving one stable thread id per day across zh/en rebuilds.
+    * The theme-switching JS is renamed to setSparkGiscusTheme so it never
+      collides with setGiscusTheme from comments.html if both partials are
+      ever rendered on the same page in the future.
+*/ -}}
+
+{{- $page := .page -}}
+{{- $date := .date -}}
+{{- if and $page.Site.Params.comments.giscus.repoid $page.Site.Params.comments.giscus.categoryid -}}
+<script src="https://giscus.app/client.js"
+        data-repo="{{ $page.Site.Params.comments.giscus.repo }}"
+        data-repo-id="{{ $page.Site.Params.comments.giscus.repoid }}"
+        data-category="{{ $page.Site.Params.comments.giscus.category }}"
+        data-category-id="{{ $page.Site.Params.comments.giscus.categoryid }}"
+        data-mapping="specific"
+        data-term="spark-{{ $date }}"
+        data-strict="0"
+        data-reactions-enabled="{{ if $page.Site.Params.comments.giscus.reactionsenabled }}1{{ else }}0{{ end }}"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="light"
+        data-lang="{{ cond (eq $page.Lang "en") "en" "zh-CN" }}"
+        data-light-theme="{{ $page.Site.Params.comments.giscus.lighttheme }}"
+        data-dark-theme="{{ $page.Site.Params.comments.giscus.darktheme }}"
+        crossorigin="anonymous"
+        async>
+</script>
+
+<script>
+  function setSparkGiscusTheme() {
+    const iframe = document.querySelector('iframe.giscus-frame');
+    if (!iframe) return;
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark'
+      ? '{{ $page.Site.Params.comments.giscus.darktheme }}'
+      : '{{ $page.Site.Params.comments.giscus.lighttheme }}';
+    iframe.contentWindow.postMessage(
+      { giscus: { setConfig: { theme } } },
+      'https://giscus.app'
+    );
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    const observer = new MutationObserver(setSparkGiscusTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    setSparkGiscusTheme();
+  });
+</script>
+{{- end -}}
