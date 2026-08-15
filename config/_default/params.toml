@@ -17,7 +17,7 @@
 
 # 站点资源（favicon / 主题色）
 [params.assets]
-  theme_color = "#9B1D20"
+  theme_color = "#db5079"
   favicon = "favicon.ico"
   favicon16x16 = "favicon-16x16.png"
   favicon32x32 = "favicon-32x32.png"

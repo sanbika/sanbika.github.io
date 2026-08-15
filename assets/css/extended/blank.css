@@ -5,16 +5,16 @@
  * --------------------------------------------------------------------------- */
 
 /* --- Brand color (Cranberry red) --------------------------------------------
- * Light mode:  #9B1D20  (deep cranberry)
- * Dark mode:   #E15D68  (lighter, AA-readable on PaperMod dark background)
+ * Light mode:  #db5079  (cranberry pink)
+ * Dark mode:   #ef7fa4  (lighter, AA-readable on PaperMod dark background)
  * ------------------------------------------------------------------------- */
 :root {
-  --primary: #9B1D20;
+  --primary: #db5079;
   --main-width: 760px;
 }
 
 :root[data-theme="dark"] {
-  --primary: #E15D68;
+  --primary: #ef7fa4;
 }
 
 /* --- CJK font stack --------------------------------------------------------
