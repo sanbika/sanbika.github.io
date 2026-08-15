@@ -92,7 +92,7 @@
                   (printf "%d月%d日" $dateParsed.Month $dateParsed.Day) -}}
               {{- $discussionURL := printf "https://github.com/sanbika/sanbika.github.io/discussions?discussions_q=spark-%s" .date -}}
 
-              <li class="quests__item">
+              <li class="quests__item" id="spark-{{ .date }}">
                 <div class="quests__meta">
                   <time class="quests__date" datetime="{{ .date }}">{{ $dateDisplay }}</time>
                   <span class="quests__tag">{{ $tag }}</span>

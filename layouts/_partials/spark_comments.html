@@ -55,4 +55,22 @@
     setSparkGiscusTheme();
   });
 </script>
+
+{{- /* Giscus fallback link: a small, secondary-coloured line under the
+       embedded thread that lets readers jump to the GitHub Discussions
+       search for `spark-<date>` — useful when giscus is blocked, when
+       someone wants to attach images, or when reading prefers a real
+       forum thread. Same route shape as .quests__discussion in
+       layouts/quests.html (the search URL never 404s regardless of whether
+       a discussion exists; giscus is lazy-create so no nodes are wasted
+       when nobody uses this fallback). Opens in a new tab. */ -}}
+<p class="spark-checkin__ghlink">
+  <a href="https://github.com/sanbika/sanbika.github.io/discussions?discussions_q=spark-{{ $date }}" target="_blank" rel="noopener noreferrer">
+    {{- if eq $page.Lang "en" -}}
+    Comment on GitHub · images supported ↗
+    {{- else -}}
+    在 GitHub 上评论 · 可传图 ↗
+    {{- end -}}
+  </a>
+</p>
 {{- end -}}

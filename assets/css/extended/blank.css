@@ -279,6 +279,36 @@ h3 {
   text-transform: uppercase;
 }
 
+/* GitHub fallback link below the Giscus iframe. A small, secondary-color
+ * line that mirrors .quests__discussion's visual register so the two
+ * surfaces (home spark card + /quests/ entries) read as the same family.
+ * Hover lifts to brand color; the arrow ↗ is part of the link text and is
+ * wrapped by the colour transition naturally.
+ */
+.spark-checkin__ghlink {
+  /* PaperMod 的 reset.css 已把 <p> 的 margin 清零, 这里手动补上与上方
+   * Giscus iframe 的呼吸距离 (1em), 让两者不挤在一起. */
+  margin: 1em 0 0;
+  font-size: 0.82em;
+  line-height: 1.5;
+}
+
+.spark-checkin__ghlink a {
+  color: var(--secondary);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.spark-checkin__ghlink a:hover,
+.spark-checkin__ghlink a:focus-visible {
+  color: var(--primary);
+}
+
+.spark-checkin__ghlink a:focus-visible {
+  outline: 2px dashed var(--secondary);
+  outline-offset: 2px;
+}
+
 /* --- Home sidebar ----------------------------------------------------------
  * Compact carded lists. Hover lifts the title color to --primary.
  * ------------------------------------------------------------------------- */
@@ -294,6 +324,41 @@ h3 {
   font-weight: 600;
   letter-spacing: 0.04em;
   color: var(--secondary);
+}
+
+/* Heading row used by the Past Quests card: title on the left + small
+ * "查看全部 → / All →" link on the right. The row replaces the heading's
+ * own margin-bottom so spacing matches the rest of the card surface
+ * (.home-side__heading no longer drives spacing when wrapped here).
+ */
+.home-side__heading-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6em;
+  margin: 0 0 0.6em;
+}
+
+.home-side__heading-row .home-side__heading {
+  margin: 0;
+}
+
+.home-side__more {
+  font-size: 0.78em;
+  color: var(--secondary);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+.home-side__more:hover,
+.home-side__more:focus-visible {
+  color: var(--primary);
+}
+
+.home-side__more:focus-visible {
+  outline: 2px dashed var(--secondary);
+  outline-offset: 2px;
 }
 
 .home-side__link {
@@ -415,9 +480,13 @@ h3 {
    * :focus-visible affordance via .quests__discussion below.
    * transition / background-color pair removed together with the old
    * :hover rule, so no dead styles linger.
+   *
+   * 锚点目标上方留一点呼吸空间：避免标题行紧贴 (或被遮挡在) sticky header
+   * 下方, 尤其是从首页侧栏的 /quests/#spark-<date> 链接跳过来时.
    */
   padding: 0.9em 0.4em;
   border-bottom: 1px solid var(--border);
+  scroll-margin-top: 70px;
 }
 
 .quests__item:last-child {

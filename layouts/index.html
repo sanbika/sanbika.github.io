@@ -6,7 +6,8 @@
         .home-spark     (Daily Spark "quest card" with strip header + body)
         .spark-checkin  (Giscus per-day check-in thread)
       .home-side
-        .home-side__card  (Recent Posts, top 5)
+        .home-side__card  (Past Quests, top 7 from site.Data.daily_spark_history
+                           minus today's date; whole card omitted if empty)
         .home-side__card  (social icons)
   Only affects the home page (Hugo resolves home kind → index.html first);
   /posts/, /about/, etc. continue to use themes/PaperMod/layouts/list.html.
@@ -31,7 +32,8 @@
 {{- $langKey := cond (eq .Lang "en") "en" "zh" -}}
 {{- $headline := cond (eq $langKey "en") "Daily Spark" "地球Online · 今日隐藏任务" -}}
 {{- $checkinLabel := cond (eq $langKey "en") "Check in Today" "今日打卡" -}}
-{{- $recentLabel := cond (eq $langKey "en") "Recent Posts" "最近文章" -}}
+{{- $pastLabel := cond (eq $langKey "en") "Past Quests" "往期任务" -}}
+{{- $pastMoreLabel := cond (eq $langKey "en") "All →" "查看全部 →" -}}
 {{- /* Strip + meta copy is constant per language; compute once so both
        the data and the empty-state branches reuse the same strings. */ -}}
 {{- $stripLabel := cond (eq $langKey "en") "EARTH ONLINE · DAILY QUEST" "地球ONLINE · 每日任务" -}}
@@ -104,16 +106,54 @@
   </div>
 
   <aside class="home-side" aria-label="{{ cond (eq $langKey "en") "sidebar" "侧栏" }}">
-    <section class="home-side__card" aria-label="{{ $recentLabel }}">
-      <h3 class="home-side__heading">{{ $recentLabel }}</h3>
-      {{- $posts := where site.RegularPages "Type" "in" site.Params.mainSections -}}
-      {{- range first 5 $posts -}}
-      <a class="home-side__link" href="{{ .Permalink }}">
-        <span class="home-side__title">{{ .Title }}</span>
-        <time class="home-side__date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format site.Params.DateFormat }}</time>
+    {{- /*
+      Sidebar Past Quests card (replaces the previous Recent Posts card).
+      Source: site.Data.daily_spark_history, minus the main-card date so
+      it doesn't double up, desc-sorted, top 7. Same pre-filter shape as
+      layouts/quests.html (zh/en title required for current language),
+      kept minimal because we only read title + date here, not tag/task.
+      When the filtered list is empty the entire card is omitted (the
+      sidebar collapses down to just the social-icons card).
+    */ -}}
+    {{- $today := "" -}}
+    {{- if $sparkOK -}}{{- $today = $spark.date -}}{{- end -}}
+    {{- $pastList := slice -}}
+    {{- $history := hugo.Data.daily_spark_history -}}
+    {{- /* 日期格式守卫: 与 layouts/quests.html 的 $datePattern 同形, 防止
+           "2026-13-01" 这类会让 Hugo time() 崩掉的脏数据混进内层渲染循环. */ -}}
+    {{- $datePattern := `^(19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$` -}}
+    {{- if $history -}}
+      {{- range $history -}}
+        {{- $pastOK := and (not (eq .date $today))
+                          (findRE $datePattern .date)
+                          (isset . "tag") (isset (index . "tag") $langKey)
+                          (isset . $langKey)
+                          (isset (index . $langKey) "title") -}}
+        {{- if $pastOK -}}
+          {{- $pastList = $pastList | append . -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+    {{- $pastTop := first 7 (sort $pastList "date" "desc") -}}
+    {{- if gt (len $pastTop) 0 -}}
+    <section class="home-side__card" aria-label="{{ $pastLabel }}">
+      <div class="home-side__heading-row">
+        <h3 class="home-side__heading">{{ $pastLabel }}</h3>
+        <a class="home-side__more" href="{{ relLangURL `/quests/` }}">{{ $pastMoreLabel }}</a>
+      </div>
+      {{- range $pastTop -}}
+        {{- $dateParsed := time .date -}}
+        {{- $dateDisplay := cond (eq $langKey "en")
+            ($dateParsed.Format "Jan 2")
+            (printf "%d月%d日" $dateParsed.Month $dateParsed.Day) -}}
+        {{- $questURL := relLangURL (printf `/quests/#spark-%s` .date) -}}
+      <a class="home-side__link" href="{{ $questURL }}">
+        <span class="home-side__title">{{ index (index . $langKey) "title" }}</span>
+        <time class="home-side__date" datetime="{{ .date }}">{{ $dateDisplay }}</time>
       </a>
       {{- end -}}
     </section>
+    {{- end -}}
 
     <section class="home-side__card home-side__social" aria-label="social">
       {{- partial "social_icons.html" (dict "align" "start") -}}
