@@ -39,19 +39,34 @@
       {{- $tag := index $spark.tag $langKey -}}
       {{- $title := index (index $spark $langKey) "title" -}}
       {{- $task := index (index $spark $langKey) "task" -}}
+      {{- /* time.ParseInLocation("2006-01-02") — see blank.css for the formatted display rules. */ -}}
+      {{- $dateParsed := time $spark.date -}}
 
       <section class="home-spark" aria-label="{{ $headline }}">
         <header class="home-spark__head">
-          <span class="home-spark__tag">{{ $tag }}</span>
-          <time class="home-spark__date" datetime="{{ $spark.date }}">{{ $spark.date }}</time>
+          <span class="home-spark__head-left">
+            <span class="home-spark__eyebrow">{{ $headline }}</span>
+            <span class="home-spark__tag">{{ $tag }}</span>
+          </span>
+          <time class="home-spark__date" datetime="{{ $spark.date }}">
+            {{- if eq $langKey "en" -}}
+            {{ $dateParsed.Format "Jan 2" }}
+            {{- else -}}
+            {{ printf "%d月%d日" $dateParsed.Month $dateParsed.Day }}
+            {{- end -}}
+          </time>
         </header>
-        <h2 class="home-spark__title">{{ $headline }}</h2>
-        <p class="home-spark__sub">{{ $title }}</p>
+        <h2 class="home-spark__title">{{ $title }}</h2>
         <p class="home-spark__task">{{ $task }}</p>
       </section>
     {{- else -}}
       <section class="home-spark home-spark--empty" aria-label="{{ $headline }}">
-        <h2 class="home-spark__title">{{ $headline }}</h2>
+        <header class="home-spark__head">
+          <span class="home-spark__eyebrow">{{ $headline }}</span>
+        </header>
+        <h2 class="home-spark__title">
+          {{- if eq $langKey "en" -}}No Spark Today{{- else -}}今日暂无小火花{{- end -}}
+        </h2>
         <p class="home-spark__task">
           {{- if eq $langKey "en" -}}
           No spark today — check back tomorrow.

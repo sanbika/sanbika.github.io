@@ -82,6 +82,13 @@ h3 {
   flex-direction: column;
   gap: var(--gap);
   min-width: 0;
+  /* Sticks the sidebar next to the main column while scrolling long posts.
+   * top covers PaperMod's fixed header (--header-height, defaults to 60px)
+   * plus the grid gap; falls back to a safe value if the theme variable is
+   * unavailable or renamed.
+   */
+  position: sticky;
+  top: calc(var(--header-height, 60px) + var(--gap) + 0.5rem);
 }
 
 /* --- Home Spark hero card ---------------------------------------------------
@@ -94,15 +101,42 @@ h3 {
   border-radius: var(--radius);
 }
 
+/* Hero meta row: eyebrow label + tag pill on the left, localized date on
+ * the right. flex-wrap so eyebrow + pill stay together on narrow widths.
+ */
 .home-spark__head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1em;
-  margin-bottom: 0.9em;
+  flex-wrap: wrap;
+  gap: 0.6em 1em;
+  margin-bottom: 1em;
   color: var(--secondary);
-  font-size: 0.85em;
+  font-size: 0.82em;
   letter-spacing: 0.02em;
+}
+
+.home-spark__head-left {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6em;
+  min-width: 0;
+}
+
+/* Kicker label (the fixed "今日小火花" / "Daily Spark" brand line).
+ * English pages uppercase via :lang() so CJK stays untouched.
+ */
+.home-spark__eyebrow {
+  font-size: 0.95em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  color: var(--secondary);
+}
+
+.home-spark__eyebrow:lang(en) {
+  text-transform: uppercase;
 }
 
 .home-spark__tag {
@@ -120,26 +154,25 @@ h3 {
   font-variant-numeric: tabular-nums;
 }
 
+/* The daily challenge title (e.g. 水果拼盘大作战). text-wrap: balance
+ * evens out ragged lines on long Chinese titles; the -webkit- prefix
+ * covers older Safari and is harmlessly ignored where unsupported.
+ */
 .home-spark__title {
-  margin: 0 0 0.35em;
+  margin: 0 0 0.4em;
   font-size: 1.6em;
   font-weight: 700;
   line-height: 1.3;
   color: var(--primary);
-}
-
-.home-spark__sub {
-  margin: 0 0 0.5em;
-  font-size: 1.15em;
-  font-weight: 600;
-  line-height: 1.4;
+  text-wrap: balance;
+  -webkit-text-wrap: balance;
 }
 
 .home-spark__task {
   margin: 0;
   color: var(--secondary);
-  font-size: 1em;
-  line-height: 1.6;
+  font-size: 1.05em;
+  line-height: 1.65;
 }
 
 .home-spark--empty .home-spark__title {
@@ -147,8 +180,10 @@ h3 {
 }
 
 /* --- Spark check-in block ---------------------------------------------------
- * Sits below the hero. Thin top divider + small heading; the Giscus iframe
- * inherits PaperMod's own responsive figure styling.
+ * Sits below the hero. Thin top divider + small kicker heading; the
+ * Giscus iframe inherits PaperMod's own responsive figure styling.
+ * The heading is intentionally a "label" (smaller, wide letter-spacing,
+ * uppercase on English pages) to layer visually underneath the hero.
  * ------------------------------------------------------------------------- */
 .spark-checkin {
   padding-top: 1em;
@@ -157,10 +192,14 @@ h3 {
 
 .spark-checkin__heading {
   margin: 0 0 0.8em;
-  font-size: 0.95em;
+  font-size: 0.78em;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.14em;
   color: var(--secondary);
+}
+
+.spark-checkin__heading:lang(en) {
+  text-transform: uppercase;
 }
 
 /* --- Home sidebar ----------------------------------------------------------
@@ -230,9 +269,16 @@ h3 {
 
 /* --- Responsive collapse ----------------------------------------------------
  * Below 768px the sidebar stacks under the main column.
+ * sticky is also disabled: a single-column page has nowhere for the
+ * sidebar to "stick" relative to, and inherited top offsets would leave
+ * a visible gap above the cards.
  * ------------------------------------------------------------------------- */
 @media (max-width: 768px) {
   .home-layout {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .home-side {
+    position: static;
   }
 }
