@@ -1,0 +1,111 @@
+{{- /*
+  往期任务列表页模板 (layouts/quests.html).
+  数据源: site.Data.daily_spark_history (数组, 每项 {date, tag, zh, en}, 结构
+  与 daily_spark.json 同; 可能为空/缺失/字段不全). 渲染策略:
+    1. 先把 $history 预过滤为 $clean: 留下 date 形如 YYYY-MM-DD 且
+       tag.zh/tag.en/zh.title/zh.task/en.title/en.task 都存在的条目;
+    2. 按 date 倒序 $clean;
+    3. 按 YYYY-MM 分组, 月份标题本地化 (2026年8月 / Aug 2026);
+    4. 每条显示本地化日期 + tag 徽章 + 标题 (zh 加「」, en 裸) + 任务正文 +
+       「打卡讨论」链接: 永远跳到 GitHub Discussions 搜索页
+       (?discussions_q=spark-<date>), 该搜索页永不 404, 无讨论则空结果.
+  为什么在 sort 之前就做预过滤 (而不是只在渲染时跳过): 月份键是通过
+  substr .date 0 7 抽取并用 time() 解析的, Hugo 的 time() 对不可解析
+  字符串会直接报错而非返回零值 — 预过滤保证月份键也一定可解析.
+  字段守卫的形态与 layouts/index.html 的 $sparkOK 保持一致.
+  镜像自 layouts/index.html 的字段读取方式 ($langKey / index 嵌套), 遵循现有
+  站点的 site-specific UI 字符串惯例 (cond on .Lang), 不为这一页新增 i18n yaml.
+*/ -}}
+{{- define "main" -}}
+{{- $history := hugo.Data.daily_spark_history -}}
+{{- $langKey := cond (eq .Lang "en") "en" "zh" -}}
+{{- $checkinText := cond (eq $langKey "en") "Check in ↗" "打卡讨论 ↗" -}}
+{{- $emptyText := cond (eq $langKey "en") "No archive yet." "还没有存档。" -}}
+{{- /* 日期格式守卫: \d{4}-\d{2}-\d{2} + 月 01-12 + 日 01-31. 形如 "2026-13-01"
+     这类能让宽松正则通过但仍会让 time() 崩掉的字符串也一并挡住. 内层渲染
+     循环不再重做此项检查, 因为 $clean 已确保 date 可解析. */ -}}
+{{- $datePattern := `^(19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$` -}}
+
+{{- /* 预过滤: 字段齐全且 date 可解析才进 $clean. sort / 月份键抽取 / time()
+       都不再需要兜底守卫. tag.zh/tag.en 与 zh.title/zh.task/en.title/en.task
+       全检, 跟 reviewer 的要求一致; 也与 index.html 的 $sparkOK 同形. */ -}}
+{{- $clean := slice -}}
+{{- if $history -}}
+  {{- range $history -}}
+    {{- $ok := and (findRE $datePattern .date)
+                  (isset . "tag")
+                  (isset (index . "tag") "zh")
+                  (isset (index . "tag") "en")
+                  (isset . "zh") (isset (index . "zh") "title") (isset (index . "zh") "task")
+                  (isset . "en") (isset (index . "en") "title") (isset (index . "en") "task") -}}
+    {{- if $ok -}}
+      {{- $clean = $clean | append . -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+<div class="quests">
+  <header class="quests__intro">
+    <h1 class="quests__title">{{ .Title }}</h1>
+    {{- with .Description -}}
+    <p class="quests__desc">{{ . }}</p>
+    {{- end -}}
+  </header>
+
+  {{- if not $clean -}}
+    <p class="quests__empty">{{ $emptyText }}</p>
+  {{- else -}}
+    {{- /* 倒序: 最新在前. $sorted 既是外层分组遍历源, 也是每组内层的逐条源,
+           同一份切片复用可保证每组内仍按 date desc. */ -}}
+    {{- $sorted := sort $clean "date" "desc" -}}
+
+    {{- /* 从 $sorted 顺序抽取唯一月份键 (YYYY-MM). 因为 $sorted 已 desc, 月份
+           键也天然 desc, 无需再排序. 用 slice + in 而非 dict 是为了让范围输出
+           顺序稳定 (Go map 迭代无序). */ -}}
+    {{- $months := slice -}}
+    {{- range $sorted -}}
+      {{- $m := substr .date 0 7 -}}
+      {{- if not (in $months $m) -}}
+        {{- $months = $months | append $m -}}
+      {{- end -}}
+    {{- end -}}
+
+    {{- range $months -}}
+      {{- $month := . -}}
+      {{- $monthTime := time (printf "%s-01" $month) -}}
+      {{- $monthTitle := cond (eq $langKey "en")
+          ($monthTime.Format "Jan 2006")
+          (printf "%d年%d月" $monthTime.Year $monthTime.Month) -}}
+
+      <section class="quests__month">
+        <h2 class="quests__month-title">{{ $monthTitle }}</h2>
+        <ul class="quests__list">
+          {{- range $sorted -}}
+            {{- if hasPrefix .date (printf "%s-" $month) -}}
+              {{- $dateParsed := time .date -}}
+              {{- $tag := index .tag $langKey -}}
+              {{- $titleRaw := index (index . $langKey) "title" -}}
+              {{- $task := index (index . $langKey) "task" -}}
+              {{- $titleDisplay := cond (eq $langKey "en") $titleRaw (printf "「%s」" $titleRaw) -}}
+              {{- $dateDisplay := cond (eq $langKey "en")
+                  ($dateParsed.Format "Jan 2")
+                  (printf "%d月%d日" $dateParsed.Month $dateParsed.Day) -}}
+              {{- $discussionURL := printf "https://github.com/sanbika/sanbika.github.io/discussions?discussions_q=spark-%s" .date -}}
+
+              <li class="quests__item">
+                <div class="quests__meta">
+                  <time class="quests__date" datetime="{{ .date }}">{{ $dateDisplay }}</time>
+                  <span class="quests__tag">{{ $tag }}</span>
+                </div>
+                <h3 class="quests__item-title">{{ $titleDisplay }}</h3>
+                <p class="quests__task">{{ $task }}</p>
+                <a class="quests__discussion" href="{{ $discussionURL }}" target="_blank" rel="noopener">{{ $checkinText }}</a>
+              </li>
+            {{- end -}}
+          {{- end -}}
+        </ul>
+      </section>
+    {{- end -}}
+  {{- end -}}
+</div>
+{{- end -}}

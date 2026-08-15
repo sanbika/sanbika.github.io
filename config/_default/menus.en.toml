@@ -11,6 +11,12 @@
   weight = 10
 
 [[main]]
+  identifier = "quests"
+  name = "Past Quests"
+  url = "/en/quests/"
+  weight = 15
+
+[[main]]
   identifier = "projects"
   name = "Projects"
   url = "/en/projects/"
