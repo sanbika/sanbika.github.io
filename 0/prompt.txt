@@ -210,3 +210,22 @@ Task: 仓库：/home/sankabox/code/sanbika.github.io（Hugo 0.164 + PaperMod 双
 5. 侧栏 sticky：.home-side { position: sticky; top: 约 1rem~calc(var(--gap) + var(--nav-height, 64px))，自行取主题里导航高度变量或合适值 }；注意 grid 布局下 sticky 生效需 align-items: start（已有，确认即可）；移动端单列时取消 sticky（media query 内 position: static）。
 
 【验证】hugo --destination /tmp/polish-check --quiet：① 中英首页：大字是每日挑战标题、eyebrow 是「今日小火花」/「Daily Spark」+ tag + 本地化日期；② /en/ 英文日期格式 Aug 15、中文 8月15日；③ CSS bundle 含 text-wrap/sticky；④ 空数据场景（临时移走 data/daily_spark.json 再构建恢复）正常；⑤ 文章页/列表页零变化。提交：`style: 首页小火花卡片视觉打磨（层级/日期本地化/sticky 侧栏/打卡标题）`。不推送。汇报每项落点与验证结果。
+
+---
+
+”今日小火花“这个名字不太喜欢，能不能还是改成Daily Spark? 或者改成地球Online今日隐藏任务之类的？英文还是Daily Spark. 然后关于品牌色，想换成绿色或者蓝紫色，有什么推荐的色号吗？
+
+---
+
+Task: 仓库：/home/sankabox/code/sanbika.github.io。改个名字：中文站「今日小火花」全部改为「地球Online · 今日隐藏任务」（地球Online 无空格、中间用中点+空格分隔），英文站保持「Daily Spark」不变。只碰 layouts/index.html 和 scripts/daily_spark.py（grep "小火花" 找到所有出现点），不碰其他文件。构建只写 /tmp。
+
+【layouts/index.html】
+- eyebrow 标签：中文「今日小火花」→「地球Online · 今日隐藏任务」（en 分支不动）
+- aria-label 同步改
+- 空态文案改成游戏味：中文大字「今日任务未刷新」、辅助句类似「系统偷懒了，明天再来看看」这类轻松语气（自行润色一句即可，别太长）；英文空态保持现有或改为 "No quest today / The quest system is taking a day off — check back tomorrow."（润色一句）
+- 「今日打卡」/「Check in Today」标题保持不变
+
+【scripts/daily_spark.py】
+- 系统提示词里「每日小火花」生成器的名字改为「地球Online 每日隐藏任务（Daily Spark）」生成器，其余 prompt 逻辑与要求一字不动
+
+【验证】hugo --destination /tmp/rename-check --quiet 构建通过；中文首页 eyebrow/aria/空态为新文案；英文页 Daily Spark 原样；grep 构建产物确认 zh 首页无「小火花」残留（en 无影响）。提交：`chore: 今日小火花更名——地球Online · 今日隐藏任务`。不推送。汇报所有改动点。
