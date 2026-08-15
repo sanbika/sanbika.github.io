@@ -1,0 +1,351 @@
+这个git仓库需要改一下账号和邮箱，刚才的commit不要提交，作者是错的
+
+---
+
+user.name sanbika, 使用GitHub的私密代理邮箱。
+
+---
+
+需要
+
+---
+
+保存好了
+
+---
+
+前端样式上你还有什么优化建议吗
+
+---
+
+Task: 侦察目标：Hugo + PaperMod 双语站点（浆果丛林 / Berry Jungle）的**前端样式现状与优化空间**，彻底度 medium。用户想要一份样式优化建议，我需要你把现状和可调项摸清。只读侦察，不要修改任何文件，构建只能输出到 /tmp。
+
+请调查：
+1. 当前样式相关配置全景：config/_default/params.toml 与 config.toml 里所有 PaperMod 外观参数（profileMode/homeInfoParams、ShowReadingTime、ShowBreadCrumbs、ShowToc、ShowPostNavLinks、ShowCodeCopyButtons、defaultTheme/dark mode、label（logo/图标/文字）、socialIcons、footer 配置等），列出「已开启 / 未开启但主题支持」的清单。
+2. 自定义样式资产：assets/css/extended/ 或 layouts 里的自定义 CSS 是否存在；主题 PaperMod 的 assets/css 结构（core/vars/chroma 之类）里默认字体、行高、内容宽度（.post-content max-width）、中文排版相关设置；当前有没有任何中文专属排版处理（font-family 栈、中英混排间距）。
+3. 首页形态：当前是 list 布局还是 homeInfo/profile？content/_index.md 是否存在、里面配了什么；posts 列表展示样式（摘要/封面/hiddenFromHomePage）。
+4. 内容页观感：hello-world.md / about / projects 的 front matter 里影响样式的字段（cover、ShowToc、tocopen、summary 等）是否缺失；代码高亮配置（markup.highlight / chroma style）有没有设置。
+5. 构建 /tmp 用只读方式检查（hugo -d /tmp/style-audit 允许，因为不写仓库）：抽查首页/文章页/关于页渲染后的 HTML 里 body class（dark/auto）、.main-container 宽度、是否引用 extended css、Google Fonts 或本地字体加载情况。
+6. 输出：① 现状摘要（当前站点长什么样的配置画像）；② 「未用上的 PaperMod 开箱功能」清单；③ 中文/双语排版的具体可改进点（字体栈、字重、行高、标点）；④ 性能/体验类可改进点（字体加载、暗色模式默认值、动画开关）；⑤ 每项给「改动落点」（哪个文件加什么）。不要给主观美学空话，要配置级、可执行的项。
+
+---
+
+用蔓越莓红吧
+
+---
+
+Task: 仓库：/home/sankabox/code/sanbika.github.io（Hugo 0.164 + PaperMod 双语站：zh-cn 默认在根路径、en 在 /en/）。执行一轮前端样式优化。铁律：只改站点级文件（config/、content/、assets/、layouts/、i18n/、static/），严禁碰 themes/ 子模块和 docs/；构建只输出到 /tmp。
+
+【品牌色】蔓越莓红：亮色模式主色 #9B1D20，暗色模式提亮为 #E15D68（保证暗背景可读，你可用目测微调 ±5% 亮度）。
+
+【改动清单】
+A. 中文排版（新建 assets/css/extended/blank.css，PaperMod 官方扩展点）：
+   1) body 字体栈补 CJK：-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue','PingFang SC','Hiragino Sans GB','Microsoft YaHei','Source Han Sans SC',sans-serif；code/pre 补 'Sarasa Mono SC','JetBrains Mono',Menlo,Consolas,monospace；
+   2) 标题行高：h1-h3 line-height 1.4；正文段落间距微调（margin-bottom 1.1em 左右）；
+   3) :root 覆盖 --primary 为蔓越莓红，暗色 [data-theme=dark] 同步覆盖（PaperMod 变量在 theme-vars.css，你先读它确认变量名与暗色选择器再写）；
+   4) 可选微调 --main-width 至 760px（中文行宽）；改动保持克制，不要大改主题视觉。
+B. 首页 homeInfoParams：在 config/_default/languages.toml 里加 [zh-cn.params.homeInfoParams] 与 [en.params.homeInfoParams]（分语言文案）。中文 Title：'你好，我是 sanbika 👋'，Content 两三句简短欢迎语（用 Markdown，风格参照 about 页开头，可从 about 正文提炼）；英文镜像。同时 params.toml 加 disableSpecial1stPost = true（文章列表不再单篇 hero）。注意 socialIcons 已在 config.toml，homeInfo 会自动展示。
+C. 双重 H1 清理：删除正文首个 H1（front matter title 已渲染）：content/about/index.md、content/about/index.en.md、content/projects/sample-project.md、content/projects/sample-project.en.md。
+D. 代码高亮修复：config/_default/config.toml 加 [markup.highlight] noClasses = false（lineNos 可 false），让主题 chroma CSS 生效。
+E. params.toml：加 ShowCodeCopyButtons = true；删 searchLimit = 10（PaperMod 不读该字段）。
+F. 配置收敛：把 config.toml [params] 里的字段（description/author/avatar/DateFormat/socialIcons 等）全部移入 params.toml，config.toml 只留非 params 项（baseURL/title/theme/语言/outputs），消除两处 [params] 重复。
+G. languages.toml：languageName 改为 label（Hugo 0.158+ 新键名，消除弃用警告），两种语言都改。
+H. 品牌色 meta：params.toml 加 [params.assets] theme_color = '#9B1D20'（确认 PaperMod 键名大小写，Hugo TOML 会转小写）。
+I. favicon 404：检查本机是否有 ImageMagick/rsvg 等工具；若有，从 static/images/avatar.jpg 生成 favicon-16x16.png、favicon-32x32.png、apple-touch-icon.png(180x180)、safari-pinned-tab.svg（可直接用 avatar 转换，或简单纯色蔓越莓方块+字母也行）；若无工具则跳过并在汇报中说明。
+J. 不要动：giscus data-lang（现有双语映射正确）、config/production/、主题任何文件、搜索逻辑。
+
+【验证】构建到 /tmp/style-verify（hugo -d，允许 --gc），逐项确认：① CSS bundle 里能搜到 PingFang/蔓越莓红色值；② about/projects 页面只有一个 H1；③ 代码块不再有 inline style，改为 class；④ 首页两种语言都渲染 home-info 卡片、无 first-entry hero；⑤ 构建无 languageName 弃用警告；⑥ /en/ 与中文首页都正常；⑦ favicon 引用的文件全部存在（若做了 I）。全部通过后提交（中文提交信息，风格如：feat: 前端样式优化（中文排版/首页简介/代码高亮/品牌色））。
+
+【汇报】① 改动文件清单；② 每项验证结果；③ 跳过/未完成项及原因（尤其 favicon 工具情况）；④ 需要用户后续替换的占位（如首页简介文案可自行润色）。
+
+---
+
+ok
+
+---
+
+不太对，蔓越莓红#db5079
+
+---
+
+Task: 仓库：/home/sankabox/code/sanbika.github.io。用户反馈品牌色不对：蔓越莓红应为 #db5079（不是我之前用的 #9B1D20）。执行颜色替换。
+
+【规则】
+- 亮色模式主色：#9B1D20 → #db5079
+- 暗色模式主色：#E15D68 → #ef7fa4（在 #db5079 基础上提亮约 15% 保证暗背景可读，构建后你可目测微调）
+- theme_color meta（#9B1D20）→ #db5079
+- 先 grep 全仓（排除 themes/、docs/、.git/）所有 #9B1D20 / #E15D68 / 9b1d20 / e15d68（大小写都要查），一处不漏全部替换，包括 assets/css/extended/blank.css、config/_default/params.toml、static/safari-pinned-tab.svg（若里面用了品牌色）等。
+- 严禁碰 themes/、docs/。
+
+【验证】hugo -d /tmp/color-verify 构建，确认 CSS bundle 里只有新色值（#db5079/#ef7fa4）无旧色值残留；theme-color meta 为 #db5079；无新增警告。
+
+【提交】提交信息如：fix: 品牌色改为 #db5079（暗色 #ef7fa4）。提交后不推送，由主进程处理。汇报：替换了哪些文件、各几处、验证结果。
+
+---
+
+你觉得亮色模式换#f0a0a6好还是维持当前的颜色好？
+
+---
+
+先维持现状吧，我现在在纠结写什么内容上去
+
+---
+
+想写读书笔记之类的，之后如果做了什么项目应该也会放
+
+---
+
+没有打算区分太多，感觉读书笔记也是一种post，而且有时候我可能直接用英文写，不用太在意。
+
+---
+
+Task: 仓库：/home/sankabox/code/sanbika.github.io。小任务：更新首页 homeInfoParams 简介文案，体现「读书笔记 + 项目，中英文随缘」的定位。只改 config/_default/languages.toml 里 [zh-cn.params.homeInfoParams] 和 [en.params.homeInfoParams] 的 Content（Title 保持现状不动），严禁碰其他文件（尤其 themes/、docs/、不改代码结构）。
+
+文案（可在道循原意下微调字词，保持简短 1-2 句）：
+- 中文 Content：这里是我的自留地 —— 写写读书笔记，记录做过的项目，偶尔折腾些新东西。中英文随缘。
+- 英文 Content：My corner on the web — reading notes, side projects, and whatever I happen to tinker with.
+
+注意 TOML 多行字符串语法与现文件保持一致（会合并为单段渲染）。验证：hugo -d /tmp/homeinfo-check 构建通过，两个首页渲染出新文案。提交信息如：chore: 首页简介定稿（读书笔记与项目方向）。不推送。汇报改动与验证结果。
+
+---
+
+先不要改，我还没有想好。然后关于首页，我的仓库里还有一个daily-spark的内容，你觉得那个可以部署在首页作为一个小组件吗？
+
+---
+
+找不到了，好像在另一台电脑的本地，但是问题不大，基本上就是接了ai api，然后每天生成一个日常小挑战这样。
+
+---
+
+1. minimax 2. 中英双语，领域就是日常简单一点的小任务，给生活提亮的而已，所以生活学习创造运动都可以，每天生成一条，帮我准备一下prompt
+
+---
+
+Task: 仓库：/home/sankabox/code/sanbika.github.io（Hugo 0.164 + PaperMod 双语站，zh-cn 根路径 / en 在 /en/，品牌色 #db5079）。新功能：首页「今日小火花 Daily Spark」每日小挑战卡片，由 GitHub Actions 每天调 MiniMax API 自动生成。铁律：不碰 themes/、docs/；构建只到 /tmp。
+
+【架构】
+Actions cron（北京时间每早 00:10，即 UTC 16:10）→ 调 MiniMax 生成双语挑战 → 写 data/daily_spark.json（今日）+ data/daily_spark_history.json（历史数组追加）→ bot commit&push → 触发现有 hugo.yml 部署 → 首页 home-info 卡片下方渲染。
+
+【1. 生成脚本 scripts/daily_spark.py（新建，python3 标准库 only，不用 pip）】
+- 日期用 Asia/Shanghai 时区当天；
+- 请求 POST {MINIMAX_BASE_URL}/v1/text/chatcompletion_v2，Bearer MINIMAX_API_KEY，body 含 model/messages/temperature=0.9；response 取 choices[0].message.content；重试 3 次、退避 10s；
+- 系统提示词（严格嵌入脚本中，一字不差）：
+```
+你是「每日小火花」生成器，为个人博客生成每日小挑战（Daily Spark），目标是给日常生活提亮。
+
+要求：
+1. 领域在 生活 / 学习 / 创造 / 运动 中轮换（按日期伪随机，不必均匀）
+2. 任务必须：当天可完成、耗时 15-30 分钟、零成本或成本极低、无需特殊装备或同伴、安全、不涉及医疗/政治/宗教等敏感内容
+3. 任务要具体可执行，带一点小巧思或新鲜感；禁止空洞鸡汤和老生常谈（如「多喝水」「早点睡」这类禁止出现）
+4. 中英文语义一致，英文自然地道
+5. 只输出 JSON，不要 markdown 代码块，不要任何其他文字，字段结构：
+{"date":"YYYY-MM-DD","tag":{"zh":"生活","en":"Life"},"zh":{"title":"不超过8个字","task":"一句话，不超过40字，具体描述做什么"},"en":{"title":"不超过6个词","task":"one sentence, concrete"}}
+tag 的 zh 固定为 生活/学习/创造/运动 之一，en 对应 Life/Learning/Creating/Movement。
+```
+- user message：`今天是{{date}}（北京时间，{{星期几}}）。请生成今天的挑战，可以结合季节/星期增加变化。`
+- 解析：剥离可能的 ```json 围栏后 json.loads；校验 date==今天、tag.zh/en、zh/en 的 title/task 均非空字符串；任一校验失败则重试（计入总重试）；
+- 写 data/daily_spark.json（pretty、ensure_ascii=False）；追加 data/daily_spark_history.json（数组，按 date 去重，新建时初始化为 []）；日志打印生成结果但绝不打印 API key。
+
+【2. 工作流 .github/workflows/daily-spark.yml（新建）】
+- on: schedule cron '10 16 * * *' + workflow_dispatch；permissions: contents: write；concurrency group daily-spark；
+- 步骤：checkout@v4 → setup-python@v5 → 生成（env：MINIMAX_API_KEY=secrets，MINIMAX_BASE_URL=vars 默认 https://api.minimaxi.com，MINIMAX_MODEL=vars 默认 MiniMax-M2）→ 配置 bot 身份（github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>）→ git pull --rebase origin main → add 两个 data 文件 → diff --cached --quiet 则跳过 → commit（信息如 `chore: daily spark {{date}}`，不加 [skip ci]，需要触发部署）→ push。注意 ${{ }} 在 run 里用 env 传参避免注入。
+
+【3. 占位数据】先手写一份今天的 data/daily_spark.json（date=今天、tag 生活/Life，中文标题「给植物擦叶子」级别的小任务，中英双语，符合 schema），保证部署后卡片立即可见，今晚 Actions 覆盖。
+
+【4. Hugo 渲染】
+- 新建 layouts/_partials/daily_spark.html：读 site.Data.daily_spark，无数据则不渲染；按 .Lang 选 zh/en 字段（tag 同理）；卡片头部左侧「今日小火花」/「Daily Spark」右侧日期（字符串直接输出）；主体：tag 小圆片 + title 加粗 + task 一句话；
+- 站点级覆盖 layouts/_partials/home_info.html：先逐字拷贝 themes/PaperMod/layouts/_partials/home_info.html（先读原文件），在末尾追加 `{{- partial "daily_spark.html" . -}}`，其余零改动；
+- assets/css/extended/blank.css 追加 .daily-spark 样式（用主题变量 --border/--radius/--secondary/--primary，tag 圆片用品牌色 #db5079 背景白字或品牌色描边，卡片在暗色下用现有变量自动适配，不要写死背景色，克制优雅约 30 行）。
+
+【5. 验证】hugo -d /tmp/spark-verify：① 中英首页 home-info 内都渲染出 daily-spark 卡片且文案随语言切换；② 无数据场景（临时移走 data 文件再构建）不报错；③ CSS bundle 含 daily-spark；④ 构建无新警告。通过后提交：`feat: 首页「今日小火花」每日挑战卡片（MiniMax + Actions 自动生成）`。不推送。
+
+【汇报】① 文件清单；② 验证结果；③ 需要用户做的：在仓库 Settings→Secrets→Actions 添加 MINIMAX_API_KEY（可选 vars：MINIMAX_BASE_URL / MINIMAX_MODEL），然后手动 Run workflow 一次验证；④ 潜在风险（cron 延迟、生成失败时卡片停留昨日、GitHub 60 天不活跃会停用 schedule 等）。
+
+---
+
+可以看到了，但是这个可以和之前添加的评论功能结合起来吗？而且首页感觉可以不用放自我介绍一类的了，文章列表也不想放在下面，是不是可以有什么侧列表？帮我重新调整下布局和样式。
+
+---
+
+Task: 仓库：/home/sankabox/code/sanbika.github.io（Hugo 0.164 + PaperMod 双语：zh-cn 根路径 / en 在 /en/，品牌色 #db5079/#ef7fa4）。任务：首页改版。铁律：不碰 themes/、docs/；构建只写 /tmp；所有新建/改动的文本文件末尾补换行符。
+
+【目标布局】首页不再显示 home-info 自我介绍与文章列表；改为：主列 = 「今日小火花」大卡片（hero）+ 下方 Giscus 每日打卡评论区；侧栏 = 最近文章（前5篇）+ 社交图标。手机端（<768px）侧栏堆叠到主列下方。
+
+【1. layouts/index.html（新建，站点级覆盖，只影响首页，/posts/ 等列表页不受影响）】
+- 先读 themes/PaperMod/layouts/list.html 与 baseof.html，沿用相同的 define "main" 结构；
+- 结构：`<div class="home-layout">` 内两列 `<div class="home-main">` 与 `<aside class="home-side">`；
+- 主列：读 site.Data.daily_spark（沿用现有字段 date/tag/zh/en），无数据时渲染占位卡片（不报错）；hero 卡片含：tag 胶囊（品牌色）、日期（右上或 tag 旁）、大号标题（zh/en 按 .Lang 选）、任务句；文案双语：「今日小火花」/「Daily Spark」、「今日打卡」/「Check in Today」（用 cond (eq .Lang "en") 模式，不建 i18n key）；
+- 主列 hero 下方：`{{- partial "spark_comments.html" (dict "page" . "date" $spark.date) -}}`（$spark 无数据时 date 用今天字符串，保证评论区仍在）；
+- 侧栏：「最近文章 / Recent Posts」标题 + 前5篇（where site.RegularPages "Type" "in" site.Params.mainSections，取前5，标题+日期，日期格式 DateFormat），每项链到 .Permalink；下方社交图标：读现有 site.Params.socialIcons，图标 SVG 复用主题渲染方式（先读 themes/PaperMod 里 social_icons 相关 partial，站点级只能新建文件不能改主题，可拷贝其 svg 引用方式或用 name 文本+链接的简化呈现，保持美观）；
+【2. layouts/_partials/spark_comments.html（新建）】
+- 先读现有 layouts/_partials/comments.html，逐字参考其 Giscus 配置（repo/repoId/category/categoryId、light/dark 主题、data-lang 的双语 cond、暗色切换 JS 如有）；唯一区别：data-mapping="specific"、data-term="spark-{{ .date }}"（每天独立话题）；partial 接收 dict（page/date），内部用 $page := .page 取 .Lang；
+- 不动原 comments.html（文章页评论零回归）。
+【3. 配置清理】
+- config/_default/languages.toml：删除 [zh-cn.params.homeInfoParams] 与 [en.params.homeInfoParams] 两段（含 Title/Content）；
+- params.toml：删 disableSpecial1stPost（首页已自定义，死配置）；
+【4. 文件清理】删除 layouts/_partials/home_info.html（覆盖不再使用，首页已不走它）与 layouts/_partials/daily_spark.html（逻辑并入 index.html hero）；
+【5. assets/css/extended/blank.css】
+- 删除旧 .daily-spark 卡片样式块，新增：.home-layout（两列 grid，主列 minmax(0,1fr)、侧栏约 280px，gap 用 --gap；<768px 改单列且侧栏在后）；.home-spark hero（用 --border/--radius/--secondary/--primary 等主题变量，暗色自动适配，标题字号明显大于正文，克制优雅）；.spark-checkin 区块（上方细分隔+小标题）；.home-side 卡片化（border/radius，列表项紧凑 hover 变色）；社交图标行内排布；总量约 60-80 行，不写死背景色（暗色靠变量）。
+【6. 验证】hugo -d /tmp/home-redesign：① 中英首页均无 home-info、无文章列表旧样式，渲染 hero+侧栏，文案随语言；② 无 data 场景（临时移走 data/daily_spark.json 再构建）不报错且有占位；③ /posts/ 列表页、文章页、about、projects、search 全部不受影响（抽查 HTML）；④ CSS bundle 含 home-layout/home-spark；⑤ 无新警告。提交：`feat: 首页改版——每日小火花主位+每日打卡评论+侧栏文章列表`。不推送。汇报：文件清单（含删除）、验证结果、社交图标最终采用的方案。
+
+---
+
+对齐方式还有样式是不是还可以再优化一下呢？然后giscus的discussion多了会有问题么？
+
+---
+
+我创建了一个新的daily-spark分类，你可以读到吗？然后其他都按你推荐的来
+
+---
+
+Task: 仓库：/home/sankabox/code/sanbika.github.io（Hugo 0.164 + PaperMod 双语：zh-cn 根路径 / en 在 /en/）。首页视觉打磨，只碰 layouts/index.html 与 assets/css/extended/blank.css，不碰其他文件（尤其不碰 spark_comments.html、themes/、docs/）。构建只写 /tmp，改动文件保持末尾换行符。
+
+【背景】当前首页 hero 结构（layouts/index.html）：header 里是 tag 胶囊 + ISO 日期；h2.home-spark__title = 「今日小火花」（固定标签）；p.home-spark__sub = 每日挑战标题（如「水果拼盘大作战」）；p.home-spark__task = 任务句。空态 home-spark--empty。
+
+【五项改动】
+1. hero 信息层级对调：h2 大字改为「每日挑战标题」（即 $spark[$langKey].title，如水果拼盘大作战）；固定标签「今日小火花」/「Daily Spark」降级为 header 里的小字标签（与 tag 胶囊、日期同排，视觉上作为 eyebrow/kicker）；home-spark__sub 这个中间层删除（挑战标题升为大字后不再需要），任务句保留为 home-spark__task，字号略大于正文（约 1.05em）。空态结构同步调整（大字留给占位文案）。
+2. 日期本地化：zh 显示「8月15日」，en 显示「Aug 15」（用 .Date/time 解析 data 的 date 字符串：time 解析 "2006-01-02" 格式后按 cond (eq .Lang "en") 用 .Format "Jan 2" / "1月2日" —— 注意 Hugo time.Format 与 .Format 均可，zh 月份名建议手写模板 `printf "%d月%d日" .Month .Day` 避免 locale 依赖）。datetime 属性保持完整 ISO 日期。
+3. hero 大标题加 text-wrap: balance（CSS，属性带兼容前缀无所谓，Safari 旧版自动忽略）。
+4. 「今日打卡」/「Check in Today」标题小标签化：小号大写风格（英文）/加字距，配合细分割线（border-top 或 ::before 线），与 hero 形成分层；CSS 实现，不改语义标签。
+5. 侧栏 sticky：.home-side { position: sticky; top: 约 1rem~calc(var(--gap) + var(--nav-height, 64px))，自行取主题里导航高度变量或合适值 }；注意 grid 布局下 sticky 生效需 align-items: start（已有，确认即可）；移动端单列时取消 sticky（media query 内 position: static）。
+
+【验证】hugo --destination /tmp/polish-check --quiet：① 中英首页：大字是每日挑战标题、eyebrow 是「今日小火花」/「Daily Spark」+ tag + 本地化日期；② /en/ 英文日期格式 Aug 15、中文 8月15日；③ CSS bundle 含 text-wrap/sticky；④ 空数据场景（临时移走 data/daily_spark.json 再构建恢复）正常；⑤ 文章页/列表页零变化。提交：`style: 首页小火花卡片视觉打磨（层级/日期本地化/sticky 侧栏/打卡标题）`。不推送。汇报每项落点与验证结果。
+
+---
+
+”今日小火花“这个名字不太喜欢，能不能还是改成Daily Spark? 或者改成地球Online今日隐藏任务之类的？英文还是Daily Spark. 然后关于品牌色，想换成绿色或者蓝紫色，有什么推荐的色号吗？
+
+---
+
+Task: 仓库：/home/sankabox/code/sanbika.github.io。改个名字：中文站「今日小火花」全部改为「地球Online · 今日隐藏任务」（地球Online 无空格、中间用中点+空格分隔），英文站保持「Daily Spark」不变。只碰 layouts/index.html 和 scripts/daily_spark.py（grep "小火花" 找到所有出现点），不碰其他文件。构建只写 /tmp。
+
+【layouts/index.html】
+- eyebrow 标签：中文「今日小火花」→「地球Online · 今日隐藏任务」（en 分支不动）
+- aria-label 同步改
+- 空态文案改成游戏味：中文大字「今日任务未刷新」、辅助句类似「系统偷懒了，明天再来看看」这类轻松语气（自行润色一句即可，别太长）；英文空态保持现有或改为 "No quest today / The quest system is taking a day off — check back tomorrow."（润色一句）
+- 「今日打卡」/「Check in Today」标题保持不变
+
+【scripts/daily_spark.py】
+- 系统提示词里「每日小火花」生成器的名字改为「地球Online 每日隐藏任务（Daily Spark）」生成器，其余 prompt 逻辑与要求一字不动
+
+【验证】hugo --destination /tmp/rename-check --quiet 构建通过；中文首页 eyebrow/aria/空态为新文案；英文页 Daily Spark 原样；grep 构建产物确认 zh 首页无「小火花」残留（en 无影响）。提交：`chore: 今日小火花更名——地球Online · 今日隐藏任务`。不推送。汇报所有改动点。
+
+---
+
+C
+
+---
+
+Task: 仓库：/home/sankabox/code/sanbika.github.io。品牌色替换：莓红 #db5079/#ef7fa4 → 靖紫 #5B5BD6（亮）/#9B9BF5（暗）。先 grep 全仓（排除 themes/、docs/、.git/）所有 db5079/ef7fa4（大小写都查），一处不漏替换：预期 assets/css/extended/blank.css、config/_default/params.toml（theme_color meta）、static/safari-pinned-tab.svg。严禁碰 themes/、docs/。验证：hugo --destination /tmp/color-c --quiet 构建通过，CSS bundle 只含新色值无旧色残留，theme-color meta = #5B5BD6。提交：`style: 品牌色换为靖紫 #5B5BD6（暗色 #9B9BF5）`。不推送。汇报替换文件与各几处。
+
+---
+
+颜色没什么问题了，但是感觉首页卡片还是不够好看，很像blog的brief而非任务卡，看着比较无聊。
+
+---
+
+Task: 仓库：/home/sankabox/code/sanbika.github.io（Hugo 0.164 + PaperMod 双语，品牌色靛紫 #5B5BD6/#9B9BF5）。首页 spark 卡片重设计：从「博客摘要卡」改成「游戏任务卡」。只碰 layouts/index.html 与 assets/css/extended/blank.css，不碰 spark_comments.html、scripts/、themes/、docs/。构建只写 /tmp，文件末尾保留换行符。
+
+【HTML 结构（layouts/index.html 的 .home-spark 区块重写，数据源与 isset 守卫链保持不变】
+结构：
+<header class="home-spark__strip">：左：「地球ONLINE · 每日任务」（en: EARTH ONLINE · DAILY QUEST，小字大写风）；右：日期 + 任务编号（编号用日期后四位，如 #0815，等宽字体感）
+<div class="home-spark__body">：
+  ① 类型徽章：tag 胶囊 + emoji 映射（生活🏠/学习📚/创造🎨/运动🏃，en: Life📚不对——en 用同样 emoji，标签文字已有 en 值；emoji 按 tag.zh 判别：生活→🏠 学习→📚 创造→🎨 运动→🏃）；
+  ② 大标题：「」引号包裹挑战标题（en 不加引号，用引号会怪，en 保持裸标题）；
+  ③ 任务句；
+  ④ meta 行（游戏味）：⚔难度 ★☆☆（星数见下）· ⏱ 约15-30分钟 · 🪙 +XX XP（XP见下）；en: ⚔ Difficulty ★☆☆ · ⏱ 15-30 min · 🪙 +XX XP；
+  ⑤ 接取按钮：<a class="home-spark__cta" href="#checkin">接取任务 ↓</a>（en: Accept Quest ↓），.spark-checkin 加 id="checkin"；
+【难度与 XP 确定性算法（模板内计算）】$hash := hash.FNV32a $spark.date；$stars := add (mod $hash 3) 1（1-3，实心★ + 空心☆拼出3位）；$xp := add (mod $hash 41) 10（10-50）。同日期跨语言/构建结果一致。
+【空态】保留占位卡但套用新 strip 结构，文案不变（今日任务未刷新等）。
+【CSS（blank.css 重写 .home-spark 块）】
+- .home-spark：去旧白底圆角样式，改为：border-radius 保留 --radius；border: 1px solid var(--border)；内部结构：strip 是卡片头部（背景靛紫：亮色 #5B5BD6 暗色 #9B9BF5，白字，flex 两端对齐，小字 letter-spacing）；body 内边距 var(--gap)；strip 与 body 之间加撕票虚线（border-bottom: 1px dashed + 或 strip 下缘用 repeating-linear-gradient 虚线，选简单可靠的）；
+- 徽章：emoji + 文本的小胶囊，背景用主题 --theme（PaperMod 有 --theme/--secondary 变量，先读 theme-vars.css 确认）；
+- meta 行：var(--secondary) 小字，图标 emoji 原样；
+- CTA 按钮：行内块，边框 1px solid 靛紫、文字靛紫、圆角 pill，hover 背景填充靛紫白字（暗色用亮色变体），去掉下划线；
+- hover 整卡：translateY(-2px) + box-shadow 0 4px 16px rgba(0,0,0,.08) + border-color 变靛紫；prefers-reduced-motion 下禁用 transform；
+- 移动端：strip 文字可换行，meta 行 flex-wrap；
+- 暗色模式全部用变量/现有色值适配，不写死背景色（strip 用品牌色变量）；
+- 旧 .home-spark__head-left/__eyebrow 等不再使用的选择器清理干净。
+【验证】hugo --destination /tmp/quest-check --quiet：① 中英首页渲染 strip/徽章/引号标题/meta/CTA；② id=checkin 存在于 spark-checkin；③ 确定性：同日期中英两页 stars/xp 一致（grep 两页输出比对）；④ 空数据场景正常；⑤ 文章页/列表页零变化；⑥ CSS bundle 含新类名、无旧类残留。提交：`style: 首页任务卡重设计——游戏任务风（任务条/徽章/难度XP/接取按钮）`。不推送。汇报设计落点与验证结果。
+
+---
+
+不太想要emoji和接取任务的按钮，因为前者太乱后者没有用。可以做成像素描边风，hover变实线，或者找一下有没有更好的方案。
+
+---
+
+Task: 仓库：/home/sankabox/code/sanbika.github.io。首页任务卡再打磨一轮：删 emoji 与接取按钮，改为像素描边风。只碰 layouts/index.html 与 assets/css/extended/blank.css。构建只写 /tmp。
+
+【layouts/index.html】
+1. 删除接取按钮整个 <a class="home-spark__cta"> 及其 $ctaLabel 变量；同步删除 .spark-checkin 上的 id="checkin"（无其他引用，先 grep 确认）。
+2. 删除 emoji：$emojiMap 映射整体删除，徽章只留 tag 文字（zh/en 各自已有值）；meta 行删掉 ⏱ 的 aria-hidden span，只留文字（中文「约15-30分钟」/ 英文「15-30 min」，如 $timeLabel 已是此内容就直接用）。
+3. 结构其余不动（strip 标签+日期+#MMDD、「」标题、任务句、空态）。
+
+【assets/css/extended/blank.css 重写 .home-spark 框架样式】
+1. 像素描边：.home-spark { border: 2px solid transparent; border-image: repeating-linear-gradient(90deg, var(--pix) 0 6px, transparent 6px 11px) 2; border-radius: 0; }——亮色 --pix 用 #5B5BD6、暗色 [data-theme=dark] 用 #9B9BF5（可在 :root/[data-theme=dark] 定义局部变量或直接写两条规则）；注意 border-image 与 border-radius 不兼容，卡片与内部 strip、徽章全部改方角（border-radius: 0，strip 原圆角去掉）。
+2. hover：.home-spark:hover { border-image: linear-gradient(var(--pix), var(--pix)) 2; }（虚线变实线；不需要 transition，状态切换即可；同时删除原 hover 的 translateY/box-shadow/border-color 规则，只保留描边变化一种反馈）。prefers-reduced-motion 下无需处理（无位移动画了）。
+3. strip（任务条）：保持靛紫背景白字，方角；删除 strip 与 body 之间的撕票虚线（border-bottom dashed 或相关），虚线语言只留给外框。
+4. 徽章：文字胶囊改方角，细边框 1px solid var(--pix)，文字用品牌色或 --secondary，去背景色（保持素净）；padding 小。
+5. 清理所有不再使用的选择器（__cta、撕线相关、旧 hover 组合、emoji 相关 padding/gap 如有）。
+6. 空态 .home-spark--empty 同样方角+像素描边（共用规则）。
+
+【验证】hugo --destination /tmp/pixel-check --quiet：① 构建产物中英首页无任何 emoji（🏠📚🎨🏃⏱）、无 home-spark__cta、无 id="checkin"；② CSS bundle 含 border-image + repeating-linear-gradient 像素描边规则、hover 实线规则、border-radius: 0；③ grep CSS 无 __cta/撕线残留；④ 空数据场景正常；⑤ 文章页/列表页零变化。提交：`style: 任务卡去装饰改像素描边风（删emoji与接取按钮，hover虚线变实线）`。不推送。汇报改动点与验证结果。
+
+---
+
+Badge看看能不能优化下，左右实线的方案也很奇怪，最上方的任务条说明也有点奇怪，还有什么别的方案吗？包括样式和hover动画，现在的不太行。
+
+---
+
+A，但是我可以本地先查看效果吗？不想一直推送
+
+---
+
+Task: 仓库：/home/sankabox/code/sanbika.github.io。首页任务卡改为「方案 A：清爽现代卡 + 进度线 hover」。只碰 layouts/index.html 与 assets/css/extended/blank.css。构建只写 /tmp，文件保留末尾换行符。用户会先本地 hugo server 预览再决定推送，所以视觉效果务必一次到位。
+
+【设计规格】
+1. 整卡 .home-spark：方角改回圆角 var(--radius)；边框 1px solid var(--border)；背景 var(--theme)（读 themes/PaperMod/assets/css/core/theme-vars.css 确认变量名，亮暗自适应）；position: relative；overflow: hidden（为底边进度线服务）；**删除全部像素描边 border-image/repeating-linear-gradient/--pix 相关规则**。
+2. 头部 .home-spark__strip 重做：不再是实色任务条——改为普通排版行：左侧小字大写风格标签「地球ONLINE · 每日任务」（en: EARTH ONLINE · DAILY QUEST，字号约 0.75em，letter-spacing 0.08em，颜色 var(--secondary)，可 text-transform: uppercase 对英文）；右侧日期（8月15日 / Aug 15）+ #MMDD 编号，同 var(--secondary)；strip 与 body 之间 1px solid var(--border) 细分割线（用 border-bottom，圆角处注意 overflow hidden 已处理）。
+3. Badge 取消实体 chip：tag 变成标题行的靛紫前缀——结构改为 <p class="home-spark__kicker">创造</p>（en: Creating）：字号约 0.8em、颜色 var(--primary)（靛紫）、font-weight 600、letter-spacing 0.05em、margin-bottom 小；**标题单独一行**（「」标题 / 英文裸标题），删除旧 __badge 规则。
+4. 任务句、时长行保持现有文字（时长 var(--secondary) 0.85em）。
+5. Hover 动画——底边进度线：.home-spark::after { content:''; position:absolute; left:0; bottom:0; width:100%; height:2px; background: var(--primary); transform: scaleX(0); transform-origin: left center; transition: transform 0.35s ease; }；.home-spark:hover::after { transform: scaleX(1); }；同时可加极淡背景变化：.home-spark:hover { border-color: var(--primary); }（描边也同步变靛紫，背景不動以免脏）。focus-within 同步支持（键盘 tab 到卡内链接时也拉线，虽然现在卡内无链接，防御性写上）。
+6. prefers-reduced-motion: reduce 下 ::after 的 transition 去掉（直接切换状态）。
+7. 清理：所有 --pix、像素 border-image、撕线、__badge、旧 strip 实色样式全部删除，不留死规则。
+
+【验证】hugo --destination /tmp/plana-check --quiet：① 构建产物无 border-image/--pix/__badge/实色 strip 残留；② CSS 含 ::after scaleX 进度线 + transition + reduced-motion 兜底；③ 中英首页头部小字标签+日期+编号、kicker、标题结构正确；④ 空数据场景正常；⑤ 其他页面零变化。提交：`style: 任务卡改清爽现代风（去像素描边，底边进度线 hover）`。不推送。汇报改动点。
+
+---
+
+不喜欢最下面的流光，此外类别的badge可以用主色调加一点透明度处理
+
+---
+
+Task: 仓库：/home/sankabox/code/sanbika.github.io。任务卡微调（用户本地预览反馈）。只碰 assets/css/extended/blank.css（若需动 HTML 才碰 layouts/index.html，预计不需要），构建只写 /tmp，最后 git commit --amend --no-edit 并入 HEAD f4955c7（保持单条提交）。
+
+1. 删除底边进度线：.home-spark::after 整条规则、:hover/:focus-within::after 的 scaleX 规则、prefers-reduced-motion 里对它的 transition 兜底（若该 media 块因此变空则整块删）。保留 .home-spark:hover { border-color: var(--primary) }（描边变靛紫是唯一 hover 反馈）；hover 可加 background 过渡到极淡靛紫（background: color-mix(in srgb, var(--primary) 4%, var(--theme)); 若担心兼容性用 rgba(91,91,214,0.04) 亮色 + rgba(155,155,245,0.06) 暗色两套，选一种实现，保持克制）。transition 上 border-color/background-color 0.25s ease 即可（纯颜色过渡无需 reduced-motion 兜底，但加上也无害，自行判断）。
+2. kicker（类别 badge）从纯文字改为半透明主色块：背景靛紫低透明度——亮色 rgba(91,91,214,0.14)、暗色 rgba(155,155,245,0.18)；文字颜色亮色 #5B5BD6（var(--primary)）、暗色 #9B9BF5（亮紫）；改为 inline-block、padding 约 0.15em 0.6em、border-radius 约 4px（小圆角即可，卡片是 var(--radius)）、字号保持 0.8em、font-weight 600、letter-spacing 0.05em；margin-bottom 0.35em。亮暗两套规则用 :root/[data-theme=dark] 或直接在 [data-theme="dark"] 选择器覆盖 background/color。
+
+验证：hugo --destination /tmp/kicker-check --quiet 构建通过；CSS 无 ::after 进度线残留、无 scaleX；kicker 有 rgba 背景两套；其他页面零变化。amend 后汇报改动。不推送（用户还在本地预览迭代）。
+
+---
+
+过往的任务列表和discussion会有记录吗
+
+---
+
+3
+
+---
+
+Task: 仓库：/home/sankabox/code/sanbika.github.io（Hugo 0.164 + PaperMod 双语，zh-cn 根路径/en 在 /en/，品牌靖紫 #5B5BD6/#9B9BF5）。新功能：往期任务页 /quests/。铁律：不碰 themes/、docs/、scripts/、workflows/；构建只写 /tmp；文件末尾换行。
+
+【1. 内容页】新建 content/quests/_index.md 与 content/quests/_index.en.md：front matter 仅 title（「往期任务」/「Past Quests」）+ layout: quests + description（一句话）；正文留空或一句引导语（两种语言各自写一句，如「过往每日任务的存档，点「打卡讨论」可跳到当天的讨论」/英文镜像）。
+【2. 模板 layouts/quests.html（新建）】
+- 读 site.Data.daily_spark_history（数组，每项 date/tag/zh/en，同 daily_spark 结构；可能为空——空时渲染一句「还没有存档」）；
+- 倒序（新在前）按月分组（YYYY-MM），月份标题如「2026年8月」/「Aug 2026」（按 .Lang）；
+- 每条：日期（本地化 8月15日/Aug 15）+ tag 徽章（复用 .home-spark__kicker 样式类或新建 .quests__tag 同款半透明靖紫色块）+ 标题（zh 加「」，en 裸）+ 任务句（默认显示，不用折叠）+ 「打卡讨论 ↗」链接：href=https://github.com/sanbika/sanbika.github.io/discussions?discussions_q=spark-{{ date }}（target=_blank rel=noopener；这个搜索页永不 404，无讨论则空结果）；
+- 今天的任务也在 history 里（生成时追加），正常展示即可；
+- 样式克制：月份标题小字+分割线，条目列表用 --border 底边线分隔，tag 色块与首页 kicker 一致（亮 rgba(91,91,214,0.14) 字 #5B5BD6，暗 rgba(155,155,245,0.18) 字 #9B9BF5）；hover 条目背景极淡靖紫（与首页卡一致 4%/6%）；
+【3. CSS】blank.css 追加 .quests 区块（约 30 行，复用变量，暗色自适应；不写死背景色）。
+【4. 菜单】config/_default/menus.zh-cn.toml 加：identifier=quests name=往期任务 url=/quests/ weight=15（在 posts 10 和 projects 20 之间）；menus.en.toml：identifier=quests name=Past Quests url=/en/quests/ weight=15。
+【5. 验证】hugo --destination /tmp/quests-check --quiet：① /quests/ 与 /en/quests/ 渲染出按月分组列表，链接正确含 spark-日期；② 中英菜单各 6 项含新入口；③ history 为空场景（临时移走 data 文件）不报错；④ 其他页面零变化（首页任务卡样式未被波及）。提交：`feat: 往期任务页 /quests/——按月存档+打卡讨论链接`。不推送（与上一条任务卡提交一起等用户预览后推）。汇报文件清单与验证结果。
