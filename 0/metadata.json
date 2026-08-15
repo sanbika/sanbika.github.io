@@ -1,0 +1,25 @@
+{
+  "cli_version": "0.9.0",
+  "checkpoint_id": "01M02G6Y262ENNJBY0A3SFAQ39",
+  "session_id": "01a000cc-b8e8-73dd-a84c-2760a9c7c191",
+  "strategy": "manual-commit",
+  "created_at": "2026-08-15T10:41:50.783649342Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Pi",
+  "model": "glm-5.2",
+  "turn_id": "3c7b681f6cd6",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 426598,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 2889344,
+    "output_tokens": 68995,
+    "api_call_count": 76
+  },
+  "session_metrics": {
+    "turn_count": 21
+  }
+}
