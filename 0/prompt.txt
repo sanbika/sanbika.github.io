@@ -57,3 +57,26 @@ J. 不要动：giscus data-lang（现有双语映射正确）、config/productio
 【验证】构建到 /tmp/style-verify（hugo -d，允许 --gc），逐项确认：① CSS bundle 里能搜到 PingFang/蔓越莓红色值；② about/projects 页面只有一个 H1；③ 代码块不再有 inline style，改为 class；④ 首页两种语言都渲染 home-info 卡片、无 first-entry hero；⑤ 构建无 languageName 弃用警告；⑥ /en/ 与中文首页都正常；⑦ favicon 引用的文件全部存在（若做了 I）。全部通过后提交（中文提交信息，风格如：feat: 前端样式优化（中文排版/首页简介/代码高亮/品牌色））。
 
 【汇报】① 改动文件清单；② 每项验证结果；③ 跳过/未完成项及原因（尤其 favicon 工具情况）；④ 需要用户后续替换的占位（如首页简介文案可自行润色）。
+
+---
+
+ok
+
+---
+
+不太对，蔓越莓红#db5079
+
+---
+
+Task: 仓库：/home/sankabox/code/sanbika.github.io。用户反馈品牌色不对：蔓越莓红应为 #db5079（不是我之前用的 #9B1D20）。执行颜色替换。
+
+【规则】
+- 亮色模式主色：#9B1D20 → #db5079
+- 暗色模式主色：#E15D68 → #ef7fa4（在 #db5079 基础上提亮约 15% 保证暗背景可读，构建后你可目测微调）
+- theme_color meta（#9B1D20）→ #db5079
+- 先 grep 全仓（排除 themes/、docs/、.git/）所有 #9B1D20 / #E15D68 / 9b1d20 / e15d68（大小写都要查），一处不漏全部替换，包括 assets/css/extended/blank.css、config/_default/params.toml、static/safari-pinned-tab.svg（若里面用了品牌色）等。
+- 严禁碰 themes/、docs/。
+
+【验证】hugo -d /tmp/color-verify 构建，确认 CSS bundle 里只有新色值（#db5079/#ef7fa4）无旧色值残留；theme-color meta 为 #db5079；无新增警告。
+
+【提交】提交信息如：fix: 品牌色改为 #db5079（暗色 #ef7fa4）。提交后不推送，由主进程处理。汇报：替换了哪些文件、各几处、验证结果。
