@@ -5,17 +5,17 @@
  * two-column layout (Daily Spark hero + sidebar).
  * --------------------------------------------------------------------------- */
 
-/* --- Brand color (Cranberry red) --------------------------------------------
- * Light mode:  #db5079  (cranberry pink)
- * Dark mode:   #ef7fa4  (lighter, AA-readable on PaperMod dark background)
+/* --- Brand color (靖紫 / Quiet purple) ---------------------------------------
+ * Light mode:  #5B5BD6  (quiet purple)
+ * Dark mode:   #9B9BF5  (lighter, AA-readable on PaperMod dark background)
  * ------------------------------------------------------------------------- */
 :root {
-  --primary: #db5079;
+  --primary: #5B5BD6;
   --main-width: 760px;
 }
 
 :root[data-theme="dark"] {
-  --primary: #ef7fa4;
+  --primary: #9B9BF5;
 }
 
 /* --- CJK font stack --------------------------------------------------------
