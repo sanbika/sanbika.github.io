@@ -1,0 +1,93 @@
+{
+  "cli_version": "0.9.0",
+  "checkpoint_id": "01M04S6GM8FB5VY9NRG60KX6C3",
+  "session_id": "01a0095e-ebb7-748c-9042-3869b2db86f5",
+  "strategy": "manual-commit",
+  "created_at": "2026-08-16T07:57:21.113970341Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "save_step_count": 1,
+  "files_touched": [
+    ".gitignore"
+  ],
+  "agent": "Pi",
+  "model": "glm-5.2",
+  "turn_id": "1920cb6f3cfa",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 9407,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 26944,
+    "output_tokens": 3297,
+    "api_call_count": 7
+  },
+  "session_metrics": {
+    "turn_count": 2
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-08-16T07:57:21.107107243Z",
+    "agent_lines": 8,
+    "agent_removed": 1,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 8,
+    "total_lines_changed": 9,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 4731,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".codegraph/.gitignore": 5,
+        ".pi/.gitignore": 1,
+        ".pi/.pisquad/.gitignore": 1,
+        ".pi/.pisquad/state.json": 10,
+        ".pi/agents/archivist.md": 54,
+        ".pi/agents/planner.md": 38,
+        ".pi/agents/reviewer.md": 36,
+        ".pi/agents/scout.md": 51,
+        ".pi/agents/worker.md": 25,
+        ".pi/extensions/codegraph/.gitignore": 1,
+        ".pi/extensions/codegraph/README.md": 40,
+        ".pi/extensions/codegraph/index.ts": 324,
+        ".pi/extensions/codegraph/package-lock.json": 1838,
+        ".pi/extensions/codegraph/package.json": 8,
+        ".pi/extensions/entire/index.ts": 127,
+        ".pi/extensions/subagent/agents.ts": 140,
+        ".pi/extensions/subagent/index.ts": 1125,
+        ".pi/extensions/wikilink-lint/index.ts": 93,
+        ".pi/extensions/wikilink-lint/lint.ts": 109,
+        ".pi/skills/project-docs/SKILL.md": 20,
+        ".pi/skills/workflow/SKILL.md": 36,
+        ".pi/skills/workflow/orchestration.md": 78,
+        "codegraph.json": 3,
+        "docs/README.md": 27,
+        "docs/architecture/README.md": 10,
+        "docs/architecture/decisions/README.md": 18,
+        "docs/architecture/overview.md": 15,
+        "docs/conventions/README.md": 19,
+        "docs/conventions/ci.md": 35,
+        "docs/conventions/frontend-styling.md": 110,
+        "docs/conventions/giscus.md": 64,
+        "docs/conventions/i18n.md": 26,
+        "docs/current-state.md": 177,
+        "docs/glossary.md": 9,
+        "docs/prds/README.md": 27,
+        "docs/tasks/README.md": 31
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 8,
+      "agent_lines_removed": 1
+    }
+  ]
+}

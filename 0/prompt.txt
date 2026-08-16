@@ -1,0 +1,43 @@
+.pi和docs是不是可以加到gitignore里？
+
+---
+
+都加上吧
+
+---
+
+Task: 修改仓库 /home/sankabox/code/sanbika.github.io/.gitignore（当前内容如下）：
+
+```
+public/
+resources/_gen/
+.hugo_build.lock
+.DS_Store
+
+# 开发与设计文档不进入 commit
+docs/superpowers/
+```
+
+改为：
+
+```
+public/
+resources/_gen/
+.hugo_build.lock
+.DS_Store
+__pycache__/
+
+# 开发与设计文档不进入 commit
+docs/
+
+# 本地开发工具（pi agent、codegraph、entire）
+.pi/
+.codegraph/
+codegraph.json
+.entire/
+```
+
+要求：
+1. 用 edit 工具做精确替换，不要动其他内容
+2. 改完运行 `git status --short` 验证：`.pi/`、`docs/`、`.codegraph/`、`codegraph.json`、`.entire/`、`scripts/__pycache__/` 都不再出现在未跟踪列表里
+3. 报告最终 .gitignore 内容和 git status 输出
