@@ -1,15 +1,15 @@
 {
-  "date": "2026-08-17",
+  "date": "2026-08-18",
   "tag": {
-    "zh": "学习",
-    "en": "Learning"
+    "zh": "生活",
+    "en": "Life"
   },
   "zh": {
-    "title": "观察生活的隐喻",
-    "task": "用手机拍下上班或上学路上最特别的一个细节，写一句20字以内的简短解读"
+    "title": "记录夏日落日",
+    "task": "傍晚找一个视野好的地方，观察并用手机记录今天日落前后的天空颜色变化"
   },
   "en": {
-    "title": "Spot the metaphor",
-    "task": "Photograph one unusual detail on your commute and write a one-sentence caption under 20 words"
+    "title": "Capture sunset",
+    "task": "Find a spot with a good view tonight and capture the sky colors before and after sunset with your phone"
   }
 }

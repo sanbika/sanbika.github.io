@@ -43,5 +43,20 @@
       "title": "Spot the metaphor",
       "task": "Photograph one unusual detail on your commute and write a one-sentence caption under 20 words"
     }
+  },
+  {
+    "date": "2026-08-18",
+    "tag": {
+      "zh": "生活",
+      "en": "Life"
+    },
+    "zh": {
+      "title": "记录夏日落日",
+      "task": "傍晚找一个视野好的地方，观察并用手机记录今天日落前后的天空颜色变化"
+    },
+    "en": {
+      "title": "Capture sunset",
+      "task": "Find a spot with a good view tonight and capture the sky colors before and after sunset with your phone"
+    }
   }
 ]
