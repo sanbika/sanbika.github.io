@@ -229,15 +229,7 @@ h3 {
   line-height: 1.65;
 }
 
-/* Meta row: a single inline line ("约15-30分钟" / "15-30 min"). Plain
- * inline flow is enough — no flex, no separator ::after, no wrapper.
- */
-.home-spark__meta {
-  margin: 0;
-  color: var(--secondary);
-  font-size: 0.85em;
-  letter-spacing: 0.02em;
-}
+
 
 /* Empty-state card: keeps the strip frame but trims the right side
  * (no date / no id without a real quest). Title is slightly smaller so

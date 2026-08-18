@@ -37,7 +37,6 @@
 {{- /* Strip + meta copy is constant per language; compute once so both
        the data and the empty-state branches reuse the same strings. */ -}}
 {{- $stripLabel := cond (eq $langKey "en") "EARTH ONLINE · DAILY QUEST" "地球ONLINE · 每日任务" -}}
-{{- $timeLabel := cond (eq $langKey "en") "15-30 min" "约15-30分钟" -}}
 
 <div class="home-layout">
   <div class="home-main">
@@ -73,7 +72,6 @@
           <p class="home-spark__kicker">{{ $tag }}</p>
           <h2 class="home-spark__title">{{ $titleDisplay }}</h2>
           <p class="home-spark__task">{{ $task }}</p>
-          <p class="home-spark__meta">{{ $timeLabel }}</p>
         </div>
       </section>
     {{- else -}}
