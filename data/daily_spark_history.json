@@ -58,5 +58,20 @@
       "title": "Capture sunset",
       "task": "Find a spot with a good view tonight and capture the sky colors before and after sunset with your phone"
     }
+  },
+  {
+    "date": "2026-08-19",
+    "tag": {
+      "zh": "创造",
+      "en": "Creating"
+    },
+    "zh": {
+      "title": "捕捉夕阳光影",
+      "task": "在日落前后30分钟内，出门找一个有光影对比的角落，用手机拍一张有故事感的照片"
+    },
+    "en": {
+      "title": "Chase Golden Hour",
+      "task": "Within 30 minutes before or after sunset, go outside and capture a photo with dramatic light and shadow in a corner of your neighborhood"
+    }
   }
 ]
