@@ -9,7 +9,7 @@
 
 - **静态生成**：Hugo extended v0.164+
 - **主题**：PaperMod（git submodule）
-- **部署**：GitHub Actions → `gh-pages` 分支 → GitHub Pages
+- **部署**：GitHub Actions → 官方 [`actions/deploy-pages`](https://github.com/actions/deploy-pages) → GitHub Pages
 - **评论**：[Giscus](https://giscus.app/)（基于 GitHub Discussions）
 - **搜索**：PaperMod 内置 Fuse.js（客户端索引）
 - **统计**：Google Analytics 4
@@ -73,7 +73,9 @@ weight: 1
 git push origin main
 ```
 
-工作流：`.github/workflows/hugo.yml`（`Build` + `Deploy to gh-pages`）。
+工作流：`.github/workflows/hugo.yml`（`build` + `deploy`，构建产物通过 `actions/upload-pages-artifact` 上传，`actions/deploy-pages` 直接驱动 Pages 服务）。
+
+> 仓库设置：Settings → Pages → Source 必须为 **GitHub Actions**（不是 "Deploy from a branch"），否则 deploy job 会失败。
 
 ## 目录结构
 

@@ -78,3 +78,38 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run hugo.yml --ref main
+
+      # Poll the live homepage until it reflects today's spark date.
+      # Pages edges usually propagate within 1-2 minutes; we wait up to
+      # 5 minutes and only warn on timeout (the deploy itself succeeded
+      # and the spark data is already committed to main).
+      - name: Verify homepage reflects today's spark
+        if: steps.push.outputs.pushed == 'true'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SITE_URL="https://sanbika.github.io/"
+          DATE=$(TZ=Asia/Shanghai date +%Y-%m-%d)
+          DEADLINE=$(( $(date +%s) + 300 ))   # 5 minutes
+          echo "Waiting for $SITE_URL to reflect spark date $DATE ..."
+          SEEN=""
+          while [ "$(date +%s)" -lt "$DEADLINE" ]; do
+            HTML=$(curl -sL "$SITE_URL" || echo "")
+            if echo "$HTML" | grep -q "datetime=$DATE"; then
+              SEEN=$DATE
+              break
+            fi
+            echo "  ...not yet ($(date -u +%H:%M:%SZ)); retrying in 20s"
+            sleep 20
+          done
+          if [ -n "$SEEN" ]; then
+            echo "✓ homepage reflects spark date $SEEN"
+          else
+            {
+              echo "::warning::homepage did NOT reflect spark date $DATE within 5 minutes."
+              echo "The deploy was triggered but Pages CDN appears to be lagging."
+              echo "Datetimes currently seen on home page:"
+              curl -sL "$SITE_URL" | grep -oE 'datetime=2026-[0-9-]+' | sort -u | head -5
+            } >&2
+          fi

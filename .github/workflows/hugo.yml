@@ -1,15 +1,39 @@
 name: Deploy Hugo site
 
+# Migrated from peaceiris/actions-gh-pages to the official Pages Actions:
+# the previous branch-push approach relied on GitHub Pages detecting a new
+# tip on `gh-pages`, which `force_orphan: true` skipped on rare occasions
+# (Pages kept serving the previous build indefinitely). The official path
+# drives Pages via the `pages-deployment` API and is atomically consistent.
+#
+# IMPORTANT: this workflow requires the repo's Pages source to be set to
+# "GitHub Actions" under Settings → Pages, otherwise the deploy job will
+# fail with "Pages is enabled but no source is configured".
+
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
+# Only one Pages deploy at a time. cancel-in-progress: false so a
+# daily-spark push mid-deploy waits for the in-flight deploy to finish
+# instead of starting a parallel deploy on stale artifacts.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+# Minimum scopes for the official Pages Actions deploy.
+#   contents:read  — checkout
+#   pages:write    — create the Pages deployment
+#   id-token:write — Pages OIDC token
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
-  build-deploy:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -25,12 +49,78 @@ jobs:
       - name: Build
         run: hugo --minify --gc --buildFuture
 
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v4
+      # Capture the just-built spark date so the deploy job can verify
+      # the homepage actually shows it after Pages picks up the new
+      # artifact. Pure stdlib (json) — no extra dependencies. Missing /
+      # malformed file is treated as "no verification target", not a fail.
+      - name: Read expected spark date
+        id: spark
+        run: |
+          DATE=$(python3 -c "
+          import json, sys
+          try:
+              print(json.load(open('data/daily_spark.json'))['date'])
+          except Exception as e:
+              sys.stderr.write(f'no spark: {e}\n')
+              sys.exit(0)
+          " 2>/dev/null || true)
+          if [ -z "$DATE" ]; then
+            echo "expected_date=" >> "$GITHUB_OUTPUT"
+            echo "No daily_spark.json or no 'date' field; skipping verification."
+          else
+            echo "expected_date=$DATE" >> "$GITHUB_OUTPUT"
+            echo "Expected spark date: $DATE"
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: ./public
-          cname: ''
-          force_orphan: true
-          clean: true
+          path: ./public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      # Post-deploy sanity check. Pages edges usually propagate within
+      # ~30s but occasionally take longer; we don't block on failure —
+      # Pages build success + artifact upload is authoritative. This step
+      # just surfaces a clear ::warning:: the next time CDN lag hides a
+      # fresh build, so the daily-spark workflow above can react.
+      - name: Verify home page reflects the just-built spark
+        if: needs.build.outputs.expected_date != ''
+        continue-on-error: true
+        env:
+          SITE_URL: ${{ steps.deployment.outputs.page_url }}
+          EXPECTED: ${{ needs.build.outputs.expected_date }}
+        run: |
+          echo "Waiting 30s for Pages edge propagation..."
+          sleep 30
+          HOME_HTML=$(curl -sL "$SITE_URL" || echo "")
+          if [ -z "$HOME_HTML" ]; then
+            echo "::warning::could not fetch $SITE_URL — Pages may be unreachable or still propagating."
+            exit 0
+          fi
+          if echo "$HOME_HTML" | grep -q "datetime=$EXPECTED"; then
+            echo "✓ home page shows datetime=$EXPECTED"
+          else
+            {
+              echo "::warning::home page does NOT show datetime=$EXPECTED yet."
+              echo "Pages CDN may be lagging. The deploy itself succeeded"
+              echo "(see the Pages badge on this run); if the page still"
+              echo "doesn't update within a few minutes, check the Pages"
+              echo "settings source is 'GitHub Actions'."
+              echo
+              echo "Datetimes currently seen on home page:"
+              echo "$HOME_HTML" | grep -oE 'datetime=2026-[0-9-]+' | sort -u | head -5
+            } >&2
+          fi
