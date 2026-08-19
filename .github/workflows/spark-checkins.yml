@@ -1,0 +1,87 @@
+name: Fetch Spark Check-ins
+
+# Pulls user-uploaded images from GitHub Discussions (term spark-<date>),
+# writes data/spark_checkins.json. No-op when nothing changed (the script
+# itself does byte-level compare and exits clean without writing).
+#
+# Schedule: every hour at :17 — chosen to stay clear of daily-spark.yml's
+# :10 trigger so the two writers never race for the same data file.
+# Manual: workflow_dispatch for one-off refresh after a notable check-in.
+#
+# We deliberately do NOT trigger hugo.yml here. hugo.yml already listens
+# to `on: push: branches: [main]` and will pick up the data file push
+# automatically — chaining `gh workflow run` would just double-deploy.
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+# Single writer — cancel-in-progress: false so two overlapping runs
+# don't fight over the same JSON / push race.
+concurrency:
+  group: spark-checkins
+  cancel-in-progress: false
+
+# contents:write — to push data/spark_checkins.json back to main
+# actions:write — not strictly needed today (no chained workflow_dispatch),
+#                 kept for parity with daily-spark.yml in case future changes
+#                 want to trigger hugo.yml manually.
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Sync with main
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main || true
+
+      - name: Fetch spark check-ins
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/fetch_spark_checkins.py
+
+      - name: Stage check-in file
+        run: |
+          git add data/spark_checkins.json
+          git status --short
+
+      - name: Check for changes
+        id: check
+        run: |
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push
+        if: steps.check.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git commit -m "chore: refresh spark check-ins"
+          if git push origin HEAD:main; then
+            exit 0
+          fi
+          echo "[spark-checkins] push failed, retrying once after rebase..." >&2
+          git pull --rebase origin main
+          git push origin HEAD:main
