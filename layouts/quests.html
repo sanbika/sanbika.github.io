@@ -7,8 +7,15 @@
     2. 按 date 倒序 $clean;
     3. 按 YYYY-MM 分组, 月份标题本地化 (2026年8月 / Aug 2026);
     4. 每条显示本地化日期 + tag 徽章 + 标题 (zh 加「」, en 裸) + 任务正文 +
-       「打卡讨论」链接: 永远跳到 GitHub Discussions 搜索页
-       (?discussions_q=spark-<date>), 该搜索页永不 404, 无讨论则空结果.
+       打卡图片墙 (若 site.Data.spark_checkins 中该日期有图) + 「打卡讨论」
+       链接: 永远跳到 GitHub Discussions 搜索页 (?discussions_q=spark-<date>),
+       该搜索页永不 404, 无讨论则空结果.
+  spark_checkins.json 由 scripts/fetch_spark_checkins.py 写入 (CI 每小时拉一次),
+  结构见 docs/superpowers/specs/2026-08-18-spark-checkins-design.md §3. 本模板
+  对该文件的处理是宽容的 — 用 $data := site.Data.spark_checkins 赋值, 然后
+  if $data 守 nil: data 文件不存在时 site.Data.x 为 nil, 直接 where <nil>
+  会渲染错误; where 返回空数组或 len==0 时跳过图卡墙. checkins 字段缺失
+  同样视为空.
   为什么在 sort 之前就做预过滤 (而不是只在渲染时跳过): 月份键是通过
   substr .date 0 7 抽取并用 time() 解析的, Hugo 的 time() 对不可解析
   字符串会直接报错而非返回零值 — 预过滤保证月份键也一定可解析.
@@ -99,6 +106,30 @@
                 </div>
                 <h3 class="quests__item-title">{{ $titleDisplay }}</h3>
                 <p class="quests__task">{{ $task }}</p>
+                {{- /* 打卡图片墙: 仅当 site.Data.spark_checkins 包含该日期时渲染.
+                    注意: data/spark_checkins.json 不存在时 site.Data.spark_checkins
+                    是 <nil>, where <nil> 会直接报错 — 先用 $data 赋值并 `if $data`
+                    守 nil, 再交给 where / index. checkins 字段缺失同样视为空. */ -}}
+                {{- $data := site.Data.spark_checkins -}}
+                {{- if $data -}}
+                  {{- $matchings := where $data "date" .date -}}
+                  {{- if gt (len $matchings) 0 -}}
+                    {{- $checkins := index (index $matchings 0) "checkins" -}}
+                    {{- if $checkins -}}
+                      {{- $checkinLabel := cond (eq $langKey "en") "Check-ins" "打卡" -}}
+                      <ul class="quests__checkins" aria-label="{{ $checkinLabel }}">
+                        {{- range $checkins -}}
+                          <li class="quests__checkin">
+                            <a href="{{ .comment_url }}" target="_blank" rel="noopener" aria-label="{{ .author }}">
+                              <img loading="lazy" src="{{ .image_url }}" alt="{{ .alt }}" width="64" height="64" />
+                              <span class="quests__checkin-author">{{ .author }}</span>
+                            </a>
+                          </li>
+                        {{- end -}}
+                      </ul>
+                    {{- end -}}
+                  {{- end -}}
+                {{- end -}}
                 <a class="quests__discussion" href="{{ $discussionURL }}" target="_blank" rel="noopener">{{ $checkinText }}</a>
               </li>
             {{- end -}}
