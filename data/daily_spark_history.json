@@ -73,5 +73,20 @@
       "title": "Chase Golden Hour",
       "task": "Within 30 minutes before or after sunset, go outside and capture a photo with dramatic light and shadow in a corner of your neighborhood"
     }
+  },
+  {
+    "date": "2026-08-20",
+    "tag": {
+      "zh": "生活",
+      "en": "Life"
+    },
+    "zh": {
+      "title": "给云朵起个名",
+      "task": "找一个视野好的位置，仰望天空5分钟，选一朵云，发挥想象给它起个名字"
+    },
+    "en": {
+      "title": "Name a Cloud",
+      "task": "Find a spot with a good view of the sky, gaze up for 5 minutes, pick a cloud and give it a creative name"
+    }
   }
 ]
