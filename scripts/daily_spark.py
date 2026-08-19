@@ -19,21 +19,21 @@ import urllib.error
 import urllib.request
 from datetime import datetime, timezone, timedelta
 
+from _lib import (
+    SHANGHAI_TZ, WEEKDAY_NAMES_ZH,
+    MAX_ATTEMPTS, BACKOFFS_SECONDS,
+    _is_retryable_http, _http_error_log,
+    read_json, write_json,
+)
+
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
 
-SHANGHAI_TZ = timezone(timedelta(hours=8))
 ALLOWED_TAGS_ZH = ("生活", "学习", "创造", "运动")
 ALLOWED_TAGS_EN = ("Life", "Learning", "Creating", "Movement")
-WEEKDAY_NAMES_ZH = (
-    "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日",
-)
 
-MAX_ATTEMPTS = 4                       # initial try + 3 retries
-BACKOFFS_SECONDS = (10, 20, 40)        # sleeps between attempts
 MAX_HISTORY = 365                      # keep last N entries
-HTTP_BODY_PREVIEW_BYTES = 500
 
 DATA_DIR = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
@@ -57,6 +57,12 @@ tag 的 zh 固定为 生活/学习/创造/运动 之一，en 对应 Life/Learnin
 
 
 def today_shanghai():
+    """Return (YYYY-MM-DD, weekday-zh) in Shanghai time.
+
+    Kept as a thin wrapper over datetime + SHANGHAI_TZ (imported from
+    _lib) because daily_spark.py is the only consumer that needs the
+    weekday string; other scripts only need the date.
+    """
     now = datetime.now(SHANGHAI_TZ)
     return now.strftime("%Y-%m-%d"), WEEKDAY_NAMES_ZH[now.weekday()]
 
@@ -118,27 +124,6 @@ def strip_code_fence(text):
     return s
 
 
-def _is_retryable_http(code):
-    """429 (rate limit) and 5xx are retryable; other 4xx are not."""
-    if code == 429:
-        return True
-    if isinstance(code, int) and 500 <= code < 600:
-        return True
-    return False
-
-
-def _http_error_log(e):
-    """Build a safe log line for HTTPError: status + body preview, never the API key."""
-    code = getattr(e, "code", "?")
-    body_preview = ""
-    try:
-        raw = e.read()
-        body_preview = raw[:HTTP_BODY_PREVIEW_BYTES].decode("utf-8", errors="replace")
-    except Exception:
-        body_preview = "<unreadable body>"
-    return f"HTTP {code}: {body_preview}"
-
-
 def validate_payload(obj, expected_date):
     if not isinstance(obj, dict):
         raise ValueError("payload is not an object")
@@ -180,32 +165,6 @@ def validate_payload(obj, expected_date):
 
 def ensure_data_dir():
     os.makedirs(DATA_DIR, exist_ok=True)
-
-
-def read_json(path, default):
-    """Read JSON; on missing/corrupt/unreadable file, return default (do not crash)."""
-    if not os.path.exists(path):
-        return default
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-    except (json.JSONDecodeError, ValueError, OSError) as e:
-        print(
-            f"[daily-spark] failed to read {path}: {e}; falling back to default",
-            file=sys.stderr,
-            flush=True,
-        )
-        return default
-    return data
-
-
-def write_json(path, obj):
-    """Atomic write via tmp + os.replace."""
-    tmp = path + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(obj, f, ensure_ascii=False, indent=2)
-        f.write("\n")
-    os.replace(tmp, path)
 
 
 def build_history(existing, payload):
