@@ -538,3 +538,62 @@ h3 {
 .quests__discussion:focus-visible {
   opacity: 1;
 }
+
+/* --- Spark check-in image wall ---------------------------------------------
+ * 出现在 /quests/ 每条 quest item 内部、__task 之后、__discussion 链接之前.
+ * 设计目标: 64×64 缩略图 + 用户名, 与现有 .quests__tag 视觉重量匹配;
+ * flex-wrap 在窄屏自动换行; 移动端通过缩小缩略图到 56×56 维持节奏.
+ * loading="lazy" 由模板加, 这里只管布局; 图裂时 alt 文案兜底.
+ * ------------------------------------------------------------------------- */
+.quests__checkins {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55em;
+  margin: 0.55em 0 0.7em;
+  padding: 0;
+  list-style: none;
+}
+
+.quests__checkin a {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25em;
+  text-decoration: none;
+  color: var(--secondary);
+  font-size: 0.75em;
+  transition: color 0.15s ease;
+}
+
+.quests__checkin a:hover,
+.quests__checkin a:focus-visible {
+  color: var(--primary);
+}
+
+.quests__checkin img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--theme);
+}
+
+.quests__checkin-author {
+  max-width: 64px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 小屏缩到 56×56 维持节奏, 不缩太小防止图看不清 */
+@media (max-width: 480px) {
+  .quests__checkin img {
+    width: 56px;
+    height: 56px;
+  }
+  .quests__checkin-author {
+    max-width: 56px;
+  }
+}
