@@ -8,9 +8,10 @@ name: Fetch Spark Check-ins
 # :10 trigger so the two writers never race for the same data file.
 # Manual: workflow_dispatch for one-off refresh after a notable check-in.
 #
-# We deliberately do NOT trigger hugo.yml here. hugo.yml already listens
-# to `on: push: branches: [main]` and will pick up the data file push
-# automatically — chaining `gh workflow run` would just double-deploy.
+# After pushing we explicitly `gh workflow run hugo.yml`: a push made with
+# the Actions GITHUB_TOKEN does NOT trigger other workflows (GitHub blocks
+# that to avoid recursive runs), so hugo.yml's `on: push` never fires for
+# our bot commit. Same chained-dispatch convention as daily-spark.yml.
 
 on:
   schedule:
@@ -28,9 +29,7 @@ concurrency:
   cancel-in-progress: false
 
 # contents:write — to push data/spark_checkins.json back to main
-# actions:write — not strictly needed today (no chained workflow_dispatch),
-#                 kept for parity with daily-spark.yml in case future changes
-#                 want to trigger hugo.yml manually.
+# actions:write   — to chain-dispatch hugo.yml after a successful push
 permissions:
   contents: write
   actions: write
@@ -84,14 +83,22 @@ jobs:
           fi
 
       - name: Commit and push
+        id: push
         if: steps.check.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           git commit -m "chore: refresh spark check-ins"
           if git push origin HEAD:main; then
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           echo "[spark-checkins] push failed, retrying once after rebase..." >&2
           git pull --rebase origin main
-          git push origin HEAD:main
+          git push origin HEAD:main && echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger Hugo deploy
+        if: steps.push.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run hugo.yml --ref main
