@@ -4,15 +4,6 @@ resources/_gen/
 .DS_Store
 __pycache__/
 
-# 开发与设计文档不进入 commit
-docs/
-
-# 本地开发工具（pi agent、codegraph、entire）
-.pi/
-.codegraph/
-codegraph.json
-.entire/
-
 # Spark 打卡图片墙的本地 fixture — CI 跑 fetch_spark_checkins.py 时才生成
 # 真正的 data/spark_checkins.json, 本地开发拷这个 example 临时用, 不进 git
 data/.spark_checkins.example.json
