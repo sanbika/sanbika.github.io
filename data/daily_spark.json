@@ -1,15 +1,15 @@
 {
-  "date": "2026-08-20",
+  "date": "2026-08-21",
   "tag": {
-    "zh": "生活",
-    "en": "Life"
+    "zh": "创造",
+    "en": "Creating"
   },
   "zh": {
-    "title": "给云朵起个名",
-    "task": "找一个视野好的位置，仰望天空5分钟，选一朵云，发挥想象给它起个名字"
+    "title": "夏日胶囊拼贴",
+    "task": "翻出家中的收据、车票或落叶，在一张纸上拼贴一张专属于今年夏天的迷你画。"
   },
   "en": {
-    "title": "Name a Cloud",
-    "task": "Find a spot with a good view of the sky, gaze up for 5 minutes, pick a cloud and give it a creative name"
+    "title": "Summer Capsule Collage",
+    "task": "Gather receipts, tickets, or fallen leaves at home and glue a tiny collage that captures this summer."
   }
 }

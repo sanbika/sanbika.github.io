@@ -88,5 +88,20 @@
       "title": "Name a Cloud",
       "task": "Find a spot with a good view of the sky, gaze up for 5 minutes, pick a cloud and give it a creative name"
     }
+  },
+  {
+    "date": "2026-08-21",
+    "tag": {
+      "zh": "创造",
+      "en": "Creating"
+    },
+    "zh": {
+      "title": "夏日胶囊拼贴",
+      "task": "翻出家中的收据、车票或落叶，在一张纸上拼贴一张专属于今年夏天的迷你画。"
+    },
+    "en": {
+      "title": "Summer Capsule Collage",
+      "task": "Gather receipts, tickets, or fallen leaves at home and glue a tiny collage that captures this summer."
+    }
   }
 ]
