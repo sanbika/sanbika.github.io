@@ -16,6 +16,10 @@ on:
   schedule:
     - cron: '17 * * * *'
   workflow_dispatch:
+  discussion:
+    types: [created, edited]
+  discussion_comment:
+    types: [created, edited]
 
 # Single writer — cancel-in-progress: false so two overlapping runs
 # don't fight over the same JSON / push race.

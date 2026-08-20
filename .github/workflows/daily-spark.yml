@@ -40,7 +40,7 @@ jobs:
         env:
           MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
           MINIMAX_BASE_URL: ${{ vars.MINIMAX_BASE_URL || 'https://api.minimaxi.com' }}
-          MINIMAX_MODEL: ${{ vars.MINIMAX_MODEL || 'MiniMax-M2' }}
+          MINIMAX_MODEL: ${{ vars.MINIMAX_MODEL || 'MiniMax-M3' }}
         run: python3 scripts/daily_spark.py
 
       - name: Stage spark files

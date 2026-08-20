@@ -241,7 +241,7 @@ def generate(api_key, base_url, model):
 def main():
     api_key = os.environ.get("MINIMAX_API_KEY")
     base_url = os.environ.get("MINIMAX_BASE_URL") or "https://api.minimaxi.com"
-    model = os.environ.get("MINIMAX_MODEL") or "MiniMax-M2"
+    model = os.environ.get("MINIMAX_MODEL") or "MiniMax-M3"
 
     if not api_key:
         print("[daily-spark] MINIMAX_API_KEY not set", file=sys.stderr)
