@@ -1,15 +1,30 @@
 #!/usr/bin/env python3
 """Spark check-ins fetcher.
 
-Pulls GitHub Discussions whose term is `spark-<date>` from
-sanbika/sanbika.github.io, extracts user-uploaded images from comment
-bodyHTML, writes data/spark_checkins.json. Stdlib only.
+Pulls GitHub Discussions from the `daily-spark` category (id
+CATEGORY_ID; mirrors config/_default/params.toml
+[params.comments.spark].categoryid) on sanbika/sanbika.github.io,
+extracts user-uploaded images from both the discussion bodyHTML and
+each comment's bodyHTML, buckets results by `spark-<date>` term parsed
+out of the discussion title, writes data/spark_checkins.json. Stdlib
+only.
 
-Window: last 90 days from today (Shanghai). Per-day GraphQL call so a
-single day failing doesn't lose the rest of the window.
+Window: last 90 days from today (Shanghai). Single GraphQL call per
+category page (vs. one per day in the previous implementation) — far
+fewer round-trips, and `search()` was returning no rows for
+`spark-<date>` queries against this repo anyway.
+
+Images are accepted only from
+  https://github.com/user-attachments/assets/
+the URL GitHub rewrites uploaded attachments to; third-party <img>
+sources are dropped to keep the surface area small and avoid
+CDN/tracking drift.
 
 Idempotent: byte-level compare against existing JSON; skip write if
 nothing changed (so cron can run hourly without spamming commits).
+Before comparing, `fetched_at` is stripped — the per-item timestamp
+was the only thing churning commits on every cron tick when the
+upstream image set was stable.
 
 Reuses helpers from _lib.py.
 """
@@ -35,6 +50,13 @@ from _lib import (
 REPO_OWNER = "sanbika"
 REPO_NAME = "sanbika.github.io"
 GRAPHQL_URL = "https://api.github.com/graphql"
+
+# Must stay in sync with config/_default/params.toml
+#   [params.comments.spark].categoryid
+# Pulling the literal here (instead of reading the toml) keeps this
+# script stdlib-only; the two values are reviewed together.
+CATEGORY_ID = "DIC_kwDOT2zk8c4DDbVZ"
+PAGE_SIZE = 100                                # GraphQL first:N for discussions page
 
 DATA_DIR = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
@@ -116,28 +138,28 @@ def dates_in_window(history_dates, start, end):
 # ---------------------------------------------------------------------------
 
 
-def query_discussion(token, date_str):
-    """Query GitHub for the discussion whose term is `spark-<date_str>`.
+def _query_category_discussions(token, after):
+    """One page of `discussions(categoryId: ...)` ordered newest-first.
 
-    Returns the Discussion node dict, or None if no matching discussion
-    exists. Raises RuntimeError after MAX_ATTEMPTS on retryable errors.
-    Non-retryable 4xx raises immediately.
+    `after=None` → first page. Caller drives the paginate loop.
+    Returns (nodes, pageInfo-dict). The pageInfo dict carries
+    `hasNextPage` + `endCursor`; we surface both so the caller can stop
+    exactly when GitHub says "no more", not on a heuristic like "page
+    wasn't full". Raises RuntimeError after MAX_ATTEMPTS on retryable
+    errors. Non-retryable 4xx raises immediately.
     """
     query = """
-    query SparkDiscussion($q: String!) {
-      search(query: $q, type: DISCUSSION, first: 1) {
-        nodes {
-          ... on Discussion {
-            number
-            url
-            createdAt
-            comments(first: 50) {
+    query SparkCategoryDiscussions($catId: ID!, $first: Int!, $after: String) {
+      repository(owner: "%(owner)s", name: "%(name)s") {
+        discussions(categoryId: $catId, first: $first, after: $after, orderBy: {field: CREATED_AT, direction: DESC}) {
+          pageInfo { hasNextPage endCursor }
+          nodes {
+            number url title bodyHTML createdAt
+            author { login avatarUrl(size: 80) }
+            comments(first: %(comments_first)d) {
               totalCount
               nodes {
-                id
-                url
-                bodyHTML
-                createdAt
+                id url bodyHTML createdAt
                 author { login avatarUrl(size: 80) }
               }
             }
@@ -145,8 +167,10 @@ def query_discussion(token, date_str):
         }
       }
     }
-    """
-    variables = {"q": f"spark-{date_str} repo:{REPO_OWNER}/{REPO_NAME} type:discussion"}
+    """ % {"owner": REPO_OWNER, "name": REPO_NAME, "comments_first": COMMENTS_PER_DISCUSSION}
+    variables = {"catId": CATEGORY_ID, "first": PAGE_SIZE}
+    if after is not None:
+        variables["after"] = after
     payload = json.dumps({"query": query, "variables": variables}).encode("utf-8")
     req = urllib.request.Request(
         GRAPHQL_URL,
@@ -167,8 +191,9 @@ def query_discussion(token, date_str):
             if data.get("errors"):
                 # GraphQL returned 200 with errors[] — treat as retryable.
                 raise RuntimeError(f"GraphQL errors: {data['errors']}")
-            nodes = (data.get("data") or {}).get("search", {}).get("nodes") or []
-            return nodes[0] if nodes else None
+            repo = (data.get("data") or {}).get("repository") or {}
+            discussions = repo.get("discussions") or {}
+            return discussions.get("nodes") or [], (discussions.get("pageInfo") or {})
         except urllib.error.HTTPError as e:
             detail = _http_error_log(e)
             if _is_retryable_http(e.code):
@@ -188,92 +213,216 @@ def query_discussion(token, date_str):
     raise RuntimeError(f"failed after {MAX_ATTEMPTS} attempts: {last_error}")
 
 
+def fetch_all_discussions(token):
+    """Return flat list of every Discussion node in the spark category.
+
+    Walks `pageInfo.hasNextPage`/`endCursor` until exhausted; each page
+    uses PAGE_SIZE first:N. Returns [] on total failure so the caller
+    can degrade to "empty for every day in window" instead of crashing
+    the workflow.
+
+    Hard ceiling on pages: 10 × PAGE_SIZE = 1000 discussions is far
+    above any realistic 90-day window for this repo. Defensive only;
+    a schema change that flips `hasNextPage` permanently on (instead of
+    false on the last page) gets caught here and logged instead of
+    pinning a workflow run.
+    """
+    nodes = []
+    after = None
+    max_pages = 10
+    has_next = True
+    for _ in range(max_pages):
+        if not has_next:
+            break
+        try:
+            page_nodes, page_info = _query_category_discussions(token, after)
+        except RuntimeError as e:
+            print(f"[spark-checkins] category fetch aborted: {e}", file=sys.stderr, flush=True)
+            return []
+        if not page_nodes:
+            break
+        nodes.extend(page_nodes)
+        has_next = bool(page_info.get("hasNextPage"))
+        after = page_info.get("endCursor")
+        if not has_next or not after:
+            break
+    else:
+        # Hit max_pages without `hasNextPage` flipping to false — log a
+        # warning so an upstream schema change shows up.
+        print("[spark-checkins] WARN pagination ceiling reached", file=sys.stderr, flush=True)
+    return nodes
+
+
+def index_by_date(nodes):
+    """Return {YYYY-MM-DD: node} keyed by `spark-<date>` in title.
+
+    Skips nodes whose title doesn't start with `spark-` or whose suffix
+    can't be parsed as an ISO date. Later nodes win on duplicate dates
+    (newest-first ordering means the latest discussion for a given
+    `spark-<date>` wins, which is what we want when Giscus lazy-creates
+    multiple threads for the same term).
+    """
+    bucket = {}
+    for node in nodes or []:
+        if not isinstance(node, dict):
+            continue
+        title = (node.get("title") or "").strip()
+        if not title.lower().startswith("spark-"):
+            continue
+        suffix = title[6:].strip()  # len("spark-") == 6
+        try:
+            date.fromisoformat(suffix)
+        except ValueError:
+            continue
+        bucket[suffix] = node
+    return bucket
+
+
 # ---------------------------------------------------------------------------
 # Image extraction
 # ---------------------------------------------------------------------------
 
 
+def _extract_imgs_from_body(body, source_id, author, avatar, source_url,
+                            posted_at, seen, out):
+    """Append parsed checkin dicts for each <img> in `body` to `out`.
+
+    Filters by USER_ATTACHMENT_PREFIX, dedups via `seen` keyed on
+    `(source_id, src)`, and falls back to a synthetic alt of the form
+    `check-in by {author} ({last-8-of-url})` when the <img> has no alt
+    attribute. Body is HTML as GitHub returns it for comments/
+    discussions — already escaped.
+    """
+    if not body:
+        return
+    for tag_match in _IMG_TAG_RE.finditer(body):
+        attrs = tag_match.group(1)
+        src_match = _IMG_SRC_RE.search(attrs)
+        if not src_match:
+            continue
+        src = src_match.group(1)
+        if not src.startswith(USER_ATTACHMENT_PREFIX):
+            continue
+        key = (source_id, src)
+        if key in seen:
+            continue
+        seen.add(key)
+        alt_match = _IMG_ALT_RE.search(attrs)
+        # `None` = alt attr absent; "" = alt attr present but empty.
+        # Both should trigger the fallback below so broken-image
+        # tooltips always say *something* useful.
+        alt = alt_match.group(1) if alt_match else None
+        if not alt:
+            # Fall back to a short identifier derived from the URL hash.
+            hash_part = src.rsplit("/", 1)[-1][:8]
+            alt = f"check-in by {author} ({hash_part})"
+        out.append({
+            "author": author,
+            "author_avatar": avatar,
+            "image_url": src,
+            "alt": alt,
+            "comment_url": source_url,
+            "posted_at": posted_at or "",
+        })
+
+
 def extract_checkins(discussion):
     """Given a Discussion node dict, return list of checkin dicts.
 
-    Drops:
-      * discussions with no comments
-      * comments whose bodyHTML contains no <img> on github.com/user-attachments/assets/
-      * duplicate (comment_id, image_url) pairs
+    Dual source:
+      1. discussion.bodyHTML — when the OP posts images directly in
+         the thread (no separate comment). Authored by the discussion
+         author; source_id = discussion number; source_url = the
+         discussion url; posted_at = the discussion createdAt.
+      2. comments[*].bodyHTML — same as before, source_id = comment id.
 
-    Each user-uploaded image becomes one checkin item, so a comment with
-    two photos yields two items sharing the same author/comment_url.
+    Dedups across both sources via a shared `seen` set keyed on
+    `(source_id, image_url)`. Returns [] on falsy input.
     """
     if not discussion:
         return []
     checkins = []
-    seen = set()                              # (comment_id, image_url)
+    seen = set()                              # (source_id, image_url)
+
+    # 1) Discussion body itself.
+    _disc_author = discussion.get("author") or {}
+    body_author = _disc_author.get("login") or "anonymous"
+    body_avatar = _disc_author.get("avatarUrl") or ""
+    _extract_imgs_from_body(
+        body=discussion.get("bodyHTML") or "",
+        source_id=f"discussion:{discussion.get('number')}",
+        author=body_author,
+        avatar=body_avatar,
+        source_url=discussion.get("url") or "",
+        posted_at=discussion.get("createdAt") or "",
+        seen=seen,
+        out=checkins,
+    )
+
+    # 2) Comments.
     for comment in (discussion.get("comments") or {}).get("nodes") or []:
-        body = comment.get("bodyHTML") or ""
         author_node = comment.get("author") or {}
         author = author_node.get("login") or "anonymous"
         avatar = author_node.get("avatarUrl") or ""
-        comment_url = comment.get("url") or ""
-        comment_id = comment.get("id") or comment_url
-
-        for tag_match in _IMG_TAG_RE.finditer(body):
-            attrs = tag_match.group(1)
-            src_match = _IMG_SRC_RE.search(attrs)
-            if not src_match:
-                continue
-            src = src_match.group(1)
-            if not src.startswith(USER_ATTACHMENT_PREFIX):
-                continue
-            alt_match = _IMG_ALT_RE.search(attrs)
-            # `None` = alt attr absent; "" = alt attr present but empty.
-            # Both should trigger the fallback below so broken-image
-            # tooltips always say *something* useful.
-            alt = alt_match.group(1) if alt_match else None
-            key = (comment_id, src)
-            if key in seen:
-                continue
-            seen.add(key)
-            if not alt:
-                # Fall back to a short identifier derived from the URL hash.
-                hash_part = src.rsplit("/", 1)[-1][:8]
-                alt = f"check-in by {author} ({hash_part})"
-            checkins.append({
-                "author": author,
-                "author_avatar": avatar,
-                "image_url": src,
-                "alt": alt,
-                "comment_url": comment_url,
-                "posted_at": comment.get("createdAt") or "",
-            })
+        _extract_imgs_from_body(
+            body=comment.get("bodyHTML") or "",
+            source_id=comment.get("id") or comment.get("url") or "",
+            author=author,
+            avatar=avatar,
+            source_url=comment.get("url") or "",
+            posted_at=comment.get("createdAt") or "",
+            seen=seen,
+            out=checkins,
+        )
     return checkins
 
 
 # ---------------------------------------------------------------------------
-# Per-day fetch (tolerates individual day failures)
+# Per-window fetch (single category pull, in-memory bucket lookup)
 # ---------------------------------------------------------------------------
 
 
 def build_checkins(token, dates):
-    """For each YYYY-MM-DD in dates, fetch discussion + extract checkins.
+    """For each YYYY-MM-DD in dates, return {"checkins": [...], "discussion_url": str|None}.
 
-    Returns dict: date -> {"checkins": [...], "discussion_url": str|None}.
-    A single day's failure is logged and yields empty checkins; doesn't
-    abort the whole window.
+    One category pull via fetch_all_discussions() per run, then a
+    single pass over `dates` index-lookups into the bucket. A category
+    fetch that totally fails degrades to empty checkins for every day
+    in the window (logged, not crash).
     """
+    by_date = index_by_date(fetch_all_discussions(token))
     result = {}
     for d in dates:
-        try:
-            discussion = query_discussion(token, d)
-        except RuntimeError as e:
-            print(f"[spark-checkins] {d} failed: {e}; skipping", file=sys.stderr, flush=True)
-            result[d] = {"checkins": [], "discussion_url": None}
-            continue
-        checkins = extract_checkins(discussion)
+        node = by_date.get(d)
         result[d] = {
-            "checkins": checkins,
-            "discussion_url": discussion.get("url") if discussion else None,
+            "checkins": extract_checkins(node) if node else [],
+            "discussion_url": node.get("url") if node else None,
         }
     return result
+
+
+# ---------------------------------------------------------------------------
+# Output
+# ---------------------------------------------------------------------------
+
+
+def _canonical_bytes(data):
+    """Serialize `data` (list of window dicts) to canonical bytes for comparison.
+
+    Strips per-item `fetched_at` so cron ticks don't churn commits when
+    the only thing that changed since the last run is the timestamp.
+    Same ensure_ascii=False / indent=2 / trailing newline as
+    `write_json`; the caller still goes through write_json for the
+    actual on-disk write (so the tmp+rename atomic-write path is
+    preserved).
+    """
+    canonical = []
+    for item in data:
+        if not isinstance(item, dict):
+            continue
+        cleaned = {k: v for k, v in item.items() if k != "fetched_at"}
+        canonical.append(cleaned)
+    return (json.dumps(canonical, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
 
 
 # ---------------------------------------------------------------------------
@@ -327,35 +476,30 @@ def main():
     new_data.sort(key=lambda x: x["date"])
 
     # Byte-level compare so hourly cron doesn't churn commits when nothing
-    # changed (an empty run still has a new `fetched_at`, so without this
-    # we'd commit on every cron tick).
+    # changed. We canonicalize both sides (drop per-item `fetched_at`)
+    # before comparing — that timestamp is the only thing that would
+    # normally differ between an empty run and the previous one, so
+    # without the canonicalization we'd commit on every cron tick
+    # regardless of upstream content.
     #
-    # We write the new payload via a tmp file then read it back, instead
-    # of comparing in-memory `json.dumps().encode()` against the on-disk
-    # file. Reason: text-mode `open(... "w")` on Windows adds CRLF and
-    # non-`sort_keys=True` writes keep insertion order, so the in-memory
-    # bytes never match what's actually on disk. Round-tripping through
-    # a tmp file guarantees the bytes we're about to write are the
-    # bytes we're comparing against.
-    tmp = OUTPUT_FILE + ".tmp"
-    write_json(tmp, new_data)
-    with open(tmp, "rb") as f:
-        new_bytes = f.read()
-    try:
-        with open(OUTPUT_FILE, "rb") as f:
-            old_bytes = f.read()
-    except FileNotFoundError:
-        old_bytes = b""
-    if new_bytes == old_bytes:
-        os.remove(tmp)
+    # Canonical comparison works in-memory because `_canonical_bytes`
+    # re-serializes from the parsed JSON tree, ignoring whatever line
+    # endings / ordering / trailing whitespace the on-disk file happened
+    # to have (the previous code's text-mode CRLF workaround was a
+    # workaround for the wrong comparison).
+    old_data = read_json(OUTPUT_FILE, default=[])
+    if _canonical_bytes(new_data) == _canonical_bytes(old_data):
         total_checkins = sum(len(v["checkins"]) for v in fresh.values())
         print(
-            f"[spark-checkins] no changes ({len(dates)} days scanned, {total_checkins} checkins), skipping commit",
+            f"[spark-checkins] no content changes ({len(dates)} days scanned, {total_checkins} checkins), skipping commit",
             flush=True,
         )
         return
 
-    os.replace(tmp, OUTPUT_FILE)
+    # Atomic write preserved: tmp + os.replace so partial writes never
+    # leave a half-finished JSON file for the workflow's next `git diff`
+    # step to see.
+    write_json(OUTPUT_FILE, new_data)
     total_checkins = sum(len(v["checkins"]) for v in fresh.values())
     print(
         f"[spark-checkins] wrote {OUTPUT_FILE}: {len(dates)} days, {total_checkins} checkins",
