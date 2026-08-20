@@ -17,9 +17,9 @@ on:
     - cron: '17 * * * *'
   workflow_dispatch:
   discussion:
-    types: [created, edited]
+    types: [created, edited, deleted]
   discussion_comment:
-    types: [created, edited]
+    types: [created, edited, deleted]
 
 # Single writer — cancel-in-progress: false so two overlapping runs
 # don't fight over the same JSON / push race.
@@ -39,6 +39,12 @@ jobs:
   fetch:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    # Category filter for discussion events: only refresh when the
+    # changed discussion is in the daily-spark category we actually pull
+    # from. `schedule` and `workflow_dispatch` skip the
+    # `github.event.discussion` branch and always run; the two
+    # discussion event types both carry the same nested path.
+    if: github.event_name != 'discussion' && github.event_name != 'discussion_comment' || github.event.discussion.category.name == 'daily-spark'
     steps:
       - name: Checkout
         uses: actions/checkout@v4

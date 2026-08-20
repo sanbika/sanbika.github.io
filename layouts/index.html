@@ -108,19 +108,27 @@
       {{- if $sparkCheckins -}}
         {{- $todays := where $sparkCheckins "date" $spark.date -}}
         {{- if gt (len $todays) 0 -}}
-          {{- $todaysList := index (index $todays 0) "checkins" -}}
-          {{- if $todaysList -}}
-            {{- $photosLabel := cond (eq $langKey "en") "Check-in photos" "打卡照片" -}}
-            <ul class="quests__checkins spark-checkin__photos" aria-label="{{ $photosLabel }}">
-              {{- range $todaysList -}}
-                <li class="quests__checkin">
-                  <a href="{{ .comment_url }}" target="_blank" rel="noopener" aria-label="{{ .author }}">
-                    <img loading="lazy" src="{{ .image_url }}" alt="{{ .alt }}" width="64" height="64" />
-                    <span class="quests__checkin-author">{{ .author }}</span>
-                  </a>
-                </li>
-              {{- end -}}
-            </ul>
+          {{- /* Layer 3 guard: $todays 0 might exist but not be a map — split the
+                 nested `index` call so a non-map item falls through cleanly
+                 instead of crashing the build with "can't index item of type
+                 string/nil by map". $todaysList then stays undefined and the
+                 `if $todaysList` layer 4 guard skips rendering. */ -}}
+          {{- $firstItem := index $todays 0 -}}
+          {{- if $firstItem -}}
+            {{- $todaysList := index $firstItem "checkins" -}}
+            {{- if $todaysList -}}
+              {{- $photosLabel := cond (eq $langKey "en") "Check-in photos" "打卡照片" -}}
+              <ul class="quests__checkins spark-checkin__photos" aria-label="{{ $photosLabel }}">
+                {{- range $todaysList -}}
+                  <li class="quests__checkin">
+                    <a href="{{ .comment_url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ .author }}">
+                      <img loading="lazy" src="{{ .image_url }}" alt="{{ .alt }}" width="64" height="64" />
+                      <span class="quests__checkin-author">{{ .author }}</span>
+                    </a>
+                  </li>
+                {{- end -}}
+              </ul>
+            {{- end -}}
           {{- end -}}
         {{- end -}}
       {{- end -}}

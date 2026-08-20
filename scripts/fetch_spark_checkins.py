@@ -217,9 +217,17 @@ def fetch_all_discussions(token):
     """Return flat list of every Discussion node in the spark category.
 
     Walks `pageInfo.hasNextPage`/`endCursor` until exhausted; each page
-    uses PAGE_SIZE first:N. Returns [] on total failure so the caller
-    can degrade to "empty for every day in window" instead of crashing
-    the workflow.
+    uses PAGE_SIZE first:N. Two-layer failure policy so a transient
+    API blip can't silently wipe the on-disk history:
+
+      * Mid-pagination RuntimeError → if we already accumulated any
+        nodes, keep them, WARN to stderr (with the count we did get),
+        and break out of the loop. The caller's `index_by_date` then
+        sees a partial-but-real window; only the dates we never reached
+        get empty check-ins.
+      * Same error before any node is collected → return [] and log
+        to stderr. `main()` has its own guard against using this to
+        overwrite a non-empty existing file (see top-level skip there).
 
     Hard ceiling on pages: 10 × PAGE_SIZE = 1000 discussions is far
     above any realistic 90-day window for this repo. Defensive only;
@@ -237,6 +245,16 @@ def fetch_all_discussions(token):
         try:
             page_nodes, page_info = _query_category_discussions(token, after)
         except RuntimeError as e:
+            if nodes:
+                # Partial result: keep what we already fetched so the
+                # caller doesn't end up with a fully empty window on a
+                # transient GitHub hiccup mid-pagination.
+                print(
+                    f"[spark-checkins] WARN category fetch aborted after {len(nodes)} nodes: {e}",
+                    file=sys.stderr, flush=True,
+                )
+                break
+            # Nothing collected yet — let the caller decide what to do.
             print(f"[spark-checkins] category fetch aborted: {e}", file=sys.stderr, flush=True)
             return []
         if not page_nodes:
@@ -248,8 +266,13 @@ def fetch_all_discussions(token):
             break
     else:
         # Hit max_pages without `hasNextPage` flipping to false — log a
-        # warning so an upstream schema change shows up.
-        print("[spark-checkins] WARN pagination ceiling reached", file=sys.stderr, flush=True)
+        # warning so an upstream schema change shows up. Include the
+        # node count so on-call can sanity-check whether the ceiling
+        # was reached on a half-full window or after a runaway loop.
+        print(
+            f"[spark-checkins] WARN pagination ceiling reached ({len(nodes)} nodes fetched)",
+            file=sys.stderr, flush=True,
+        )
     return nodes
 
 
@@ -257,10 +280,13 @@ def index_by_date(nodes):
     """Return {YYYY-MM-DD: node} keyed by `spark-<date>` in title.
 
     Skips nodes whose title doesn't start with `spark-` or whose suffix
-    can't be parsed as an ISO date. Later nodes win on duplicate dates
-    (newest-first ordering means the latest discussion for a given
-    `spark-<date>` wins, which is what we want when Giscus lazy-creates
-    multiple threads for the same term).
+    can't be parsed as an ISO date. First iteration wins on duplicate
+    dates — combined with newest-first ordering from the GraphQL query,
+    that means the latest discussion for a given `spark-<date>` is the
+    one we keep, which is what we want when Giscus lazy-creates
+    multiple threads for the same term. The `if suffix not in bucket:`
+    guard makes that intent explicit instead of relying on iteration
+    order semantics.
     """
     bucket = {}
     for node in nodes or []:
@@ -274,7 +300,8 @@ def index_by_date(nodes):
             date.fromisoformat(suffix)
         except ValueError:
             continue
-        bucket[suffix] = node
+        if suffix not in bucket:
+            bucket[suffix] = node
     return bucket
 
 
@@ -448,6 +475,25 @@ def main():
     print(f"[spark-checkins] fetching {len(dates)} days from {start} to {end}", flush=True)
     fresh = build_checkins(token, dates)
     fetched_at = utc_now_iso()
+
+    # Top-level safety net: if the GitHub fetch came back with nothing
+    # useful for every day in the window AND we already have a non-empty
+    # data file on disk, refuse to overwrite. A transient API failure
+    # would otherwise write a JSON full of empty check-ins, blow away
+    # the commit history of the file, and (because hugo.yml watches main)
+    # ship the empty version live. Stale data beats missing data.
+    fresh_has_content = any(
+        v["checkins"] or v["discussion_url"]
+        for v in fresh.values()
+    )
+    existing_bytes = os.path.getsize(OUTPUT_FILE) if os.path.exists(OUTPUT_FILE) else 0
+    if not fresh_has_content and existing_bytes > 0:
+        print(
+            "[spark-checkins] fetch came back empty while existing data is non-empty, "
+            "skipping overwrite (likely transient API failure)",
+            file=sys.stderr, flush=True,
+        )
+        return
 
     # Merge: window dates get the freshly fetched value; everything else in
     # the existing JSON (out-of-window) is preserved verbatim.
