@@ -8,6 +8,7 @@
 ## 任务看板
 | Task | 状态 | 备注 |
 |------|------|------|
+| 打卡图片墙：抓取脚本重写 + 首页当日打卡图片墙 + 模型升 MiniMax-M3 + workflow discussion 事件触发（reviewer 一轮修复） | done | HEAD 15b7aa4 未推送；reviewer 4 项（2 Critical + W1 守卫 + W2 事件过滤）全部修复于 15b7aa4，S4/S5 留 future |
 | 双语国际化收尾（搜索标题 / Giscus 评论语言 / 语言切换标签 / 英文项目页 / 站点 i18n 副本） | done | 热修式迭代，无 PRD 拆分 |
 | 前端样式优化（中文排版 / 首页简介 / 代码高亮 / 品牌色 / favicon / config 收敛 / 多语言 label 迁移） | done | 热修式迭代，无 PRD 拆分；HEAD commit 46e48b5 |
 | 首页「今日小火花 Daily Spark」每日挑战卡片 | done | GH Actions cron + MiniMax API + bot push + 显式 `gh workflow run hugo.yml` 触部署；HEAD 6af78a1 |
@@ -30,10 +31,39 @@
 - [ ] **Entire CLI 注入的 `Entire-Checkpoint: ...` 提交 trailer 是工具噪音** — 可在使用 Entire CLI 时关闭以保持 git log 整洁
 - [x] **giscus `spark-<date>` 每天建一个 discussion 长期累积空 discussion 的卫生问题已缓解** — HEAD 7339b19 起 spark 评论迁到独立 `daily-spark` 分类 + giscus 本身是**懒创建**（term 找不到对应 discussion 时不会预创建，只有用户首次提交评论才真正建 discussion；空评论区不会留痕迹）。切换前已有人在旧 General 分类下对 `spark-<date>` 留过评论的，新分类下不会显示（giscus 按 `category + term` 检索），原 discussion 留在 GitHub General 里不再回流——这部分历史评论视为放弃，无需迁移。本仓侧不再需要做任何清理动作
 - [ ] **两个 giscus partial（`comments.html` / `spark_comments.html`）不可同时渲染在同一页面** — `comments.html` 用 `setGiscusTheme` + MutationObserver，`spark_comments.html` 用 `setSparkGiscusTheme` + 各自 observer；若同页同时渲染会冲突。当前 home 只用 spark_comments、single 只用 comments，无同页场景；如未来要同页混用需合并函数与 observer
-- [ ] **本地 3 个 commit 待推送（1199969 + eefe0dd + 1aadc7d）** — `1199969` 任务卡微调（HEAD 963a608 像素描边风之后的小修） + `eefe0dd` 往期任务页 `/quests/` + `1aadc7d` 首页侧栏往期任务卡 + 打卡区 GitHub 评论入口（含图）+ quests 锚点 + `:focus-visible` 补齐；等用户 `hugo server` 本地预览确认无回归后一起 push。**本地预览流程**：`hugo server`（默认 `http://localhost:1313`）+ LiveReload 自动刷新；推送前可 `git log --oneline -5` 复核三 commit 内容，wiki 链接守卫、菜单项顺序、守卫字段定义、`:focus-visible` 键盘可达与本轮 `最近变更` 条目一致
+- [ ] **本地 4 个 commit 待推送（e381e18 + 60367d4 + d82e996 + 15b7aa4）** — `e381e18` 打卡抓取脚本重写（按分类枚举讨论 + body/评论双源提图 + canonical 化对比消除 fetched_at 噪声） + `60367d4` 首页当日打卡图片墙 + `d82e996` 模型升 `MiniMax-M3`（脚本 + workflow 两处）+ workflow 增加 `discussion`/`discussion_comment` 事件触发 + job 级 daily-spark 分类过滤 + `15b7aa4` reviewer 修复（失败保数据双层防护 / 索引语义校正 / 模板四层守卫含类型守卫 / 事件类型过滤白名单 / canonical 剔除 `fetched_at` 后比较）。**Push 后务必在 Actions 页手动 Run 一次 `spark-checkins` workflow**（`workflow_dispatch`）验证真实 GraphQL 抓取——之前本地 0 个真图、4 个 commit 都未跑过真链路；预期 `data/spark_checkins.json` 至少填入 `2026-08-17` 与 `2026-08-19` 两个 discussion body 中的图（这俩是 REST 实测有图的节点）。**本地预览流程**：`hugo server`（默认 `http://localhost:1313`）+ LiveReload 自动刷新；推送前可 `git log --oneline -5` 复核 4 commit 内容，wiki 链接守卫、菜单项顺序、守卫字段定义、`:focus-visible` 键盘可达与本轮 `最近变更` 条目一致
+- [ ] **`CATEGORY_ID` 字面量双份存在，改分类时两处必须同步** — `scripts/fetch_spark_checkins.py` 顶部 `CATEGORY_ID = "DIC_kwDOT2zk8c4DDbVZ"`（daily-spark giscus 分类）+ `config/_default/params.toml` 的 `comments.spark.categoryid = "DIC_kwDOT2zk8c4DDbVZ"`（giscus 嵌入用同一分类 ID）。脚本**不读 toml** 是有意取舍（保持 stdlib-only、不引入 `tomllib` 依赖），代价是分类 ID 字面量必须人工保持同步。未来若改 giscus 分类，**先**在 GitHub Discussions 建新分类 → 拿到新 `DIC_…` → **两处同时**替换；只换一处会导致打卡抓取与 giscus 嵌入走不同分类、抓取的图永远不显示
 - [x] **giscus iframe 不支持上传图片 → 带图打卡走 GitHub 原生评论 ↗ 入口（工作流决策）** — 已沉淀（HEAD 1aadc7d 起）：giscus iframe 没有 GitHub 上传权限（嵌入上下文不带 GitHub 会话），无法上传本地图片；带图打卡走首页评论区下方的「在 GitHub 上评论 · 可传图 ↗」链接（GitHub Discussions 搜索 URL `discussions_q=spark-<date>`，永不 404 + 懒创建无副作用），GitHub 网页本身支持拖拽上传图片，giscus 与 GitHub Discussions 是**双向同步**的（小卡片评论 ↔ 网页 discussion 同一节点），用户在网页上传图，giscus 这边也能看到。三处入口（首页打卡区 / 侧栏往期任务卡「打卡讨论」 / `/quests/` 月份存档「打卡讨论」）走同一个搜索 URL 模式
 
 ## 最近变更
+
+- **打卡图片墙 — 抓取脚本重写 + 首页当日图片墙 + 模型升 M3 + discussion 事件触发 + reviewer 一轮修复（HEAD 15b7aa4 / 未推送）** `fix: 打卡抓取脚本重写（按分类枚举讨论、body/评论双源提图、消除 fetched_at 噪声）` + `feat: 首页新增当日打卡图片墙` + `chore: 模型切换 MiniMax-M3 + 打卡 workflow 增加 discussion 事件触发` + `fix: review 修复——抓取失败保数据、索引语义校正、守卫补齐、事件过滤`
+  - **根因（为什么之前图从来不显示）**：① 抓取脚本用 GraphQL per-date search（`spark-YYYY-MM-DD repo:… type:discussion`）90 天 90 次调用，**全部落空**（`discussion_url` 全 `null`）；GitHub search 索引对刚开的 discussion 不可靠，per-date 搜索命中率低；② 图实际贴在 discussion 的 `bodyHTML` 里、而脚本只读评论 `bodyHTML`（REST 实测讨论 #4/#6 的图都在 body）；③ 首页 `layouts/index.html` **根本没消费 `data/spark_checkins.json`**，只有 `/quests/` 页消费 → 即使抓得到图也显示不出来
+  - **本轮修**（四 commit）：
+    - `e381e18` `scripts/fetch_spark_checkins.py` — 整体重写抓取策略：
+      - **按分类枚举**（`categoryId: DIC_kwDOT2zk8c4DDbVZ` 一次 GraphQL 调用拉全量）→ Python 侧按 `title in {spark-YYYY-MM-DD}` 精确匹配 + `endCursor` 翻页拿完所有 discussion，**彻底放弃 per-date search**
+      - **discussion body + 评论双源提图**：先扫 `discussion.bodyHTML` 拿 body 内的图，再扫每条 `comment.bodyHTML` 拿评论里的图，合并去重（同一 `user-attachments/assets/<hash>` 只算一次）
+      - **canonical 化对比再写盘**：构造 `fetched_at = "1970-01-01T00:00:00Z"` 的副本与旧 JSON 比，**剔除抓取时间噪声**——只要内容数组无变化就**不写盘、不 commit**，消除每小时 cron 的「fetched_at 变了 → 部署一次」噪音风暴
+      - **失败保数据双层防护**：单日期 partial 失败时保留旧 entries；全空 + 旧数据非空时直接拒绝写盘（`raise SystemExit`）；保持 `data/spark_checkins.json` 永远不为「已知比之前更糟」的状态
+    - `60367d4` `layouts/index.html` + `assets/css/extended/blank.css` — 首页 `.spark-checkin` 卡片**内**新增当日打卡缩略图墙：复用 `/quests/` 已有的 `.quests__checkins*` 类作视觉基底 + 新增 `.spark-checkin__photos` 修饰类做首页落点；**四层守卫**——`site.Data.spark_checkins` 是否存在数组 → 单条 `checkins` 字段是否存在 → 每条 `image_url` / `alt` / `comment_url` / `author` 类型守卫（必须是字符串、长度合理）→ 外链白名单校验（必须 `https://github.com/user-attachments/assets/` 开头）；任何一层失败该条静默隐藏、不打日志、不破坏页面
+    - `d82e996` 模型升级 + workflow 事件触发：
+      - `scripts/daily_spark.py` 与 `.github/workflows/daily-spark.yml` 两处默认模型 `MiniMax-M2` → `MiniMax-M3`；repo variable `MINIMAX_MODEL` 仍可覆盖
+      - `.github/workflows/spark-checkins.yml` 增加 `discussion` / `discussion_comment`（`created` / `edited` / `deleted`）事件触发；**job 级分类白名单**：仅 daily-spark 分类（`DIC_kwDOT2zk8c4DDbVZ`）触发，`issues` / 其它分类事件一律跳过——贴图后站点分钟级更新，每小时 cron 仍保留作兜底
+    - `15b7aa4` reviewer 一轮 4 项全部修复：
+      - **Critical 1**（失败清空数据）→ 双层防护（partial 保留 / 全空且旧数据非空时拒写盘）
+      - **Critical 2**（索引覆盖语义）→ 抓取循环按"分类内全部 discussions → Python 标题匹配"重写，索引语义从「搜索结果必含目标」校正为「拉全量后 Python 侧过滤」
+      - **W1**（模板守卫未覆盖）→ `.spark-checkin__photos` 加四层守卫含类型守卫
+      - **W2**（事件过滤）→ job 级 `if: github.event.discussion.category.id == '...'` 仅 daily-spark 分类触发
+      - **S1-S3**（小型代码卫生）→ 一并修复；**S4**（img 正则 hardening）/ **S5**（indent 常量抽公共）**明确跳过**，留作未来维护（reviewer 同意 scope-out）
+  - 关键决策：
+    - **放弃 per-date search 改分类枚举** —— GitHub search 索引对刚开的 discussion 不可靠（最多滞后数小时甚至不入索引），per-date 90 次调用 0 命中；同时单次 GraphQL 调用省配额（一次拿全分类），后续窗口外的数据靠 canonical 比对天然保稳定。代价是**放弃 per-date 命中即停**的早退优化，但全量枚举的 `endCursor` 翻页 ≤ 100 条 discussion 在小仓库下成本可忽略
+    - **图在 body 不在评论** —— REST API 实测 discussion #4/#6 的图都贴在 discussion 自身的 `bodyHTML`（用户开 discussion 时直接拖图上传，绕过评论区上传限制），而评论里只有纯文字反馈；之前只读评论 `bodyHTML` 是结构性的漏取。**双源提图**是 bug fix 而非 feature —— body 永远先扫，评论里如果有同 hash 再去重
+    - **复用 quests 视觉不新增设计语言** —— `.quests__checkins*` 系列已在 `/quests/` 跑通（HEAD 2026-08-18 起），首页 `.spark-checkin__photos` 只加修饰（页面尺寸、间距微调），不引入第二套图片/标签 CSS 变量。约定见 [[conventions/frontend-styling.md|前端样式约定]] §2（CSS override 落点 = `assets/css/extended/blank.css`）
+    - **`no-change-no-commit` 让事件触发不产生部署风暴** —— canonical 化（剔除 `fetched_at`）后做内容数组比较，无变化不写盘；这是**事件触发 + 兜底 cron 共存**的关键：如果不做这层，事件触发每小时可能产 60 次内容相同的"伪变更" commit，触发 60 次 `hugo.yml` 部署。discussion event 触发 + 兜底 cron 的双轨设计见 [[conventions/ci.md|CI / GitHub Actions 约定]] §1
+    - **失败宁可陈旧不清空** —— 双层防护中"全空且旧数据非空 → 拒写盘"是核心：抓取脚本失败 / GraphQL 限流 / 仓库权限失效时，**站点继续展示上一次成功抓取的图**（哪怕图已过期），总比"今天显示空"好；`fetched_at` 字段保留作为运维肉眼判断数据陈旧度的依据（不参与内容比）
+  - reviewer 一轮通过 + 4 项全部修复于 `15b7aa4`；S4/S5 明确 scope-out 留 future
+  - 范围严格收敛在 `scripts/fetch_spark_checkins.py` / `layouts/index.html` / `assets/css/extended/blank.css` / `scripts/daily_spark.py` / `.github/workflows/daily-spark.yml` / `.github/workflows/spark-checkins.yml`；未触碰 themes 子模块 / `.gitmodules` / `.gitignore` / docs / 其它业务代码
+  - 关联：spec [[superpowers/specs/2026-08-18-spark-checkins-design.md|2026-08-18 Spark 打卡图片墙设计 spec]] 在 §4.2 处有「实装改为 categoryId 枚举 + Python 标题匹配 + body/评论双源提图」的更新标注（主体不动）
 
 - **首页侧栏往期任务卡 + 打卡区 GitHub 评论入口（含图）+ quests 锚点 + `:focus-visible` 补齐（HEAD 1aadc7d）** `feat: 首页侧栏往期任务卡 + GitHub 评论入口（含图）+ quests 锚点 + :focus-visible 补齐`
   - ① `layouts/index.html` — 侧栏「最近文章」卡替换为「往期任务」卡：数据源 `site.Data.daily_spark_history`，与 `layouts/quests.html` 同一组预过滤（`findRE $datePattern .date` 验日期格式 + 6 字段 `isset` 全检 `date / tag / tag.{zh,en} / zh|en.{title,task}`），保证侧栏与 `/quests/` 页对脏数据的处理口径一致（任何一处数据脏两侧都安静忽略，不出现「侧栏显示了 quests 页却没有」或反之的撕裂）；`$sideItems` 在 `sort "date desc"` 后取前 7 条并排除今天（`$today := now.Format "2006-01-02"`；`where ... (ne .date $today)`），空态整卡隐藏（`{{- if $sideItems -}}` 包外层，仅 social icons 兜底，不展示空框架），每条链接走 `/quests/#spark-<date>` 锚点
@@ -135,7 +165,7 @@
 
 - **首页 Daily Spark 卡片上线（HEAD 6af78a1）** `feat: 首页「今日小火花 Daily Spark」每日挑战卡片`
   - `.github/workflows/daily-spark.yml`（新建） — schedule 北京时间 00:10（`cron: '10 16 * * *'` UTC）+ `workflow_dispatch`；`permissions: { contents: write, actions: write }`，因含 `gh workflow run hugo.yml` 显式触发布署
-  - `scripts/daily_spark.py`（新建） — 调用 MiniMax `chatcompletion_v2` 生成中英双语小挑战（领域 生活/学习/创造/运动 ↔ Life/Learning/Creating/Movement）；模型/地址可用 repo vars `MINIMAX_MODEL` / `MINIMAX_BASE_URL` 覆盖，默认 `MiniMax-M2` / `https://api.minimaxi.com`；`validate_payload` 严格（除日期强制覆盖为今天外，其余字段失配即 fail + retry）；4 次重试 + 指数退避；atomic write（tmp + `os.replace`）；history dedup-by-date + 滚动 365 条上限
+  - `scripts/daily_spark.py`（新建） — 调用 MiniMax `chatcompletion_v2` 生成中英双语小挑战（领域 生活/学习/创造/运动 ↔ Life/Learning/Creating/Movement）；模型/地址可用 repo vars `MINIMAX_MODEL` / `MINIMAX_BASE_URL` 覆盖，默认 `MiniMax-M3` / `https://api.minimaxi.com`；`validate_payload` 严格（除日期强制覆盖为今天外，其余字段失配即 fail + retry）；4 次重试 + 指数退避；atomic write（tmp + `os.replace`）；history dedup-by-date + 滚动 365 条上限
   - `data/daily_spark.json` + `data/daily_spark_history.json`（新建） — 今日卡 + 滚动历史；由 workflow 写入、提交信息 `chore: daily spark YYYY-MM-DD`
   - `layouts/_partials/daily_spark.html`（新建） — 卡片 partial，`.Lang` 切换中英 headline / tag / title / task；守卫 `(isset $spark "date") (isset $spark "zh") (isset $spark "en")`（**未覆盖 `tag`，见 TODO**）
   - `layouts/_partials/home_info.html`（站点级 PaperMod 覆盖） — 在 `{{- end -}}` 前增加一行 `{{- partial "daily_spark.html" $ -}}`，把卡片插在 home-info 之后
