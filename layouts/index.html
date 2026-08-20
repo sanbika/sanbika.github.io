@@ -98,6 +98,32 @@
     {{- if $sparkOK -}}
     <section class="spark-checkin" aria-label="{{ $checkinLabel }}">
       <h3 class="spark-checkin__heading">{{ $checkinLabel }}</h3>
+      {{- /* Today's check-in photo wall (reuses the .quests__checkins*
+             visual from layouts/quests.html, scoped with a modifier
+             .spark-checkin__photos). Four guards so dirty data (missing
+             spark_checkins, no match for $spark.date, no checkins field,
+             malformed types) silently falls through to rendering just
+             the Giscus iframe below — never an empty <ul>. */ -}}
+      {{- $sparkCheckins := hugo.Data.spark_checkins -}}
+      {{- if $sparkCheckins -}}
+        {{- $todays := where $sparkCheckins "date" $spark.date -}}
+        {{- if gt (len $todays) 0 -}}
+          {{- $todaysList := index (index $todays 0) "checkins" -}}
+          {{- if $todaysList -}}
+            {{- $photosLabel := cond (eq $langKey "en") "Check-in photos" "打卡照片" -}}
+            <ul class="quests__checkins spark-checkin__photos" aria-label="{{ $photosLabel }}">
+              {{- range $todaysList -}}
+                <li class="quests__checkin">
+                  <a href="{{ .comment_url }}" target="_blank" rel="noopener" aria-label="{{ .author }}">
+                    <img loading="lazy" src="{{ .image_url }}" alt="{{ .alt }}" width="64" height="64" />
+                    <span class="quests__checkin-author">{{ .author }}</span>
+                  </a>
+                </li>
+              {{- end -}}
+            </ul>
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
       {{- partial "spark_comments.html" (dict "page" . "date" $spark.date) -}}
     </section>
     {{- end -}}

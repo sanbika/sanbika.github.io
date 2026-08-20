@@ -539,6 +539,13 @@ h3 {
   opacity: 1;
 }
 
+/* --- Spark check-in photo wall (home page) -------------------------------
+ * 复用 quests 页 .quests__checkins* 视觉, 仅调整间距: 顶贴 heading,
+ * 底给 giscus 1em 距离 (giscus fallback 已有独立 .spark-checkin__ghlink
+ * margin-top, 这里给墙体的下边距就够了).
+ * ------------------------------------------------------------------------- */
+.spark-checkin__photos { margin: 0 0 1em; }
+
 /* --- Spark check-in image wall ---------------------------------------------
  * 出现在 /quests/ 每条 quest item 内部、__task 之后、__discussion 链接之前.
  * 设计目标: 64×64 缩略图 + 用户名, 与现有 .quests__tag 视觉重量匹配;
