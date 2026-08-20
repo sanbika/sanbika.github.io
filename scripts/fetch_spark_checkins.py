@@ -4,8 +4,15 @@
 Pulls GitHub Discussions from the `daily-spark` category (id
 CATEGORY_ID; mirrors config/_default/params.toml
 [params.comments.spark].categoryid) on sanbika/sanbika.github.io,
-extracts user-uploaded images from both the discussion bodyHTML and
-each comment's bodyHTML, buckets results by `spark-<date>` term parsed
+extracts user-uploaded images from both the discussion body and
+each comment's body (markdown source — `bodyHTML` returns the
+JWT-signed `private-user-images.githubusercontent.com/...` URLs which
+are time-limited and don't match the canonical
+`github.com/user-attachments/assets/` prefix we filter on; the
+markdown `body` inlines uploaded attachments as
+`<img ... src="https://github.com/user-attachments/assets/<uuid>">`,
+exactly what the existing regex expects), buckets results by
+`spark-<date>` term parsed
 out of the discussion title, writes data/spark_checkins.json. Stdlib
 only.
 
@@ -154,12 +161,12 @@ def _query_category_discussions(token, after):
         discussions(categoryId: $catId, first: $first, after: $after, orderBy: {field: CREATED_AT, direction: DESC}) {
           pageInfo { hasNextPage endCursor }
           nodes {
-            number url title bodyHTML createdAt
+            number url title body createdAt
             author { login avatarUrl(size: 80) }
             comments(first: %(comments_first)d) {
               totalCount
               nodes {
-                id url bodyHTML createdAt
+                id url body createdAt
                 author { login avatarUrl(size: 80) }
               }
             }
@@ -317,8 +324,10 @@ def _extract_imgs_from_body(body, source_id, author, avatar, source_url,
     Filters by USER_ATTACHMENT_PREFIX, dedups via `seen` keyed on
     `(source_id, src)`, and falls back to a synthetic alt of the form
     `check-in by {author} ({last-8-of-url})` when the <img> has no alt
-    attribute. Body is HTML as GitHub returns it for comments/
-    discussions — already escaped.
+    attribute. Body is the markdown source GitHub returns via
+    `Discussion.body` / `DiscussionComment.body`; uploaded attachments
+    are inlined there as `<img ... src="https://github.com/user-attachments/assets/<uuid>" ...>`
+    so the existing regex still matches.
     """
     if not body:
         return
@@ -357,11 +366,11 @@ def extract_checkins(discussion):
     """Given a Discussion node dict, return list of checkin dicts.
 
     Dual source:
-      1. discussion.bodyHTML — when the OP posts images directly in
+      1. discussion.body — when the OP posts images directly in
          the thread (no separate comment). Authored by the discussion
          author; source_id = discussion number; source_url = the
          discussion url; posted_at = the discussion createdAt.
-      2. comments[*].bodyHTML — same as before, source_id = comment id.
+      2. comments[*].body — same as before, source_id = comment id.
 
     Dedups across both sources via a shared `seen` set keyed on
     `(source_id, image_url)`. Returns [] on falsy input.
@@ -376,7 +385,7 @@ def extract_checkins(discussion):
     body_author = _disc_author.get("login") or "anonymous"
     body_avatar = _disc_author.get("avatarUrl") or ""
     _extract_imgs_from_body(
-        body=discussion.get("bodyHTML") or "",
+        body=discussion.get("body") or "",
         source_id=f"discussion:{discussion.get('number')}",
         author=body_author,
         avatar=body_avatar,
@@ -392,7 +401,7 @@ def extract_checkins(discussion):
         author = author_node.get("login") or "anonymous"
         avatar = author_node.get("avatarUrl") or ""
         _extract_imgs_from_body(
-            body=comment.get("bodyHTML") or "",
+            body=comment.get("body") or "",
             source_id=comment.get("id") or comment.get("url") or "",
             author=author,
             avatar=avatar,
