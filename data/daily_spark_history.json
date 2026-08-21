@@ -103,5 +103,20 @@
       "title": "Summer Capsule Collage",
       "task": "Gather receipts, tickets, or fallen leaves at home and glue a tiny collage that captures this summer."
     }
+  },
+  {
+    "date": "2026-08-22",
+    "tag": {
+      "zh": "创造",
+      "en": "Creating"
+    },
+    "zh": {
+      "title": "夏日口袋册",
+      "task": "用A4纸折成四页口袋册，每页记录这个夏天的一个词、一种颜色、一句气味、一笔速写。"
+    },
+    "en": {
+      "title": "Summer Pocket Zine",
+      "task": "Fold an A4 paper into a 4-page pocket zine; each page captures this summer with a word, a color, a scent line, and a quick sketch."
+    }
   }
 ]
