@@ -1,0 +1,215 @@
+name: Check Theme Drift
+
+# Warns when the two site-level PaperMod overrides have moved past the
+# pinned submodule SHA. The overrides live at
+#   layouts/_partials/header.html         — search box / theme switcher / breadcrumbs
+#   layouts/_partials/translation_list.html — language picker
+# both of which are routinely touched upstream and routinely need a
+# site-specific re-merging before bumping the submodule.
+#
+# Schedule: every Monday at 02:30 UTC — that's 10:30 Beijing time Monday
+# morning, well clear of daily-spark.yml (16:10 UTC) and spark-checkins.yml
+# (every hour at :17) so we never race those writers for the data files.
+# Weekly cadence matches PaperMod's release pace.
+# Manual: workflow_dispatch for an on-demand check right after a PaperMod
+# release, without waiting for the next scheduled tick.
+
+on:
+  schedule:
+    - cron: '30 2 * * 1'
+  workflow_dispatch:
+
+# Single instance per workflow-name kebab (spark-checkins,
+# daily-spark, theme-drift-check). The kebab is derived from the
+# meaningful words of the workflow `name:` — `theme-drift-check`
+# happens to also equal the filename sans `.yml`, but the convention
+# is driven by the workflow name, not the file. cancel-in-progress:
+# false so a long manual run isn't killed by the next scheduled tick
+# while it's still writing its issue body.
+concurrency:
+  group: theme-drift-check
+  cancel-in-progress: false
+
+# contents:read — checkout the submodule to capture its current pinned SHA
+# issues:write  — open / comment on / close the drift reminder issue
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # Same checkout shape as spark-checkins.yml / daily-spark.yml:
+      # recursive to materialise themes/PaperMod, fetch-depth 0 so the
+      # submodule's own commit graph is intact (we diff against the
+      # submodule HEAD, not just a snapshot).
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      # Diff our two site-level overrides between the currently-pinned
+      # submodule SHA and upstream HEAD. Non-empty output ⇒ upstream has
+      # moved in ways that touch at least one of the overridden files;
+      # empty output ⇒ either the submodule is already at HEAD or
+      # upstream's changes don't touch these files.
+      #
+      # We rely on `remote set-head origin --auto` to materialise
+      # origin/HEAD (the submodule clone didn't always set the symbolic
+      # ref). After that, origin/HEAD resolves to the upstream default
+      # branch — `master` for PaperMod at time of writing, but we don't
+      # hardcode that here so this keeps working if PaperMod renames its
+      # default branch.
+      - name: Diff overridden templates against upstream
+        id: diff
+        env:
+          # Cap the snippet we paste into the issue body so a huge
+          # upstream rewrite doesn't blow past GitHub's 65536-char
+          # issue-body limit. 100 lines is plenty for a human to see
+          # what drifted.
+          DIFF_SUMMARY_LINES: '100'
+        run: |
+          set -euo pipefail
+
+          git -C themes/PaperMod fetch origin
+          git -C themes/PaperMod remote set-head origin --auto
+
+          pinned=$(git -C themes/PaperMod rev-parse HEAD)
+          upstream=$(git -C themes/PaperMod rev-parse origin/HEAD)
+          echo "pinned=$pinned"     >> "$GITHUB_OUTPUT"
+          echo "upstream=$upstream" >> "$GITHUB_OUTPUT"
+
+          diff_out=$(git -C themes/PaperMod diff \
+                       "$pinned" "$upstream" -- \
+                       layouts/_partials/header.html \
+                       layouts/_partials/translation_list.html \
+                     || true)
+
+          if [ -n "$diff_out" ]; then
+            echo "drifted=true" >> "$GITHUB_OUTPUT"
+            {
+              # Random per-output heredoc delimiter so an upstream diff
+              # containing a literal `EOF` line can't prematurely close
+              # the multi-line `diff_summary` value on $GITHUB_OUTPUT
+              # (GitHub's official guidance: each output must use a
+              # unique delimiter, not a fixed `EOF`).
+              delim="EOF_$(openssl rand -hex 8)"
+              echo "diff_summary<<$delim"
+              echo '```diff'
+              # `printf '%s\n'` (with `\n`) keeps the last diff line
+              # terminated so the closing ``` from the next echo lands
+              # on its own line — without that `\n` the backticks glue
+              # to the last diff line because `$(...)` already strips
+              # git diff's own trailing newline. The default value on
+              # DIFF_SUMMARY_LINES is also defensive against `set -u`
+              # when the env var isn't pinned.
+              printf '%s\n' "$diff_out" | head -n "${DIFF_SUMMARY_LINES:-100}"
+              echo '```'
+              echo "$delim"
+            } >> "$GITHUB_OUTPUT"
+          else
+            echo "drifted=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # One fresh issue per drift cycle: when the diff step reports
+      # drift, we always open a new issue with the fixed title. Any
+      # previously-opened drift issue from an earlier cycle will have
+      # already been closed by the "Close stale drift issue" step below
+      # once that cycle's drift was resolved, so it sits in the issue
+      # list as historical record (closed, not deleted). On a sustained
+      # multi-cycle drift, that means multiple closed reminders plus
+      # the new open one — not a single long-lived thread.
+      - name: Open or update drift issue
+        if: steps.diff.outputs.drifted == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PINNED: ${{ steps.diff.outputs.pinned }}
+          UPSTREAM: ${{ steps.diff.outputs.upstream }}
+          DIFF_SUMMARY: ${{ steps.diff.outputs.diff_summary }}
+        run: |
+          set -euo pipefail
+          title="PaperMod upstream drift: site template overrides need review"
+
+          body_file="$(mktemp)"
+          {
+            echo "The two site-level PaperMod overrides need to be re-checked"
+            echo "against upstream before bumping the submodule."
+            echo
+            echo "**Files in scope:**"
+            echo
+            echo "- \`layouts/_partials/header.html\`"
+            echo "- \`layouts/_partials/translation_list.html\`"
+            echo
+            echo "**Submodule SHA:**"
+            echo
+            echo "- pinned (current): \`${PINNED}\`"
+            echo "- upstream HEAD:    \`${UPSTREAM}\`"
+            echo
+            echo "**Diff summary:**"
+            echo
+            printf '%s\n' "$DIFF_SUMMARY"
+            echo
+            echo "---"
+            echo
+            echo "_Upgrading the submodule is a deliberate manual step — diff and"
+            echo "adapt the two files above, then bump \`themes/PaperMod\`. This"
+            echo "issue will close automatically on the next run that reports"
+            echo "no drift._"
+          } > "$body_file"
+
+          # Match by exact title via --json + jq — more robust than
+          # --search qualifier parsing across gh versions.
+          existing=$(gh issue list --state open --limit 200 \
+                       --json number,title \
+                       --jq ".[] | select(.title == \"$title\") | .number")
+          if [ -n "$existing" ]; then
+            echo "Updating existing drift issue(s): $existing"
+            for n in $existing; do
+              gh issue comment "$n" --body-file "$body_file"
+            done
+          else
+            echo "Opening new drift issue."
+            gh issue create --title "$title" --body-file "$body_file"
+          fi
+
+      # No drift → if the reminder issue is still open, close it with a
+      # note explaining why. The issue stays as historical record
+      # (closed, not deleted).
+      - name: Close stale drift issue
+        if: steps.diff.outputs.drifted != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PINNED: ${{ steps.diff.outputs.pinned }}
+          UPSTREAM: ${{ steps.diff.outputs.upstream }}
+        run: |
+          set -euo pipefail
+          title="PaperMod upstream drift: site template overrides need review"
+
+          open=$(gh issue list --state open --limit 200 \
+                   --json number,title \
+                   --jq ".[] | select(.title == \"$title\") | .number")
+          if [ -z "$open" ]; then
+            echo "No open drift issue; nothing to close."
+            exit 0
+          fi
+
+          note_file="$(mktemp)"
+          {
+            echo "Closing: no drift detected for the two site-level overrides."
+            echo
+            echo "- pinned:   \`${PINNED}\`"
+            echo "- upstream: \`${UPSTREAM}\`"
+            if [ "$PINNED" = "$UPSTREAM" ]; then
+              echo "- (submodule already at upstream HEAD)"
+            else
+              echo "- upstream moved past pinned, but neither overridden template changed"
+            fi
+          } > "$note_file"
+
+          note="$(cat "$note_file")"
+          for n in $open; do
+            gh issue close "$n" --comment "$note"
+          done
