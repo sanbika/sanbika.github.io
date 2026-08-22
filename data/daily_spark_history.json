@@ -118,5 +118,20 @@
       "title": "Summer Pocket Zine",
       "task": "Fold an A4 paper into a 4-page pocket zine; each page captures this summer with a word, a color, a scent line, and a quick sketch."
     }
+  },
+  {
+    "date": "2026-08-23",
+    "tag": {
+      "zh": "创造",
+      "en": "Creating"
+    },
+    "zh": {
+      "title": "夏日拼贴",
+      "task": "翻出旧杂志，剪出5个代表这个夏天的词或图，拼成一页告别海报。"
+    },
+    "en": {
+      "title": "Summer Collage",
+      "task": "Rummage through old magazines, cut out five words or images that capture this summer, and arrange them into a one-page farewell poster."
+    }
   }
 ]
