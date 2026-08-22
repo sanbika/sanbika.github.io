@@ -214,6 +214,14 @@ query SparkDiscussions($query: String!, $first: Int!) {
 4. `alt` 提取：`<img alt="...">`，否则用 URL 末段 hash 前 8 位
 5. 每张图对应一条 `checkins` 项，`comment_url` 复用同一评论的 URL
 
+> **2026-08-22 本轮注记（不修改正文历史，仅追加）**：spark-checkins reviewer 一轮留下的 **S4**（img 正则 hardening）/ **S5**（indent 常量抽公共）在本轮 D 收尾实现——
+> - **S4**（旧 startswith → 新 fullmatch）：旧「`src.startswith("https://github.com/user-attachments/assets/")`」白名单已被收紧替换为 `re.fullmatch(USER_ATTACHMENT_URL_RE, src)`，其中 `USER_ATTACHMENT_URL_RE = re.compile(re.escape(USER_ATTACHMENT_PREFIX) + r"[0-9a-f-]+$", re.IGNORECASE)`；`USER_ATTACHMENT_PREFIX` 成为全脚本**唯一真值源**，`re.escape` 防前缀里含 regex 元字符。字符类从宽松 `[A-Za-z0-9_-]+` 收紧为合法 hex/UUID 末段 `[0-9a-f-]+` 并锚 `$`，多余的 `.png` / query string / 路径片段会被直接拒掉。**与 canonical 比对（剔除 `fetched_at` 的内容数组比较）交互正确**：本次 cron 会把 JSON 里残留的脏图一次性清掉、产生一个 cleanup commit、之后恢复稳态
+> - **S5**（indent 常量）：脚本内 `indent=2` 字面量统一抽为 `JSON_INDENT = 2` 常量
+> - **CATEGORY_ID 同步契约注释扩写**：脚本顶部 `CATEGORY_ID` 上方与 `config/_default/params.toml` 的 `comments.spark.categoryid` 上方各加一段注释互相指向；改分类必须两处同步（参见 [[conventions/giscus.md]] §1 / §2 双分类设计）
+> - **修剪逻辑**：合并 `existing` 与窗口内新抓取数据时，丢弃**窗口外 + `checkins` 为空**的条目（带 `[spark-checkins] pruning N stale empty entries` 日志）；窗口外 `checkins` 非空保留（是 `/quests/` 图片墙数据源）
+> - 历史正文（含此处旧的 startswith 描述与 `comment.bodyHTML` 措辞）保持原样不动；本注记仅用于提醒未来读者"现实现已不同"
+> - 关联：plan [[superpowers/plans/2026-08-18-spark-checkins-implementation.md]] line 241 处同步加注；[[current-state.md]] 最近变更本轮条目
+
 ### 4.4 写盘策略
 
 - **原子写**：先写 `data/spark_checkins.json.tmp`，再 `os.replace` 覆盖

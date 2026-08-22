@@ -15,28 +15,55 @@
 | 首页改版（撤 home_info；`layouts/index.html` 双列布局；`spark_comments.html` giscus 按天独立话题 `spark-<date>`） | done | reviewer 一轮通过 + worker 小修（`time` 合法 ISO `datetime`、无数据隐藏评论区、`aria-label` 双语、CSS 清理）；HEAD 95757ff |
 | 首页任务卡重设计（游戏任务风：靛紫任务条 / 类型徽章 / 接取按钮 / 撕票虚线） | done | 难度★/XP 实现后按用户要求移除（不会被记录，纯装饰无意义）；reviewer 一轮通过（对比度 AA / 空态无孤儿 giscus / 中英跨语言确定性）；HEAD 0769320 |
 | 往期任务页 /quests/（按月倒序分组的历史存档 + 双语菜单第 6 项） | done | reviewer 一轮通过 + 防御加固（regex 日期 + 6 字段 isset 守卫；GitHub Discussions 搜索 URL 永不 404）；HEAD eefe0dd |
+| 本轮批量优化（B 卫生修复：zh-cn `languageCode` / giscus `data-lang` 健壮化 / i18n 字节对齐 + C 体验优化：about 邮箱替换 / 打卡 `<img>` 加 `decoding="async"` + D 收尾：fetch 脚本 S4 fullmatch + S5 `JSON_INDENT` + CATEGORY_ID 同步契约注释 / theme-drift-check workflow 上线） | done | reviewer 两轮无 Critical，13 文件改动合并结论可执行；**未 commit 待用户确认**（含 1 新建 `.github/workflows/theme-drift-check.yml`） |
 
 ## TODO / 阻塞
-- [ ] **置顶：上线前置 — GitHub 仓库 Settings → Secrets and variables → Actions 必须新增 `MINIMAX_API_KEY` secret**，然后 Actions 页手动 Run 一次 `daily-spark` workflow 验证一次 — 未配置此 secret 则 schedule 调度每日失败；这是 GitHub Actions API 密钥推送的前置条件，本地文档无法代为操作
+- [x] **置顶：上线前置 — GitHub 仓库 Settings → Secrets and variables → Actions 必须新增 `MINIMAX_API_KEY` secret**（已确认用户配置成功；daily-spark 08-21 / 08-22 实跑验证均生成成功；secret 推送是 GitHub Actions API 操作，本地文档无法代为完成——此条后续不会再触发，仅作历史沉淀）
 - [x] **`daily_spark.html` 的 `isset` 守卫未覆盖 `tag` 字段** — 已随任务卡重设计（HEAD 0769320）消化：守卫并入 `layouts/index.html` 的 `$sparkOK` 并升级覆盖 `date / tag / tag.zh|en / zh|en.{title,task}` 全字段，无效数据整段隐藏 `.spark-checkin` 而非空评论区
-- [ ] **仓库 60 天无 push 会停用 schedule workflow（GitHub 安全策略）** — `.github/workflows/daily-spark.yml` 当前 `schedule: cron: '10 16 * * *'`；长期闲置仓库会被自动禁用 schedule，日常 push 自愈，长期闲置（≥60 天）需在 Actions 页确认并手动 Re-enable
-- [ ] **about 页邮箱占位符待本人替换** — `content/about/index.md`（`<你的邮箱>`）与 `content/about/index.en.md`（`<your email>`）
+- [x] **仓库 60 天无 push 会停用 schedule workflow（GitHub 安全策略）** — 风险实际解除：本仓现每日都有 daily-spark / spark-checkins 两个 writer workflow bot push（最坏情况每天 ≥ 1 次 push），远低于 60 天停用阈值；此约定本身仍然成立（[[conventions/ci.md]] §2），但"长期闲置"在本仓语境下不再是一个需要单独盯的运维风险
+- [x] **about 页邮箱占位符待本人替换** — 已替换为 `sanbika2719@gmail.com`（中英两版同步，本轮 B/C 体验优化）
 - [x] **首页 `homeInfoParams.Content` 文案已定稿（本轮）** — 中文「这里是我的自留地…」/ 英文「My corner on the web…」；写入 `config/_default/languages.toml`，提交 5e46a90
 - [ ] **favicon 4 件套是 `avatar.jpg` 直接缩放占位** — `static/{favicon.ico,favicon-16x16.png,favicon-32x32.png,apple-touch-icon.png,safari-pinned-tab.svg}`；待正式 logo（圆形裁剪 + 安全区 + 透明背景）
-- [ ] **暗色品牌色 `#9B9BF5` 在 PaperMod 深底上的对比度待实机确认** — `assets/css/extended/blank.css`；若 AA 不达标可继续往紫色高亮方向上调（本轮已较初版 `#E15D68` 经蔓越莓红 `#ef7fa4` 提亮，仍需目测确认）
-- [ ] **`layouts/_partials/header.html` 与 `translation_list.html` 是站点级主题模板覆盖** — 升级主题子模块后必须 `diff` 复核（PaperMod 上游改动不会被本地覆盖自动跟进），本轮已将 `.Language.Label` 显式写入
+- [x] **暗色品牌色 `#9B9BF5` 在 PaperMod 深底上的对比度待实机确认** — 用户实机目测确认可接受（个人博客视觉语境，非企业级 WCAG 强制场景；本轮交付即定稿，不再列入 TODO）
+- [x] **`layouts/_partials/header.html` 与 `translation_list.html` 是站点级主题模板覆盖** — 已自动化：`.github/workflows/theme-drift-check.yml`（本轮新建）每周一 02:30 UTC + `workflow_dispatch` 跑一次：fetch 上游 `themes/PaperMod` → diff pinned SHA vs `origin/HEAD` 中这两处覆盖 → 有 drift 开/评论 issue（带 100 行 diff 截断）→ 无 drift 自动关闭旧提醒 issue。约定见 [[conventions/ci.md]] §3。**升级子模块时仍需人工复核**（workflow 只盯这两处，theme 其他文件的改动由 PR review 流程兜底），但"忘记 diff 这两处"不再是纯人工记忆
 - [x] **英文站列表可能较空是预期状态** — 已明确策略：内容单语为主、不追求双语全覆盖；英文站内容稀疏属预期，不要把它当 TODO 去做补齐。约定见 [[conventions/i18n.md]] §1
-- [ ] **`i18n/zh-cn.yaml` 与主题源 `themes/PaperMod/i18n/zh.yaml` 字节级不一致**（line 13 尾随空白差异）— 二选一：a) 与主题字节对齐；b) 文件头加注释声明 snapshot + 同步策略
-- [ ] **giscus `data-lang` 条件对"未来第三语言"不健壮** — `layouts/_partials/comments.html:13` 当前 `cond (eq .Lang "en") "en" "zh-CN"`，可改 `cond (eq .Lang "en") "en" .Lang`（前提：值是 giscus 支持的语言码）
+- [x] **`i18n/zh-cn.yaml` 与主题源 `themes/PaperMod/i18n/zh.yaml` 字节级不一致**（line 13 尾随空白差异）— 选 (a) 与主题字节对齐（line 13 尾随空格），现 `diff` 输出空；选 (a) 的理由是 diff 干净利于后续 theme-drift-check 检测 / 升级时一眼能看出站点 i18n 是否漂移；snapshot 注释方案不被采纳（YAML 不接受文件头注释，会被解析为文档起始或被编辑器误识别）
+- [x] **giscus `data-lang` 条件对"未来第三语言"不健壮** — `layouts/_partials/comments.html` 与 `spark_comments.html` 已统一改 `cond (eq .Lang "en") "en" (default .Lang .Site.Language.LanguageCode)`：英文强制走 `en`（giscus 大小写敏感），其余语言优先 `.Lang`（页面级最准）、缺失则回退 `Site.Language.LanguageCode`（站点级配置兜底）。副产物：`config/_default/languages.toml` `[zh-cn]` 同步新增 `languageCode = "zh-CN"`，修正了此前中文页因 `languageCode` 缺失导致 Hugo 静默回退 `defaultContentLanguage = "en"` 的 `"en-US"`、错误发出 `<html lang="en-US">`/hreflang/RSS 的潜在 bug
 - [ ] **Entire CLI 注入的 `Entire-Checkpoint: ...` 提交 trailer 是工具噪音** — 可在使用 Entire CLI 时关闭以保持 git log 整洁
 - [x] **giscus `spark-<date>` 每天建一个 discussion 长期累积空 discussion 的卫生问题已缓解** — HEAD 7339b19 起 spark 评论迁到独立 `daily-spark` 分类 + giscus 本身是**懒创建**（term 找不到对应 discussion 时不会预创建，只有用户首次提交评论才真正建 discussion；空评论区不会留痕迹）。切换前已有人在旧 General 分类下对 `spark-<date>` 留过评论的，新分类下不会显示（giscus 按 `category + term` 检索），原 discussion 留在 GitHub General 里不再回流——这部分历史评论视为放弃，无需迁移。本仓侧不再需要做任何清理动作
 - [ ] **两个 giscus partial（`comments.html` / `spark_comments.html`）不可同时渲染在同一页面** — `comments.html` 用 `setGiscusTheme` + MutationObserver，`spark_comments.html` 用 `setSparkGiscusTheme` + 各自 observer；若同页同时渲染会冲突。当前 home 只用 spark_comments、single 只用 comments，无同页场景；如未来要同页混用需合并函数与 observer
-- [ ] **追加验证：链式触发未真实贴图实测** — 有数据变化时 `Trigger Hugo deploy` 步骤（`gh workflow run hugo.yml --ref main`，commit `fde7641`）尚未被真实贴图场景实测过；与 daily-spark.yml 静态同形、风险低；下次真实打卡后顺手确认一次「discussion 事件 → 抓取 → 显式触发 hugo → 部署」全链路。约定见 [[conventions/ci.md]] §1
-- [ ] **MiniMax-M3 首次生成质量观察** — 模型 `MiniMax-M3` 已推送（HEAD `fde7641`），但要到下一个 `16:10 UTC` 的 daily-spark 运行才首次生效；届时看一次生成质量（中英双语 / tag 域 / 标题与任务措辞）是否达到预期——若生成明显劣化可临时通过 repo var `MINIMAX_MODEL` 回退 `MiniMax-M2`
-- [ ] **`CATEGORY_ID` 字面量双份存在，改分类时两处必须同步** — `scripts/fetch_spark_checkins.py` 顶部 `CATEGORY_ID = "DIC_kwDOT2zk8c4DDbVZ"`（daily-spark giscus 分类）+ `config/_default/params.toml` 的 `comments.spark.categoryid = "DIC_kwDOT2zk8c4DDbVZ"`（giscus 嵌入用同一分类 ID）。脚本**不读 toml** 是有意取舍（保持 stdlib-only、不引入 `tomllib` 依赖），代价是分类 ID 字面量必须人工保持同步。未来若改 giscus 分类，**先**在 GitHub Discussions 建新分类 → 拿到新 `DIC_…` → **两处同时**替换；只换一处会导致打卡抓取与 giscus 嵌入走不同分类、抓取的图永远不显示
+- [x] **追加验证：链式触发未真实贴图实测** — 用户已确认「贴图 → discussion 事件 → 抓取 → commit → 显式触发 hugo → 部署」全链路实测通过；约定见 [[conventions/ci.md]] §1（不假定 `hugo.yml` 自动跟；本仓两个 writer workflow 已对齐）
+- [x] **MiniMax-M3 首次生成质量观察** — 用户确认生成质量达标（中英双语 / tag 域 / 标题与任务措辞均符合预期）；无需回退 `MiniMax-M2`；daily-spark 08-21 / 08-22 实跑验证通过（MINIMAX_API_KEY secret 同步配置成功）
+- [x] **`CATEGORY_ID` 字面量双份存在，改分类时两处必须同步** — 双份字面量作为 stdlib-only 权衡保留（脚本**不读 toml** 是有意取舍：避免引入 `tomllib` 依赖）。本轮 D 收尾加同步契约注释：脚本顶部 `CATEGORY_ID` 上方与 `config/_default/params.toml` 的 `comments.spark.categoryid` 上方各加一段注释互相指向，注释内显式列出"另一处位置 + 改分类必须两处同步"的契约；未来若改 giscus 分类，**先**在 GitHub Discussions 建新分类 → 拿到新 `DIC_…` → **两处同时**替换（注释会提醒）；只换一处仍会导致打卡抓取与 giscus 嵌入走不同分类、抓取的图永远不显示——这是本仓 giscus 双分类设计 [[conventions/giscus.md]] §1 / §2 带来的必然代价
 - [x] **giscus iframe 不支持上传图片 → 带图打卡走 GitHub 原生评论 ↗ 入口（工作流决策）** — 已沉淀（HEAD 1aadc7d 起）：giscus iframe 没有 GitHub 上传权限（嵌入上下文不带 GitHub 会话），无法上传本地图片；带图打卡走首页评论区下方的「在 GitHub 上评论 · 可传图 ↗」链接（GitHub Discussions 搜索 URL `discussions_q=spark-<date>`，永不 404 + 懒创建无副作用），GitHub 网页本身支持拖拽上传图片，giscus 与 GitHub Discussions 是**双向同步**的（小卡片评论 ↔ 网页 discussion 同一节点），用户在网页上传图，giscus 这边也能看到。三处入口（首页打卡区 / 侧栏往期任务卡「打卡讨论」 / `/quests/` 月份存档「打卡讨论」）走同一个搜索 URL 模式
 
 ## 最近变更
+
+- **批量优化（B 卫生修复 + C 体验优化 + D 收尾，待 commit，工作区 13 文件改动 / reviewer 两轮无 Critical）** `chore: docs/i18n/lang housekeeping + theme-drift-check workflow`
+  - **B 卫生修复**（3 项，零行为变化或仅润色）：
+    - `config/_default/languages.toml` — `[zh-cn]` 新增 `languageCode = "zh-CN"`（附注释：新语言须用 giscus 认识的语言码、大小写敏感、不认识会回退英文）。**副产物**：修正了中文页此前因 `languageCode` 缺失 → Hugo 静默回退 `defaultContentLanguage = "en"` → 错误发出 `<html lang="en-US">` / `hreflang="en-US"` / RSS `xml:lang="en-US"` 的潜在 bug；这一行新增顺带让中文页语言码正确
+    - `layouts/_partials/comments.html` + `layouts/_partials/spark_comments.html` — giscus `data-lang` 统一改 `cond (eq .Lang "en") "en" (default .Lang .Site.Language.LanguageCode)`：英文强制 `en`（giscus 大小写敏感），其余优先 `.Lang`（页面级）、缺失回退 `Site.Language.LanguageCode`（站点级兜底）；第三语言开箱即用、giscus 认识的码走 `.Lang` 直接生效，不认识回退 `languageCode` 仍可能不被 giscus 接受——加注释提醒
+    - `i18n/zh-cn.yaml` — 与主题 `themes/PaperMod/i18n/zh.yaml` **字节级对齐**（line 13 尾随空格），现 `diff` 输出空。选字节对齐而非 snapshot 注释的理由：diff 干净利于未来 theme-drift-check 检测 / 主题升级时一眼看出站点 i18n 是否漂移；YAML 不接受文件头注释，注释方案落地差
+  - **C 体验优化**（2 项，肉眼可感但零行为变化）：
+    - `content/about/index.md` + `content/about/index.en.md` — 邮箱占位符 `<你的邮箱>` / `<your email>` → `sanbika2719@gmail.com`（中英两版同步）
+    - `layouts/index.html` + `layouts/quests.html` — 打卡 `<img>` 补 `decoding="async"`（`loading="lazy"` 与 `width`/`height` 原本已有；`decoding="async"` 让图片解码不阻塞主线程，缩略图墙场景下体验更顺）
+  - **D 收尾**（3 项，spark-checkins reviewer 遗留 S4/S5 + 跨文件契约 + 新 workflow）：
+    - `scripts/fetch_spark_checkins.py` —
+      - **S4**：`USER_ATTACHMENT_URL_RE = re.compile(re.escape(USER_ATTACHMENT_PREFIX) + r"[0-9a-f-]+$", re.IGNORECASE)`，`fullmatch` 替代旧 `startswith` 白名单；`USER_ATTACHMENT_PREFIX` 成为全脚本**唯一真值源**（`re.escape` 防前缀里含 regex 元字符导致误匹配；字符类 `[0-9a-f-]+$` 收紧为合法 UUID/hex 末段，不再接受 `[A-Za-z0-9_-]+` 的宽松集——避免前缀后任意字符串都过，比如路径里 `assets/foo.png` 这种会被 startswith 误收但 fullmatch 直接拒掉）。reviewer 确认与 `canonical` 比对（剔除 `fetched_at` 的内容数组比较）交互正确；下次 cron 会把 JSON 里残留的脏图一次性清掉、产生一个 cleanup commit、之后恢复稳态
+      - **S5**：`JSON_INDENT = 2` 抽公共常量（取代脚本各处 `indent=2` 字面量）
+      - **CATEGORY_ID 同步契约注释扩写**：脚本顶部 `CATEGORY_ID` 上方新增注释显式说明"另一处在 `config/_default/params.toml` 的 `comments.spark.categoryid`、改分类必须两处同步"；`config/_default/params.toml` 的 `categoryid` 上方镜像一段反向注释
+      - **新增修剪逻辑**：合并 `existing` 数组与窗口内新抓取数据时，丢弃**窗口外 + `checkins` 为空**的条目（带一行 `[spark-checkins] pruning N stale empty entries` 日志）；**窗口外且 `checkins` 非空**的条目保留（是 `/quests/` 图片墙的历史图数据源，不能误删）。reviewer 确认无副作用
+    - `.github/workflows/theme-drift-check.yml`（新建）— 每周一 02:30 UTC + `workflow_dispatch`；`permissions: contents: read + issues: write`（无 push / 无 deploy）；流程：checkout 含子模块 → 在 `themes/PaperMod` 内 `git fetch` 上游 → diff pinned SHA vs `origin/HEAD` 中 `layouts/_partials/header.html` 与 `translation_list.html` 两处站点级覆盖 → 有 drift 时开 issue（标题带短 hash、body 包含站点级覆盖清单 + 100 行截断的 `diff` 输出、随机唯一 heredoc 分隔符防脚本注入），无 drift 时自动关闭旧的同主题提醒 issue；**issue 生命周期设计**（open on drift → close when upstream rebases back）而非失败 job / PR 模式，避免每次失败推 PR 噪音 + 对接无 PR review 流程
+  - 关键决策：
+    - **languageCode 顺带修正 en-US 潜在 bug** —— 中文页 `languageCode` 缺失时 Hugo 静默回退 `defaultContentLanguage = "en"` 的 `"en-US"`；这一轮加上 `"zh-CN"` 后，中文页 `<html lang>` / `hreflang` / RSS 全部正确发中文语言码，是 `languageCode` 顺手带来的副产物，不是显式 patch。**结论**：i18 配置里 `languageCode` 不可省（不只是 giscus 用，Hugo 整站语言码都依赖它）
+    - **i18n 字节对齐而非 snapshot 注释声明** —— 选字节对齐是因为：(a) YAML 不接受文件头注释（会被解析为文档起始 / 编辑器误识别为 front matter），落地差；(b) diff 干净利于 theme-drift-check 检测 / 升级时一眼看出站点 i18n 是否漂移；(c) 字节级对齐 = 无差异 = 漂移检测零误报。snapshot 注释方案只在"主动要 drift"时才有意义（明确标记"本站有覆盖"），但本仓 i18n 是无覆盖场景（继承主题的完整 11 个 key）
+    - **giscus `data-lang` 用 `default` 而非固定 zh-CN** —— 三段式 `cond (eq .Lang "en") "en" (default .Lang .Site.Language.LanguageCode)` 是"英文保底 en + 其它优先页 + 站点兜底"的最小健壮写法，未来加第三语言（ja / ko / fr…）无需再改模板、只要在 `languages.toml` 加 `languageCode` 且该码 giscus 支持即生效；不认识的语言码仍会被 giscus 静默回退英文（这是 giscus 行为，不是我们的责任）
+    - **修剪只丢窗口外空条目** —— 窗口外"有人打过卡"的条目必须保留（是 `/quests/` 图片墙 / 侧栏往期任务卡的图数据源），只丢"窗口外 + 无图 + 无评论"的条目（对站点零可见影响）；合并时日志 `[spark-checkins] pruning N stale empty entries` 一次性告知运维下次 cron 会产生 cleanup commit，恢复稳态后无影响
+    - **S4 fullmatch 而非 startswith** —— 旧 startswith 接受 `https://github.com/user-attachments/assets/foo.png`（前缀对了就行、`foo.png` 不是合法 hash 也会通过）；新 fullmatch `re.escape(PREFIX) + [0-9a-f-]+$` 要求前缀后必须是合法 hex/UUID 字符 + 必须以 hex/UUID 收尾，多余的 `.png` / query string / 路径片段都会被拒。`re.escape(PREFIX)` 让 PREFIX 成为唯一真值源（改一处前缀，全脚本同步）。reviewer 确认 canonical 比对交互正确
+    - **theme-drift-check 用 issue 生命周期而非失败 job** —— 失败 job 模式会让 workflow 每周红一次（即使已有 issue 提醒）、需要额外 mute 机制；issue 生命周期模式：上游回到 pinned SHA → 无 drift → 自动 close 旧 issue → workflow 静默绿。无 PR review 流程对接（这是单人博客仓库），所以也不走 PR 模式
+  - reviewer 两轮均无 Critical，**合并结论可执行**；本轮 13 文件改动（12 改 + 1 新建 workflow）**未 commit，待用户确认**
+  - 范围严格收敛在 `config/_default/languages.toml` / `layouts/_partials/{comments,spark_comments}.html` / `i18n/zh-cn.yaml` / `scripts/fetch_spark_checkins.py` / `config/_default/params.toml` / `content/about/index.{md,en.md}` / `layouts/{index,quests}.html` / `.github/workflows/theme-drift-check.yml`；未触碰 themes 子模块 / `.gitmodules` / `.gitignore` / 其它业务代码
+  - 关联：spec [[superpowers/specs/2026-08-18-spark-checkins-design.md]] §4.3 旁加注 S4 fullmatch + S5 `JSON_INDENT` 的本轮更新；plan [[superpowers/plans/2026-08-18-spark-checkins-implementation.md]] line 241 处加注 `USER_ATTACHMENT_URL_RE` fullmatch + `re.escape` 收紧。约定 [[conventions/ci.md]] 新增 §3「theme-drift-check workflow」一节记录用途 / 触发频率 / 权限边界
 
 - **打卡图片墙 — 抓取脚本重写 + 首页当日图片墙 + 模型升 M3 + discussion 事件触发 + reviewer 一轮修复 + 2 个线上追加修复（HEAD fde7641 / 已推送 / 上线验证通过）** 最终 commit 链（远端 main tip = `fde7641`）：
   - rebase 后原 5 commit 的新 SHA：`d249c04`（fix: 抓取脚本重写）/ `07175ae`（feat: 首页打卡图片墙）/ `aede4c1`（chore: 模型 M3 + discussion 事件）/ `331809f`（fix: review 修复）/ `8d690fa`（docs: current-state 更新）；旧 SHA（`e381e18`/`60367d4`/`d82e996`/`15b7aa4`/`260b2eb`）已因 rebase 失效

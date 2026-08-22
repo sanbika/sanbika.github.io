@@ -273,6 +273,15 @@ if __name__ == "__main__":
     main()
 ```
 
+> **2026-08-22 本轮注记（不修改正文历史，仅追加；对应原 line 241 的 `USER_ATTACHMENT_RE`）**：spark-checkins reviewer 一轮留下的 **S4**（img 正则 hardening）在本轮 D 收尾实现——
+> - 旧正则 `r"https://github\.com/user-attachments/assets/[A-Za-z0-9_-]+"` + 旧使用处 `src.startswith("https://github.com/user-attachments/assets/")` 已被收紧替换为 `fullmatch` 正则：
+>   - 引入 `USER_ATTACHMENT_PREFIX = "https://github.com/user-attachments/assets/"` 作为**唯一真值源**，`re.escape(PREFIX)` 防前缀里含 regex 元字符
+>   - 字符类从宽松 `[A-Za-z0-9_-]+` 收紧为合法 hex/UUID 末段 `[0-9a-f-]+`，并锚 `$`（`re.IGNORECASE` 保留大小写不敏感）
+>   - 全脚本统一 `re.fullmatch(USER_ATTACHMENT_URL_RE, src)` 替代 startswith；多余的 `.png` / query string / 路径片段会被直接拒掉
+> - **交互正确性**：与 canonical 比对（剔除 `fetched_at` 的内容数组比较）交互正确——reviewer 确认本次 cron 会把 JSON 里残留的脏图一次性清掉、产生一个 cleanup commit、之后恢复稳态
+> - 历史正文（含此处旧的 startswith 描述）保持原样不动；本注记仅用于提醒未来读者"现实现已不同"
+> - 关联：spec [[superpowers/specs/2026-08-18-spark-checkins-design.md]] §4.3 旁同步加注；[[current-state.md]] 最近变更本轮条目
+
 - [ ] **Step 2: 验证骨架可启动**
 
 ```bash
