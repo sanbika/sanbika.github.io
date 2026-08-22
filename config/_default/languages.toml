@@ -2,6 +2,7 @@
   label = "中文"
   weight = 1
   title = "浆果丛林"
+  languageCode = "zh-CN" # giscus-supported code; new languages must also pick a value giscus recognises (case-sensitive — unrecognised codes silently fall back to English UI).
   [zh-cn.params]
     description = "浆果丛林 —— 个人主页与博客"
 

@@ -30,7 +30,7 @@
         data-emit-metadata="0"
         data-input-position="bottom"
         data-theme="light"
-        data-lang="{{ cond (eq $page.Lang "en") "en" "zh-CN" }}"
+        data-lang="{{ cond (eq $page.Lang "en") "en" (default $page.Lang $page.Site.Language.LanguageCode) }}"
         data-light-theme="{{ $page.Site.Params.comments.giscus.lighttheme }}"
         data-dark-theme="{{ $page.Site.Params.comments.giscus.darktheme }}"
         crossorigin="anonymous"
