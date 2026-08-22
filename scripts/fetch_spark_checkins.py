@@ -61,7 +61,13 @@ GRAPHQL_URL = "https://api.github.com/graphql"
 # Must stay in sync with config/_default/params.toml
 #   [params.comments.spark].categoryid
 # Pulling the literal here (instead of reading the toml) keeps this
-# script stdlib-only; the two values are reviewed together.
+# script stdlib-only; the two values are reviewed together. ⚠ When
+# migrating to a new giscus discussion category, replace BOTH this
+# literal AND `params.toml` [params.comments.spark].categoryid in the
+# SAME commit — replacing only one will silently desync: the fetcher
+# will pull from one category while the embedded giscus iframe renders
+# against another, and freshly-fetched check-ins will never appear in
+# the day's thread.
 CATEGORY_ID = "DIC_kwDOT2zk8c4DDbVZ"
 PAGE_SIZE = 100                                # GraphQL first:N for discussions page
 
@@ -80,6 +86,27 @@ COMMENTS_PER_DISCUSSION = 50                    # GraphQL first:N for comments
 # comments is dropped — keeps the surface area small and avoids third-party
 # tracking/CDN drift.
 USER_ATTACHMENT_PREFIX = "https://github.com/user-attachments/assets/"
+# JSON indent used by `_canonical_bytes` for byte-level comparison
+# against the on-disk file written via `_lib.write_json`. The two MUST
+# match or the canonical-vs-on-disk comparison will always claim the
+# content changed (since the indentation alone shifts bytes), defeating
+# the whole no-change-no-commit guard. If you change one, change both.
+JSON_INDENT = 2
+# Stricter whole-URL match used after the <img src="..."> value is
+# extracted: enforces that the URL is *exactly* the canonical asset
+# prefix followed by a UUID-shaped token (hex + hyphen). We deliberately
+# do NOT use a UUID-spec regex (8-4-4-4-12) — GitHub asset IDs all match
+# that shape, but the character class is the real safety net:
+#   * rejects paths like /assets/<id>/foo or query strings (?jwt=...)
+#   * rejects whitespace, control chars, and any non-hex/non-hyphen byte
+#     creeping in from a malformed or hostile comment
+#   * single character class + bounded quantifier → linear time, no
+#     pathological backtracking. Used via `fullmatch()` so the URL must
+#     be the entire matched string, not just start with the prefix.
+_USER_ATTACHMENT_URL_RE = re.compile(
+    re.escape(USER_ATTACHMENT_PREFIX) + r"[0-9a-f-]+$",
+    re.IGNORECASE,
+)
 # Match `<img ... src="..." ... alt="...">` (alt optional / any order). Used
 # to extract both src and alt from the rendered comment HTML.
 #
@@ -321,12 +348,14 @@ def _extract_imgs_from_body(body, source_id, author, avatar, source_url,
                             posted_at, seen, out):
     """Append parsed checkin dicts for each <img> in `body` to `out`.
 
-    Filters by USER_ATTACHMENT_PREFIX, dedups via `seen` keyed on
-    `(source_id, src)`, and falls back to a synthetic alt of the form
-    `check-in by {author} ({last-8-of-url})` when the <img> has no alt
-    attribute. Body is the markdown source GitHub returns via
-    `Discussion.body` / `DiscussionComment.body`; uploaded attachments
-    are inlined there as `<img ... src="https://github.com/user-attachments/assets/<uuid>" ...>`
+    Filters by USER_ATTACHMENT_URL_RE (fullmatch on the canonical
+    `github.com/user-attachments/assets/<uuid>` shape), dedups via
+    `seen` keyed on `(source_id, src)`, and falls back to a synthetic
+    alt of the form `check-in by {author} ({last-8-of-url})` when the
+    `<img>` has no alt attribute. Body is the markdown source GitHub
+    returns via `Discussion.body` / `DiscussionComment.body`; uploaded
+    attachments are inlined there as
+    `<img ... src="https://github.com/user-attachments/assets/<uuid>" ...>`
     so the existing regex still matches.
     """
     if not body:
@@ -337,7 +366,7 @@ def _extract_imgs_from_body(body, source_id, author, avatar, source_url,
         if not src_match:
             continue
         src = src_match.group(1)
-        if not src.startswith(USER_ATTACHMENT_PREFIX):
+        if not _USER_ATTACHMENT_URL_RE.fullmatch(src):
             continue
         key = (source_id, src)
         if key in seen:
@@ -447,7 +476,7 @@ def _canonical_bytes(data):
 
     Strips per-item `fetched_at` so cron ticks don't churn commits when
     the only thing that changed since the last run is the timestamp.
-    Same ensure_ascii=False / indent=2 / trailing newline as
+    Same ensure_ascii=False / JSON_INDENT / trailing newline as
     `write_json`; the caller still goes through write_json for the
     actual on-disk write (so the tmp+rename atomic-write path is
     preserved).
@@ -458,7 +487,7 @@ def _canonical_bytes(data):
             continue
         cleaned = {k: v for k, v in item.items() if k != "fetched_at"}
         canonical.append(cleaned)
-    return (json.dumps(canonical, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    return (json.dumps(canonical, ensure_ascii=False, indent=JSON_INDENT) + "\n").encode("utf-8")
 
 
 # ---------------------------------------------------------------------------
@@ -524,10 +553,21 @@ def main():
             "discussion_url": fresh[d]["discussion_url"],
             "checkins": fresh[d]["checkins"],
         })
+    # Out-of-window items are normally preserved verbatim — the /quests/
+    # image wall renders from them — but we drop the entries whose
+    # checkins list is empty (or missing): the 90-day window only writes
+    # fresh data for in-window dates, so anything out-of-window AND
+    # checkin-less is unreachable from any page and just bloats the JSON.
+    # Window-internal dates are always populated above (fresh fetch, never
+    # empty), so the pruning only ever touches out-of-window rows. Stale
+    # items that DO have check-ins are the image-wall data source, so
+    # they survive.
     for item in existing:
         d = item.get("date") if isinstance(item, dict) else None
-        if d and d not in in_window_dates:
+        if d and d not in in_window_dates and item.get("checkins"):
             new_data.append(item)
+        elif d and d not in in_window_dates and not item.get("checkins"):
+            print(f"[spark-checkins] pruning out-of-window empty: {d}", flush=True)
     new_data.sort(key=lambda x: x["date"])
 
     # Byte-level compare so hourly cron doesn't churn commits when nothing
