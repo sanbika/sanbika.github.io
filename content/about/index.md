@@ -16,6 +16,6 @@ comments: true
 ## 联系方式
 
 - GitHub: [@sanbika](https://github.com/sanbika)
-- Email: <你的邮箱>
+- Email: <sanbika2719@gmail.com>
 
 ![Avatar](/images/avatar.jpg)

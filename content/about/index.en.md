@@ -16,6 +16,6 @@ Brief self-introduction here.
 ## Contact
 
 - GitHub: [@sanbika](https://github.com/sanbika)
-- Email: <your email>
+- Email: <sanbika2719@gmail.com>
 
 ![Avatar](/images/avatar.jpg)

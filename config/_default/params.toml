@@ -48,6 +48,13 @@
     # 首页「每日打卡」评论专用 Giscus 分类：与文章评论的 General 分离
     [params.comments.spark]
       category = "daily-spark"
+      # ⚠ MUST stay in sync with `scripts/fetch_spark_checkins.py`'s
+      # `CATEGORY_ID` constant — that script does NOT read this toml
+      # (intentionally, to keep it stdlib-only). Replacing only one of
+      # the two will desync: the fetcher will pull from one giscus
+      # category while the embedded iframe below renders against
+      # another, and freshly-fetched check-ins will never appear in
+      # the day's thread.
       categoryid = "DIC_kwDOT2zk8c4DDbVZ"
 
 # Google Analytics
