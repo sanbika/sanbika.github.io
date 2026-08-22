@@ -122,7 +122,7 @@
                 {{- range $todaysList -}}
                   <li class="quests__checkin">
                     <a href="{{ .comment_url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ .author }}">
-                      <img loading="lazy" src="{{ .image_url }}" alt="{{ .alt }}" width="64" height="64" />
+                      <img loading="lazy" decoding="async" src="{{ .image_url }}" alt="{{ .alt }}" width="64" height="64" />
                       <span class="quests__checkin-author">{{ .author }}</span>
                     </a>
                   </li>
