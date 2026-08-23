@@ -1,15 +1,15 @@
 {
-  "date": "2026-08-23",
+  "date": "2026-08-24",
   "tag": {
     "zh": "创造",
     "en": "Creating"
   },
   "zh": {
-    "title": "夏日拼贴",
-    "task": "翻出旧杂志，剪出5个代表这个夏天的词或图，拼成一页告别海报。"
+    "title": "拼贴一句话",
+    "task": "从旧杂志或报纸上剪下5-8个字，拼成一句你想对自己说的话，贴在你明天会看到的地方"
   },
   "en": {
-    "title": "Summer Collage",
-    "task": "Rummage through old magazines, cut out five words or images that capture this summer, and arrange them into a one-page farewell poster."
+    "title": "Cut-Out Message",
+    "task": "Cut 5–8 characters from an old magazine or newspaper, arrange them into a message for yourself, and post it where you'll see it tomorrow."
   }
 }
