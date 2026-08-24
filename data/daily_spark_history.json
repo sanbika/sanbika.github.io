@@ -148,5 +148,20 @@
       "title": "Cut-Out Message",
       "task": "Cut 5–8 characters from an old magazine or newspaper, arrange them into a message for yourself, and post it where you'll see it tomorrow."
     }
+  },
+  {
+    "date": "2026-08-25",
+    "tag": {
+      "zh": "创造",
+      "en": "Creating"
+    },
+    "zh": {
+      "title": "给夏天写封短信",
+      "task": "用一张纸写一封给这个夏天的告别信（3-5句话），折成任意形状，拍照留念。"
+    },
+    "en": {
+      "title": "A Letter to Summer",
+      "task": "Write a 3–5 sentence goodbye letter to this summer on a piece of paper, fold it into any shape, and snap a photo of it."
+    }
   }
 ]

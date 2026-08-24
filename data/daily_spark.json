@@ -1,15 +1,15 @@
 {
-  "date": "2026-08-24",
+  "date": "2026-08-25",
   "tag": {
     "zh": "创造",
     "en": "Creating"
   },
   "zh": {
-    "title": "拼贴一句话",
-    "task": "从旧杂志或报纸上剪下5-8个字，拼成一句你想对自己说的话，贴在你明天会看到的地方"
+    "title": "给夏天写封短信",
+    "task": "用一张纸写一封给这个夏天的告别信（3-5句话），折成任意形状，拍照留念。"
   },
   "en": {
-    "title": "Cut-Out Message",
-    "task": "Cut 5–8 characters from an old magazine or newspaper, arrange them into a message for yourself, and post it where you'll see it tomorrow."
+    "title": "A Letter to Summer",
+    "task": "Write a 3–5 sentence goodbye letter to this summer on a piece of paper, fold it into any shape, and snap a photo of it."
   }
 }
