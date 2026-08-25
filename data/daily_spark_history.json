@@ -163,5 +163,20 @@
       "title": "A Letter to Summer",
       "task": "Write a 3–5 sentence goodbye letter to this summer on a piece of paper, fold it into any shape, and snap a photo of it."
     }
+  },
+  {
+    "date": "2026-08-26",
+    "tag": {
+      "zh": "创造",
+      "en": "Creating"
+    },
+    "zh": {
+      "title": "落叶拼图",
+      "task": "捡3片形状各异的落叶，在纸上拼成你喜欢的小图案，拍照留念"
+    },
+    "en": {
+      "title": "Leaf Collage",
+      "task": "Gather 3 differently shaped fallen leaves, arrange them into a small picture on paper, and snap a photo"
+    }
   }
 ]
