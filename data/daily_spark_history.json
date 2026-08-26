@@ -178,5 +178,20 @@
       "title": "Leaf Collage",
       "task": "Gather 3 differently shaped fallen leaves, arrange them into a small picture on paper, and snap a photo"
     }
+  },
+  {
+    "date": "2026-08-27",
+    "tag": {
+      "zh": "创造",
+      "en": "Creating"
+    },
+    "zh": {
+      "title": "为照片写诗",
+      "task": "挑一张手机里最近的照片，为它写一首三行小诗，押不押韵都行"
+    },
+    "en": {
+      "title": "Poem for a Photo",
+      "task": "Pick a recent photo on your phone and write a three-line micro poem for it—rhyme optional"
+    }
   }
 ]
