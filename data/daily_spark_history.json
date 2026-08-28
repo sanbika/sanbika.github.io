@@ -193,5 +193,20 @@
       "title": "Poem for a Photo",
       "task": "Pick a recent photo on your phone and write a three-line micro poem for it—rhyme optional"
     }
+  },
+  {
+    "date": "2026-08-28",
+    "tag": {
+      "zh": "运动",
+      "en": "Movement"
+    },
+    "zh": {
+      "title": "盲盒舞动15分",
+      "task": "随机播放一首从没听过的快歌，关掉灯，跟着节奏自由舞动15分钟，不用好看。"
+    },
+    "en": {
+      "title": "Blind Dance Break",
+      "task": "Shuffle a song you've never heard, turn off the lights, and free-dance to it for 15 minutes—no skill required."
+    }
   }
 ]

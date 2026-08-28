@@ -1,15 +1,15 @@
 {
-  "date": "2026-08-27",
+  "date": "2026-08-28",
   "tag": {
-    "zh": "创造",
-    "en": "Creating"
+    "zh": "运动",
+    "en": "Movement"
   },
   "zh": {
-    "title": "为照片写诗",
-    "task": "挑一张手机里最近的照片，为它写一首三行小诗，押不押韵都行"
+    "title": "盲盒舞动15分",
+    "task": "随机播放一首从没听过的快歌，关掉灯，跟着节奏自由舞动15分钟，不用好看。"
   },
   "en": {
-    "title": "Poem for a Photo",
-    "task": "Pick a recent photo on your phone and write a three-line micro poem for it—rhyme optional"
+    "title": "Blind Dance Break",
+    "task": "Shuffle a song you've never heard, turn off the lights, and free-dance to it for 15 minutes—no skill required."
   }
 }
