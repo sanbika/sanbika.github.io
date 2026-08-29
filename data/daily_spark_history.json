@@ -208,5 +208,20 @@
       "title": "Blind Dance Break",
       "task": "Shuffle a song you've never heard, turn off the lights, and free-dance to it for 15 minutes—no skill required."
     }
+  },
+  {
+    "date": "2026-08-29",
+    "tag": {
+      "zh": "创造",
+      "en": "Creating"
+    },
+    "zh": {
+      "title": "拾一缕夏声",
+      "task": "用手机录下一分钟窗外的夏末声音（蝉鸣、晚风或雨声），再为它写一首三行小诗。"
+    },
+    "en": {
+      "title": "Capture a Summer Sound",
+      "task": "Record one minute of late-summer ambient sound outside your window (cicadas, evening breeze, or rain), then write a three-line poem inspired by it."
+    }
   }
 ]
