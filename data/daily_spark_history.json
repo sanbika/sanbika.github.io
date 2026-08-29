@@ -223,5 +223,20 @@
       "title": "Capture a Summer Sound",
       "task": "Record one minute of late-summer ambient sound outside your window (cicadas, evening breeze, or rain), then write a three-line poem inspired by it."
     }
+  },
+  {
+    "date": "2026-08-30",
+    "tag": {
+      "zh": "创造",
+      "en": "Creating"
+    },
+    "zh": {
+      "title": "夏天书页",
+      "task": "用纸写下这个夏天三个闪亮瞬间，折好夹进一本书里，等冬天再翻出。"
+    },
+    "en": {
+      "title": "Summer Bookmark",
+      "task": "Jot down three bright moments from this summer on paper, fold them up, and tuck them into a book to rediscover next winter."
+    }
   }
 ]

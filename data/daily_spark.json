@@ -1,15 +1,15 @@
 {
-  "date": "2026-08-29",
+  "date": "2026-08-30",
   "tag": {
     "zh": "创造",
     "en": "Creating"
   },
   "zh": {
-    "title": "拾一缕夏声",
-    "task": "用手机录下一分钟窗外的夏末声音（蝉鸣、晚风或雨声），再为它写一首三行小诗。"
+    "title": "夏天书页",
+    "task": "用纸写下这个夏天三个闪亮瞬间，折好夹进一本书里，等冬天再翻出。"
   },
   "en": {
-    "title": "Capture a Summer Sound",
-    "task": "Record one minute of late-summer ambient sound outside your window (cicadas, evening breeze, or rain), then write a three-line poem inspired by it."
+    "title": "Summer Bookmark",
+    "task": "Jot down three bright moments from this summer on paper, fold them up, and tuck them into a book to rediscover next winter."
   }
 }
