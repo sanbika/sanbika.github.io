@@ -238,5 +238,20 @@
       "title": "Summer Bookmark",
       "task": "Jot down three bright moments from this summer on paper, fold them up, and tuck them into a book to rediscover next winter."
     }
+  },
+  {
+    "date": "2026-08-31",
+    "tag": {
+      "zh": "创造",
+      "en": "Creating"
+    },
+    "zh": {
+      "title": "物件传记",
+      "task": "挑一件厨房里的物品，用三段话为它写一段「前世今生」的小传记。"
+    },
+    "en": {
+      "title": "Object Biography",
+      "task": "Pick one item from your kitchen and write a short three-paragraph past-life story imagining its journey to you."
+    }
   }
 ]
