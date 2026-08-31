@@ -253,5 +253,20 @@
       "title": "Object Biography",
       "task": "Pick one item from your kitchen and write a short three-paragraph past-life story imagining its journey to you."
     }
+  },
+  {
+    "date": "2026-09-01",
+    "tag": {
+      "zh": "创造",
+      "en": "Creating"
+    },
+    "zh": {
+      "title": "秋日剪贴",
+      "task": "翻一本旧杂志，剪下带有暖色调的图案，拼成一张秋日小画。"
+    },
+    "en": {
+      "title": "Autumn Collage",
+      "task": "Flip through an old magazine, cut out warm-toned images, and arrange them into a small autumn artwork."
+    }
   }
 ]
