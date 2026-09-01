@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-01",
+  "date": "2026-09-02",
   "tag": {
     "zh": "创造",
     "en": "Creating"
   },
   "zh": {
-    "title": "秋日剪贴",
-    "task": "翻一本旧杂志，剪下带有暖色调的图案，拼成一张秋日小画。"
+    "title": "光的变奏",
+    "task": "用手机给同一件物品拍3张不同光影下的照片，排列成三联画保存。"
   },
   "en": {
-    "title": "Autumn Collage",
-    "task": "Flip through an old magazine, cut out warm-toned images, and arrange them into a small autumn artwork."
+    "title": "Light Variations",
+    "task": "Photograph one object under three different lighting conditions and arrange the shots as a triptych."
   }
 }

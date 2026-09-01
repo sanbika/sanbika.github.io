@@ -268,5 +268,20 @@
       "title": "Autumn Collage",
       "task": "Flip through an old magazine, cut out warm-toned images, and arrange them into a small autumn artwork."
     }
+  },
+  {
+    "date": "2026-09-02",
+    "tag": {
+      "zh": "创造",
+      "en": "Creating"
+    },
+    "zh": {
+      "title": "光的变奏",
+      "task": "用手机给同一件物品拍3张不同光影下的照片，排列成三联画保存。"
+    },
+    "en": {
+      "title": "Light Variations",
+      "task": "Photograph one object under three different lighting conditions and arrange the shots as a triptych."
+    }
   }
 ]
