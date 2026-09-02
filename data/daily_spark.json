@@ -1,15 +1,15 @@
 {
   "date": "2026-09-02",
   "tag": {
-    "zh": "探索",
-    "en": "Exploration"
+    "zh": "社交",
+    "en": "Social"
   },
   "zh": {
-    "title": "光的变奏",
-    "task": "用手机给同一件物品拍3张不同光影下的照片，排列成三联画保存。"
+    "title": "通讯录冒泡",
+    "task": "翻通讯录，找一个存了却很久没联系的人，发一条消息：'翻到你名字，冒个泡～'"
   },
   "en": {
-    "title": "Light Variations",
-    "task": "Photograph one object under three different lighting conditions and arrange the shots as a triptych."
+    "title": "Cold Ping",
+    "task": "Scroll your contacts, find someone you haven't messaged in ages, and send: 'Just saw your name — popping in to say hi.'"
   }
 }
