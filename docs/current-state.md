@@ -16,8 +16,10 @@
 | 首页任务卡重设计（游戏任务风：靛紫任务条 / 类型徽章 / 接取按钮 / 撕票虚线） | done | 难度★/XP 实现后按用户要求移除（不会被记录，纯装饰无意义）；reviewer 一轮通过（对比度 AA / 空态无孤儿 giscus / 中英跨语言确定性）；HEAD 0769320 |
 | 往期任务页 /quests/（按月倒序分组的历史存档 + 双语菜单第 6 项） | done | reviewer 一轮通过 + 防御加固（regex 日期 + 6 字段 isset 守卫；GitHub Discussions 搜索 URL 永不 404）；HEAD eefe0dd |
 | 本轮批量优化（B 卫生修复：zh-cn `languageCode` / giscus `data-lang` 健壮化 / i18n 字节对齐 + C 体验优化：about 邮箱替换 / 打卡 `<img>` 加 `decoding="async"` + D 收尾：fetch 脚本 S4 fullmatch + S5 `JSON_INDENT` + CATEGORY_ID 同步契约注释 / theme-drift-check workflow 上线） | done | reviewer 两轮无 Critical，13 文件改动合并结论可执行；**未 commit 待用户确认**（含 1 新建 `.github/workflows/theme-drift-check.yml`） |
+| Daily Spark prompt 重写 + 分类切换（社交/健康/探索/内省）+ 历史 8 条 + 当日卡 tag 一次性语义迁移 | done | HEAD 98fa5dd / 298197e / c3fdd39（本地未推送）；reviewer 两轮：首轮 0 Critical + W1（历史 8 条全探索太单调）已由 c3fdd39 修复（08-15→健康 / 08-17→内省，逐条判断后最终分布 探索×6 / 健康×1 / 内省×1；「社交」暂无历史条目属正常）+ W2（探索/内省定义重叠）已由 c3fdd39 修复（探索=外部世界、内省=落到自己身上且伴随纸面/手上动作）；S1-S5 不采纳或留 future（S5 长度硬校验是 pre-existing 设计选择，维持现状） |
 
 ## TODO / 阻塞
+- [ ] **push 前置 — 本地 main 领先 4 commit、origin/main 领先 24 commit（后者为 daily-spark / spark-checkins 两个 bot workflow 每日 commit）** — push 前必须 `git pull --rebase`，预期冲突：`data/daily_spark.json` + `data/daily_spark_history.json`（bot 在分叉窗口内持续追加）。处理约定：**冲突时以远端为准**（bot 数据更新），然后把本地 tag 迁移逻辑**重放**到远端新增的旧 tag 条目上（这些条目是分叉期间旧 prompt 生成的，会带 生活/学习/创造/运动 旧 tag；直接复用本轮逐条判断标准即可）。rebase 后新 prompt 才对 cron 生效。push 后可 `gh workflow run daily-spark.yml --ref main` 手动触发验证新 prompt 首跑；注意本仓约定：`GITHUB_TOKEN` push 不触发其他 workflow，部署需显式 `gh workflow run hugo.yml --ref main`（见 [[conventions/ci.md]] §1）
 - [x] **置顶：上线前置 — GitHub 仓库 Settings → Secrets and variables → Actions 必须新增 `MINIMAX_API_KEY` secret**（已确认用户配置成功；daily-spark 08-21 / 08-22 实跑验证均生成成功；secret 推送是 GitHub Actions API 操作，本地文档无法代为完成——此条后续不会再触发，仅作历史沉淀）
 - [x] **`daily_spark.html` 的 `isset` 守卫未覆盖 `tag` 字段** — 已随任务卡重设计（HEAD 0769320）消化：守卫并入 `layouts/index.html` 的 `$sparkOK` 并升级覆盖 `date / tag / tag.zh|en / zh|en.{title,task}` 全字段，无效数据整段隐藏 `.spark-checkin` 而非空评论区
 - [x] **仓库 60 天无 push 会停用 schedule workflow（GitHub 安全策略）** — 风险实际解除：本仓现每日都有 daily-spark / spark-checkins 两个 writer workflow bot push（最坏情况每天 ≥ 1 次 push），远低于 60 天停用阈值；此约定本身仍然成立（[[conventions/ci.md]] §2），但"长期闲置"在本仓语境下不再是一个需要单独盯的运维风险
@@ -38,6 +40,37 @@
 - [x] **giscus iframe 不支持上传图片 → 带图打卡走 GitHub 原生评论 ↗ 入口（工作流决策）** — 已沉淀（HEAD 1aadc7d 起）：giscus iframe 没有 GitHub 上传权限（嵌入上下文不带 GitHub 会话），无法上传本地图片；带图打卡走首页评论区下方的「在 GitHub 上评论 · 可传图 ↗」链接（GitHub Discussions 搜索 URL `discussions_q=spark-<date>`，永不 404 + 懒创建无副作用），GitHub 网页本身支持拖拽上传图片，giscus 与 GitHub Discussions 是**双向同步**的（小卡片评论 ↔ 网页 discussion 同一节点），用户在网页上传图，giscus 这边也能看到。三处入口（首页打卡区 / 侧栏往期任务卡「打卡讨论」 / `/quests/` 月份存档「打卡讨论」）走同一个搜索 URL 模式
 
 ## 最近变更
+
+- **Daily Spark prompt 重写 + 分类切换 + 历史 8 条 + 当日卡 tag 一次性语义迁移（本地未推送，HEAD 98fa5dd / 298197e / c3fdd39）** `feat: daily-spark prompt 重写 + 历史回灌防重复 + 分类切换` + `chore: daily-spark 历史 tag 一次性迁移到新分类` + `fix: reviewer 修复——历史 tag 逐条重贴（08-15→健康、08-17→内省）+ prompt 探索/内省定义去重叠`
+  - **用户痛点**（为什么这一轮要改）：① 任务脱离实际做不到（"去美术馆看一次展""挑战 30 分钟冥想"这类工具体验型不适合个人博客语境）；② **重复度高**——8 条历史里 4 条「出门拍照」结构、3 条「拼贴/折纸/口袋册」手工向；高频意象集中在日落×7 / 夏日×5 / 拍照×4 / 角落×4（同一意象在历史窗口内反复命中）
+  - **根因**（reviewer 与用户共同归因）：① **生成冷启动无历史回灌**——`build_user_message` 原版只发日期 + 星期，模型看不到任何已生成内容；冷启动时容易回到熟悉的"拍照 / 户外观察 / 拼贴"套路；② **prompt 无多样性约束**——`temperature=0.9` 不够，原 SYSTEM_PROMPT 只规定人设与硬约束，没禁止具体意象；③ **「创造」类同质化引力**——「创造」在「生活/学习/创造/运动」四分类里对 LLM 是高熵诱惑（"做个小手工 / 拼贴 / 折纸 / 拍个照"都在它引力范围里），让模型反复回到"动手做点东西"这条路上
+  - **本轮修**（三 commit）：
+    - `98fa5dd` `scripts/daily_spark.py`（唯一改业务的脚本）：
+      - **SYSTEM_PROMPT 重写**：人设从「极简挑战生成器」改为**温暖生活教练**（"像朋友随口安利一个小乐子，不像布置作业"——反作业感保留在原味上 + 措辞升级）；硬约束显式列举**15 分钟 / 零成本 / 无特殊工具 / 步行可达 / 不绑定天气时段 / 无需同伴 / 安全 / 不涉医疗政治宗教 / 禁止空洞鸡汤**（"多喝水""早点睡""深呼吸感恩"这类明确禁出）；具体可执行要求"明确动作动词 + 具体对象，让人读完就知道动手做什么"；**多样性硬约束**——"不与最近已生成过的任务在主题/场景/动作/核心意象上雷同 + 换着使用不同动词和生活场景 + 不要连续围绕同一类意象"（显式禁掉「拍照记录/日落天空/拼贴组合/手工折纸/给物件命名」这些历史高频意象）
+      - **分类切换**：`ALLOWED_TAGS_ZH = ("社交", "健康", "探索", "内省")` / `ALLOWED_TAGS_EN = ("Social", "Health", "Exploration", "Introspection")`——元组索引对齐（`ALLOWED_TAGS_EN[ALLOWED_TAGS_ZH.index(tag_zh)]` 反查），`validate_payload` 的 index 映射逻辑不变；分类顺序按 **外向他律→身体本能→外部观察→内在整理** 排（社交 = 与人发生轻互动 / 健康 = 身体活动或照料 / 探索 = 外部世界新发现 / 内省 = 自我整理 + 具体动作）
+      - **`build_user_message` 回灌最近 7 天任务清单**：`existing_history[-7:]` 取最近 7 条按日期倒序喂给模型（`date / tag.zh / title / task` 四字段），成为多样性约束的**显式 context**——model 看到最近做过的意象，新任务就能主动避雷；这是冷启动问题的最小补丁，不需要引入向量检索或 embedding
+    - `298197e` `data/daily_spark.json` + `data/daily_spark_history.json` — **历史 8 条 + 当日卡一次性语义迁移**到新分类：第一遍 best-effort 贴标（机械映射 生活→社交 / 学习→健康 / 创造→探索 / 运动→健康 / 未匹配→探索），提交 `chore: daily-spark 历史 tag 一次性迁移到新分类`。**best-effort 而非人工精修**——理由：① 内容早于新分类体系产生，旧 prompt 根本没考虑新分类，机械映射已经覆盖 80%；② history JSON 的功能是数据可视化（首页/侧栏/quests 页的消费端只显示 tag 文字），轻微误贴不影响视觉；③ 后面 c3fdd39 会做一遍人工微调补漏
+    - `c3fdd39` **reviewer 一轮 + 零轮修复**：
+      - **W1（历史 8 条全探索太单调）** → 逐条重贴：
+        - `2026-08-15` 「水果拼盘大作战」→ 健康（对象是饮食节律，符合健康的身体活动或照料）
+        - `2026-08-17` 「观察生活的隐喻」→ 内省（核心是"通勤路上观察细节 + 写一句 20 字以内解读"，对象是"自身对生活的察觉"，伴随"写一句"的具体动作，符合内省 = 落到自己身上 + 伴随纸面动作的双重约束）
+        - 其余 6 条（08-16 角落 / 08-18 日落 / 08-19 夕阳光影 / 08-20 云朵命名 / 08-21 夏日胶囊拼贴 / 08-22 口袋册）维持探索
+        - **最终分布**：探索×6 / 健康×1 / 内省×1；**「社交」暂无历史条目属正常**（旧 prompt 没这条引力线 + history 只有 8 条样本，未触发社交是统计上的预期，不是缺失 bug）
+      - **W2（探索 / 内省定义在 prompt 中重叠）** → **沉淀判定线**（这是本轮的核心约定之一）：
+        - **探索**：对象必须是**外部世界**——不熟悉的空间 / 物件 / 路径 / 小实验
+        - **内省**：对象必须**落在自己身上**（昨天的一个决定 / 一种惯常反应 / 一段对话留下的余味 / 近期反复出现的小情绪）**且伴随落到纸面或手上的具体动作**（划掉 / 写一句 / 挪一挪）——**非纯书写**，与「禁止作业感」**不冲突**：前者要求内省必须伴随动作，后者禁止纯文字产出型任务；两个约束互补而非重复
+        - 该判定线写入 SYSTEM_PROMPT 探索/内省定义段，并在 c3fdd39 的 commit message 显式标注，便于将来 prompt 再迭代时不被误合并回重叠定义
+      - **S1-S5 不采纳或留 future**：reviewer 给的 5 项小建议中，S5（任务长度硬校验）是 pre-existing 设计选择（SYSTEM_PROMPT 已有标题 ≤8 字 / 任务 ≤40 字的软约束，校验在 `validate_payload` 之外），本轮不动以避免 scope creep；S1-S4 同样留 future
+    - **前端零改动**：`layouts/index.html` / `layouts/quests.html` 对 tag 是**裸透传**（无白名单、无 enum）——读 `$spark.tag.zh` / `$spark.tag.en` 直接渲染，新分类文本无需任何模板层适配；这是 daily-spark 早期设计（HEAD 6af78a1 起）就把 tag 当纯数据而非约定的回报
+    - **关联约定更新**：`[[conventions/frontend-styling.md]] §4.5 任务编号的跨语言确定性` 一处改完——"标签文字本身走 `$langKey`：`zh` 显示 `生活/学习/创造/运动`，`en` 显示 `Life/Learning/Creating/Movement`" → `zh` 显示 `社交/健康/探索/内省`，`en` 显示 `Social/Health/Exploration/Introspection`（§4.5 是描述当前生效状态，所以同步；其它历史变更记录里的旧分类列举属 changelog 式历史，按约定保留原样）
+  - **关键决策**：
+    - **历史 tag 是新分类体系下的 best-effort 语义贴标，而非历史重写** —— history 里的任务是旧 prompt 在旧分类下生成的，最早可追溯到 HEAD 6af78a1 起；这些内容早于新分类产生，强行"重写任务措辞以匹配新分类"会变成编辑历史数据，违反 history 文件作为"每日挑战实际产出存档"的语义；best-effort 贴标 + 人类微调（08-15 → 健康 / 08-17 → 内省）是"承认数据来自旧时代 + 当前分类是后置理解"的最诚实的处理；最终分布 探索×6 / 健康×1 / 内省×1 + 「社交」暂无，是 8 条样本上的合理结果而非异常
+    - **冷启动回灌用 last-7 列表而非 embedding** —— 引入 embedding + 向量库是 50 倍工程量级的过度设计；last-7 显式列表让模型"看见"最近意象就足以规避 80% 重复（reviewer 第一轮 W1 观察到的"4 条拍照 + 3 条拼贴"问题本质是冷启动没看见历史，并不是 embedding 解决不了的问题）；当 history 涨到 30+ 条时再考虑向量相似度或 BM25（届时 365 条上限窗口里 last-30 也仍是合理选择）；本轮选择最小补丁
+    - **「创造」类被「探索」类吸收而非并入** —— 在新分类里动手做点小手工 / 拼贴 / 折纸这些原本属于「创造」的内容，归到「探索」（动手做点小作品是"尝试一点小实验"的具体形式）；「创造」分类被废止而非保留为"创造 = 探索的子集"，理由是分类体系 4 项 > 5 项（用户的认知带宽）+ 「创造」边界太模糊（「创造」与「探索」在新分类里高度重叠，留着会反复触发"这该归哪"的歧义）——选择**减法**
+    - **W2 沉淀为 SYSTEM_PROMPT 内部约定**而非外置 ADR —— 探索/内省判定线是 prompt 工程层面的硬约束，会被 LLM 阅读 + 反复迭代；外置 ADR 写在哪都形不成"模型能看见"的契约；写入 SYSTEM_PROMPT 探索/内省定义段 + 在 commit message 标注，是约束离它约束的对象最近的方式；本仓 prompt 后续若改动探索/内省定义，commit message 需显式说明是否动到这条判定线
+  - reviewer 两轮 — **第一轮 0 Critical + W1（8 条全探索）+ W2（两类定义重叠）**，已全部修复于 c3fdd39；**第二轮通过**；S1-S5 中 S5（长度硬校验）pre-existing 设计选择不采纳维持现状，其余留 future
+  - **commit 链**：`98fa5dd` → `298197e` → `c3fdd39`（本地 main tip，**未推送**）；数据冲突处理与 push 前置见 TODO 区 `[ ]` 条目
+  - **范围严格收敛**：`scripts/daily_spark.py`（业务改动）+ `data/daily_spark.json` + `data/daily_spark_history.json`（历史迁移）+ `docs/current-state.md` + `docs/conventions/frontend-styling.md`（约定同步）；未触碰 themes 子模块 / `.gitmodules` / `.gitignore` / 任何 layouts / 任何 workflows；新分类对前端零侵入（layouts 对 tag 是裸透传）
 
 - **批量优化（B 卫生修复 + C 体验优化 + D 收尾，待 commit，工作区 13 文件改动 / reviewer 两轮无 Critical）** `chore: docs/i18n/lang housekeeping + theme-drift-check workflow`
   - **B 卫生修复**（3 项，零行为变化或仅润色）：

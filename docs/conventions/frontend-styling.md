@@ -91,7 +91,7 @@
 
 ### 4.5 任务编号的跨语言确定性
 
-任务编号 `#MMDD` 派生自 ISO 日期 `YYYY-MM-DD` 而非显示日期，**跨语言/跨构建结果一致**。标签文字本身走 `$langKey`：`zh` 显示 `生活/学习/创造/运动`，`en` 显示 `Life/Learning/Creating/Movement`。视觉锚点不再依赖 emoji（§4.1 已删），纯文字 tag 在两种语言下都稳定。
+任务编号 `#MMDD` 派生自 ISO 日期 `YYYY-MM-DD` 而非显示日期，**跨语言/跨构建结果一致**。标签文字本身走 `$langKey`：`zh` 显示 `社交/健康/探索/内省`，`en` 显示 `Social/Health/Exploration/Introspection`。视觉锚点不再依赖 emoji（§4.1 已删），纯文字 tag 在两种语言下都稳定。
 
 ### 4.6 空态
 
