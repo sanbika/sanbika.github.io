@@ -30,8 +30,8 @@ from _lib import (
 # Configuration
 # ---------------------------------------------------------------------------
 
-ALLOWED_TAGS_ZH = ("生活", "学习", "创造", "运动")
-ALLOWED_TAGS_EN = ("Life", "Learning", "Creating", "Movement")
+ALLOWED_TAGS_ZH = ("社交", "健康", "探索", "内省")
+ALLOWED_TAGS_EN = ("Social", "Health", "Exploration", "Introspection")
 
 MAX_HISTORY = 365                      # keep last N entries
 
@@ -46,15 +46,50 @@ HISTORY_FILE = os.path.join(DATA_DIR, "daily_spark_history.json")
 
 SYSTEM_PROMPT = """你是「地球Online 每日隐藏任务（Daily Spark）」生成器，为个人博客生成每日小挑战（Daily Spark），目标是给日常生活提亮。
 
-要求：
-1. 领域在 生活 / 学习 / 创造 / 运动 中轮换（按日期伪随机，不必均匀）
-2. 任务必须：当天可完成、耗时 5-15 分钟、零成本、在家或步行可达的范围即可完成、不依赖特定天气/光照/时段、无需特殊装备或同伴、安全、不涉及医疗/政治/宗教等敏感内容
-3. 任务要具体可执行，带一点小巧思或新鲜感；低门槛不等于无聊；禁止空洞鸡汤和老生常谈（如「多喝水」「早点睡」这类禁止出现）
-4. 禁止作业感：任务是「做一件有趣的小事」，不是「完成一份作品」——不要设计写感受、写解读、写日记、起名字、列清单这类文字产出，也不要在 task 里堆指令式量词（如「记录5个」「写20字以内」）
-5. 中英文语义一致，英文自然地道
-6. 只输出 JSON，不要 markdown 代码块，不要任何其他文字，字段结构：
-{"date":"YYYY-MM-DD","tag":{"zh":"生活","en":"Life"},"zh":{"title":"不超过8个字","task":"一句话，不超过40字，具体描述做什么"},"en":{"title":"不超过6个词","task":"one sentence, concrete"}}
-tag 的 zh 固定为 生活/学习/创造/运动 之一，en 对应 Life/Learning/Creating/Movement。"""
+人设与语气：
+- 温暖、积极的生活教练，像朋友随口安利一个小乐子，不像布置作业
+- 轻松、幽默、正向，让用户读完会心一笑，而不是觉得又来活了
+- 用一个具体动作把今天点亮，不要靠说教、不要靠口号
+
+分类：
+- 固定四类轮换：社交 / 健康 / 探索 / 内省
+- 按日期伪随机，不必均匀，但连续两条尽量不重样
+- 社交：与人发生一点轻互动（问候、分享、寄出、邀约等）
+- 健康：身体层面的活动或照料（走动、舒展、饮食节律、用眼/用耳休息等）
+- 探索：发现新角落、观察新细节、动手做点小作品、尝试一点小实验
+- 内省：独处时落在一个具体动作上的自我整理（对照、整理、复盘、慢观察等），不是纯书写或纯冥想
+
+硬约束（必须满足，保证做得到）：
+- 15 分钟内可完成
+- 零成本、不需要特殊工具或 APP
+- 在家或步行可达范围内完成
+- 当天任何时段都能做（不绑定早晚）
+- 不依赖特定天气、光照、温度
+- 无需同伴，不涉及与陌生人深交
+- 安全、无身体风险
+- 不涉及医疗、政治、宗教等敏感内容
+- 禁止空洞鸡汤（「多喝水」「早点睡」「深呼吸感恩」「给自己一个微笑」这类禁止出现）
+
+具体可执行：
+- 任务是一个普通人今天顺手就能开始做的小事
+- 描述里要有明确的动作动词和具体对象，让人读完就知道动手做什么
+- 避免抽象形容词堆砌，禁止只给情绪不给动作
+
+禁止作业感：
+- 不要写感受、写日记、写解读、起名字、列清单等纯文字产出型任务
+- 「内省」类也必须落在一个具体动作上（例如观察、整理、尝试、对照、复盘某个小细节），不是纯书写、纯冥想、纯感恩
+
+多样性硬约束（防重复）：
+- 不与最近已生成过的任务（用户消息中会给清单）在主题、场景、动作、核心意象上雷同
+- 换着使用不同的动词和生活场景
+- 不要连续围绕同一类意象（例如不要连续围绕拍照记录、日落天空、拼贴组合、手工折纸、给物件命名等）
+
+中英文：
+- 语义一致，英文自然地道（不直译）
+
+输出 JSON（与现有 schema 完全一致，只输出 JSON，无 markdown 代码块，无任何其他文字）：
+{"date":"YYYY-MM-DD","tag":{"zh":"探索","en":"Exploration"},"zh":{"title":"不超过8个字","task":"一句话，不超过40字，具体描述做什么"},"en":{"title":"不超过6个词","task":"one sentence, concrete"}}
+tag 的 zh 固定为 社交/健康/探索/内省 之一，en 对应 Social/Health/Exploration/Introspection。"""
 
 
 def today_shanghai():
@@ -68,8 +103,26 @@ def today_shanghai():
     return now.strftime("%Y-%m-%d"), WEEKDAY_NAMES_ZH[now.weekday()]
 
 
-def build_user_message(date_str, weekday_zh):
-    return f"今天是{date_str}（北京时间，{weekday_zh}）。请生成今天的挑战，可以结合季节/星期增加变化。"
+def build_user_message(date_str, weekday_zh, recent_tasks=None):
+    head = f"今天是{date_str}（北京时间，{weekday_zh}）。请生成今天的挑战，可以结合季节/星期增加变化。"
+    recent = recent_tasks or []
+    if not recent:
+        return head
+    lines = [head, "", "最近已生成过的任务（新任务不得与它们在主题、动作、意象上雷同）："]
+    for i, t in enumerate(recent, 1):
+        if not isinstance(t, dict):
+            continue
+        date = t.get("date") or ""
+        mmdd = date[5:10] if len(date) >= 10 else date
+        tag_obj = t.get("tag") if isinstance(t.get("tag"), dict) else {}
+        tag_zh = tag_obj.get("zh") or ""
+        zh_obj = t.get("zh") if isinstance(t.get("zh"), dict) else {}
+        title = (zh_obj.get("title") or "").strip()
+        task = (zh_obj.get("task") or "").strip()
+        lines.append("{i}. [{mmdd}·{tag}] {title}：{task}".format(
+            i=i, mmdd=mmdd, tag=tag_zh, title=title, task=task,
+        ))
+    return "\n".join(lines)
 
 
 # ---------------------------------------------------------------------------
@@ -190,9 +243,9 @@ def build_history(existing, payload):
 # Main loop
 # ---------------------------------------------------------------------------
 
-def generate(api_key, base_url, model):
+def generate(api_key, base_url, model, recent_tasks=None):
     date_str, weekday_zh = today_shanghai()
-    user_message = build_user_message(date_str, weekday_zh)
+    user_message = build_user_message(date_str, weekday_zh, recent_tasks)
     last_error = None
 
     for attempt in range(1, MAX_ATTEMPTS + 1):
@@ -250,15 +303,24 @@ def main():
 
     ensure_data_dir()
 
+    # Load existing history once: feed the most recent 7 entries (date desc) to
+    # the model as anti-repetition context, then reuse the same list when
+    # rebuilding the history after a successful generation.
+    existing_history = read_json(HISTORY_FILE, default=[])
+    if isinstance(existing_history, list) and existing_history:
+        recent_tasks = list(reversed(existing_history[-7:]))
+        recent_tasks = [t for t in recent_tasks if isinstance(t, dict)]
+    else:
+        recent_tasks = []
+
     try:
-        payload = generate(api_key, base_url, model)
+        payload = generate(api_key, base_url, model, recent_tasks)
     except RuntimeError as e:
         print(f"[daily-spark] FAILED: {e}", file=sys.stderr)
         sys.exit(2)
 
     # Compute history fully in memory BEFORE writing anything to disk, so that
     # a write failure cannot leave behind a half-updated pair of files.
-    existing_history = read_json(HISTORY_FILE, default=[])
     new_history = build_history(existing_history, payload)
 
     try:
