@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-02",
+  "date": "2026-09-03",
   "tag": {
     "zh": "社交",
     "en": "Social"
   },
   "zh": {
-    "title": "通讯录冒泡",
-    "task": "翻通讯录，找一个存了却很久没联系的人，发一条消息：'翻到你名字，冒个泡～'"
+    "title": "15秒的惦记",
+    "task": "挑一位三个月没联系的老朋友，发一条15秒语音，只说一句'突然想到你'。"
   },
   "en": {
-    "title": "Cold Ping",
-    "task": "Scroll your contacts, find someone you haven't messaged in ages, and send: 'Just saw your name — popping in to say hi.'"
+    "title": "A 15-Second Ping",
+    "task": "Pick a friend you haven't talked to in months. Send them a 15-second voice note that just says, 'Just thought of you.'"
   }
 }

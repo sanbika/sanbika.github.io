@@ -283,5 +283,20 @@
       "title": "Light Variations",
       "task": "Photograph one object under three different lighting conditions and arrange the shots as a triptych."
     }
+  },
+  {
+    "date": "2026-09-03",
+    "tag": {
+      "zh": "社交",
+      "en": "Social"
+    },
+    "zh": {
+      "title": "15秒的惦记",
+      "task": "挑一位三个月没联系的老朋友，发一条15秒语音，只说一句'突然想到你'。"
+    },
+    "en": {
+      "title": "A 15-Second Ping",
+      "task": "Pick a friend you haven't talked to in months. Send them a 15-second voice note that just says, 'Just thought of you.'"
+    }
   }
 ]
