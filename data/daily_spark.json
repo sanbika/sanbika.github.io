@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-03",
+  "date": "2026-09-04",
   "tag": {
-    "zh": "社交",
-    "en": "Social"
+    "zh": "健康",
+    "en": "Health"
   },
   "zh": {
-    "title": "15秒的惦记",
-    "task": "挑一位三个月没联系的老朋友，发一条15秒语音，只说一句'突然想到你'。"
+    "title": "脚底地图",
+    "task": "脱掉鞋袜，赤脚走一遍家里的木地板、地砖和地毯，记下脚底最舒服的那一小块是哪儿。"
   },
   "en": {
-    "title": "A 15-Second Ping",
-    "task": "Pick a friend you haven't talked to in months. Send them a 15-second voice note that just says, 'Just thought of you.'"
+    "title": "Sole Map",
+    "task": "Kick off your shoes and socks, then walk barefoot across the wood, tile, and carpet at home — note which small patch feels the coziest underfoot."
   }
 }
