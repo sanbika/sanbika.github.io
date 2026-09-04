@@ -313,5 +313,20 @@
       "title": "Sole Map",
       "task": "Kick off your shoes and socks, then walk barefoot across the wood, tile, and carpet at home — note which small patch feels the coziest underfoot."
     }
+  },
+  {
+    "date": "2026-09-05",
+    "tag": {
+      "zh": "社交",
+      "en": "Social"
+    },
+    "zh": {
+      "title": "递一份小甜",
+      "task": "从家里挑一样多出来的水果或零食，下楼时带给常去小店的人，说一句\"这个给你尝尝\"。"
+    },
+    "en": {
+      "title": "A Little Treat",
+      "task": "Grab an extra fruit or snack from home and hand it to someone at your usual little shop on your way out, saying \"this one's for you.\""
+    }
   }
 ]

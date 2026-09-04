@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-04",
+  "date": "2026-09-05",
   "tag": {
-    "zh": "健康",
-    "en": "Health"
+    "zh": "社交",
+    "en": "Social"
   },
   "zh": {
-    "title": "脚底地图",
-    "task": "脱掉鞋袜，赤脚走一遍家里的木地板、地砖和地毯，记下脚底最舒服的那一小块是哪儿。"
+    "title": "递一份小甜",
+    "task": "从家里挑一样多出来的水果或零食，下楼时带给常去小店的人，说一句\"这个给你尝尝\"。"
   },
   "en": {
-    "title": "Sole Map",
-    "task": "Kick off your shoes and socks, then walk barefoot across the wood, tile, and carpet at home — note which small patch feels the coziest underfoot."
+    "title": "A Little Treat",
+    "task": "Grab an extra fruit or snack from home and hand it to someone at your usual little shop on your way out, saying \"this one's for you.\""
   }
 }
