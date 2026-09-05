@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-05",
+  "date": "2026-09-06",
   "tag": {
-    "zh": "社交",
-    "en": "Social"
+    "zh": "内省",
+    "en": "Introspection"
   },
   "zh": {
-    "title": "递一份小甜",
-    "task": "从家里挑一样多出来的水果或零食，下楼时带给常去小店的人，说一句\"这个给你尝尝\"。"
+    "title": "口袋考古",
+    "task": "翻翻口袋和钱包里的收据、便签，挑一张最不起眼的贴到镜子边，让它多活一天。"
   },
   "en": {
-    "title": "A Little Treat",
-    "task": "Grab an extra fruit or snack from home and hand it to someone at your usual little shop on your way out, saying \"this one's for you.\""
+    "title": "Pocket Archaeology",
+    "task": "Rummage through the receipts and notes in your pockets and wallet, pick the most forgettable one, and stick it to the edge of your mirror so it gets another day of life."
   }
 }
