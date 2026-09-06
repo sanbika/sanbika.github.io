@@ -343,5 +343,20 @@
       "title": "Pocket Archaeology",
       "task": "Rummage through the receipts and notes in your pockets and wallet, pick the most forgettable one, and stick it to the edge of your mirror so it gets another day of life."
     }
+  },
+  {
+    "date": "2026-09-07",
+    "tag": {
+      "zh": "健康",
+      "en": "Health"
+    },
+    "zh": {
+      "title": "脚趾抓布",
+      "task": "地上铺一条小毛巾，光脚用脚趾一根根把它抓起再放下，反复5分钟。"
+    },
+    "en": {
+      "title": "Toe Grip",
+      "task": "Lay a small towel on the floor and use your toes to grip and release it, repeating for 5 minutes."
+    }
   }
 ]

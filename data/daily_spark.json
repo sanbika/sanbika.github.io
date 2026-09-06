@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-06",
+  "date": "2026-09-07",
   "tag": {
-    "zh": "内省",
-    "en": "Introspection"
+    "zh": "健康",
+    "en": "Health"
   },
   "zh": {
-    "title": "口袋考古",
-    "task": "翻翻口袋和钱包里的收据、便签，挑一张最不起眼的贴到镜子边，让它多活一天。"
+    "title": "脚趾抓布",
+    "task": "地上铺一条小毛巾，光脚用脚趾一根根把它抓起再放下，反复5分钟。"
   },
   "en": {
-    "title": "Pocket Archaeology",
-    "task": "Rummage through the receipts and notes in your pockets and wallet, pick the most forgettable one, and stick it to the edge of your mirror so it gets another day of life."
+    "title": "Toe Grip",
+    "task": "Lay a small towel on the floor and use your toes to grip and release it, repeating for 5 minutes."
   }
 }
