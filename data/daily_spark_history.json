@@ -358,5 +358,20 @@
       "title": "Toe Grip",
       "task": "Lay a small towel on the floor and use your toes to grip and release it, repeating for 5 minutes."
     }
+  },
+  {
+    "date": "2026-09-08",
+    "tag": {
+      "zh": "探索",
+      "en": "Exploration"
+    },
+    "zh": {
+      "title": "低头猎奇",
+      "task": "出门走5分钟，低头找三个平时会忽略的地面细节，回来用手指在桌上比划出它们的样子。"
+    },
+    "en": {
+      "title": "Ground Hunt",
+      "task": "Walk for 5 minutes with your eyes on the ground, find three tiny details you'd normally step over, then trace their shapes on a table with your finger."
+    }
   }
 ]

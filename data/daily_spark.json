@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-07",
+  "date": "2026-09-08",
   "tag": {
-    "zh": "健康",
-    "en": "Health"
+    "zh": "探索",
+    "en": "Exploration"
   },
   "zh": {
-    "title": "脚趾抓布",
-    "task": "地上铺一条小毛巾，光脚用脚趾一根根把它抓起再放下，反复5分钟。"
+    "title": "低头猎奇",
+    "task": "出门走5分钟，低头找三个平时会忽略的地面细节，回来用手指在桌上比划出它们的样子。"
   },
   "en": {
-    "title": "Toe Grip",
-    "task": "Lay a small towel on the floor and use your toes to grip and release it, repeating for 5 minutes."
+    "title": "Ground Hunt",
+    "task": "Walk for 5 minutes with your eyes on the ground, find three tiny details you'd normally step over, then trace their shapes on a table with your finger."
   }
 }
