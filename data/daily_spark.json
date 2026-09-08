@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-08",
+  "date": "2026-09-09",
   "tag": {
-    "zh": "探索",
-    "en": "Exploration"
+    "zh": "内省",
+    "en": "Introspection"
   },
   "zh": {
-    "title": "低头猎奇",
-    "task": "出门走5分钟，低头找三个平时会忽略的地面细节，回来用手指在桌上比划出它们的样子。"
+    "title": "加购清点",
+    "task": "打开购物App的收藏夹，挑一件加了最久没下单的——今天给它一个了结：付款或划掉。"
   },
   "en": {
-    "title": "Ground Hunt",
-    "task": "Walk for 5 minutes with your eyes on the ground, find three tiny details you'd normally step over, then trace their shapes on a table with your finger."
+    "title": "Wishlist Audit",
+    "task": "Open your shopping app's wishlist, pick the item you've saved longest—today, pay for it or delete it."
   }
 }
