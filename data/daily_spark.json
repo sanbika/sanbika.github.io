@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-09",
+  "date": "2026-09-10",
   "tag": {
-    "zh": "内省",
-    "en": "Introspection"
+    "zh": "社交",
+    "en": "Social"
   },
   "zh": {
-    "title": "加购清点",
-    "task": "打开购物App的收藏夹，挑一件加了最久没下单的——今天给它一个了结：付款或划掉。"
+    "title": "便签写谢",
+    "task": "在便利贴上写'谢谢___'填一件具体的事，今天悄悄贴到对方的桌面或物品上。"
   },
   "en": {
-    "title": "Wishlist Audit",
-    "task": "Open your shopping app's wishlist, pick the item you've saved longest—today, pay for it or delete it."
+    "title": "Note of Thanks",
+    "task": "On a sticky note, write 'Thanks for ___' naming one specific thing, and quietly stick it on their desk or belongings today."
   }
 }
