@@ -403,5 +403,20 @@
       "title": "Note of Thanks",
       "task": "On a sticky note, write 'Thanks for ___' naming one specific thing, and quietly stick it on their desk or belongings today."
     }
+  },
+  {
+    "date": "2026-09-11",
+    "tag": {
+      "zh": "探索",
+      "en": "Exploration"
+    },
+    "zh": {
+      "title": "换路回家",
+      "task": "挑一个常走的路口故意拐另一条路，多走10分钟，看到从没进过的店就进去转一圈。"
+    },
+    "en": {
+      "title": "Detour Home",
+      "task": "At a familiar intersection, deliberately turn down a road you never take, walk 10 extra minutes, and step inside one shop you've never entered."
+    }
   }
 ]
