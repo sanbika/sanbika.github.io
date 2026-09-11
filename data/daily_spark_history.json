@@ -418,5 +418,20 @@
       "title": "Detour Home",
       "task": "At a familiar intersection, deliberately turn down a road you never take, walk 10 extra minutes, and step inside one shop you've never entered."
     }
+  },
+  {
+    "date": "2026-09-12",
+    "tag": {
+      "zh": "健康",
+      "en": "Health"
+    },
+    "zh": {
+      "title": "筷子夹豆",
+      "task": "桌上撒一小把花生米或豆子，用筷子一颗颗夹到碗里，数一数两分钟夹了几颗。"
+    },
+    "en": {
+      "title": "Chopstick Bean Pick",
+      "task": "Scatter a handful of peanuts or beans on the table, then use chopsticks to pick them up one by one into a bowl — count how many you move in two minutes."
+    }
   }
 ]

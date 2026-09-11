@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-11",
+  "date": "2026-09-12",
   "tag": {
-    "zh": "探索",
-    "en": "Exploration"
+    "zh": "健康",
+    "en": "Health"
   },
   "zh": {
-    "title": "换路回家",
-    "task": "挑一个常走的路口故意拐另一条路，多走10分钟，看到从没进过的店就进去转一圈。"
+    "title": "筷子夹豆",
+    "task": "桌上撒一小把花生米或豆子，用筷子一颗颗夹到碗里，数一数两分钟夹了几颗。"
   },
   "en": {
-    "title": "Detour Home",
-    "task": "At a familiar intersection, deliberately turn down a road you never take, walk 10 extra minutes, and step inside one shop you've never entered."
+    "title": "Chopstick Bean Pick",
+    "task": "Scatter a handful of peanuts or beans on the table, then use chopsticks to pick them up one by one into a bowl — count how many you move in two minutes."
   }
 }
