@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-12",
+  "date": "2026-09-13",
   "tag": {
-    "zh": "健康",
-    "en": "Health"
+    "zh": "社交",
+    "en": "Social"
   },
   "zh": {
-    "title": "筷子夹豆",
-    "task": "桌上撒一小把花生米或豆子，用筷子一颗颗夹到碗里，数一数两分钟夹了几颗。"
+    "title": "一句语音",
+    "task": "给一个三个月没聊过的朋友发条语音，不寒暄，只讲你这周吃到的、看到的、听到的一件具体小事。"
   },
   "en": {
-    "title": "Chopstick Bean Pick",
-    "task": "Scatter a handful of peanuts or beans on the table, then use chopsticks to pick them up one by one into a bowl — count how many you move in two minutes."
+    "title": "One Voice Note",
+    "task": "Send a voice message to a friend you haven't talked to in three months — skip the pleasantries, just share one specific thing you saw, ate, or heard this week."
   }
 }
