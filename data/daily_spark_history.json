@@ -448,5 +448,20 @@
       "title": "One Voice Note",
       "task": "Send a voice message to a friend you haven't talked to in three months — skip the pleasantries, just share one specific thing you saw, ate, or heard this week."
     }
+  },
+  {
+    "date": "2026-09-14",
+    "tag": {
+      "zh": "探索",
+      "en": "Exploration"
+    },
+    "zh": {
+      "title": "闻香识调料",
+      "task": "闭眼从厨房随手摸三瓶调料，闻一闻猜名字，睁眼揭晓答案。"
+    },
+    "en": {
+      "title": "Name That Spice",
+      "task": "Close your eyes, grab three spice jars from the kitchen, sniff each, and guess which one it is before opening your eyes to check."
+    }
   }
 ]

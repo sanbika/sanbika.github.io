@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-13",
+  "date": "2026-09-14",
   "tag": {
-    "zh": "社交",
-    "en": "Social"
+    "zh": "探索",
+    "en": "Exploration"
   },
   "zh": {
-    "title": "一句语音",
-    "task": "给一个三个月没聊过的朋友发条语音，不寒暄，只讲你这周吃到的、看到的、听到的一件具体小事。"
+    "title": "闻香识调料",
+    "task": "闭眼从厨房随手摸三瓶调料，闻一闻猜名字，睁眼揭晓答案。"
   },
   "en": {
-    "title": "One Voice Note",
-    "task": "Send a voice message to a friend you haven't talked to in three months — skip the pleasantries, just share one specific thing you saw, ate, or heard this week."
+    "title": "Name That Spice",
+    "task": "Close your eyes, grab three spice jars from the kitchen, sniff each, and guess which one it is before opening your eyes to check."
   }
 }
