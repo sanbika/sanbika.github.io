@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-14",
+  "date": "2026-09-15",
   "tag": {
-    "zh": "探索",
-    "en": "Exploration"
+    "zh": "内省",
+    "en": "Introspection"
   },
   "zh": {
-    "title": "闻香识调料",
-    "task": "闭眼从厨房随手摸三瓶调料，闻一闻猜名字，睁眼揭晓答案。"
+    "title": "对话余温",
+    "task": "回忆昨天某次对话里对方最后说的那句话，原样写在一张小纸片上，旁边画个符号标出你现在的态度。"
   },
   "en": {
-    "title": "Name That Spice",
-    "task": "Close your eyes, grab three spice jars from the kitchen, sniff each, and guess which one it is before opening your eyes to check."
+    "title": "Yesterday's Echo",
+    "task": "Recall the last sentence someone said to you yesterday, write it verbatim on a small piece of paper, and draw a simple symbol (√ / ? / ×) showing how you feel about it now."
   }
 }
