@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-15",
+  "date": "2026-09-16",
   "tag": {
-    "zh": "内省",
-    "en": "Introspection"
+    "zh": "健康",
+    "en": "Health"
   },
   "zh": {
-    "title": "对话余温",
-    "task": "回忆昨天某次对话里对方最后说的那句话，原样写在一张小纸片上，旁边画个符号标出你现在的态度。"
+    "title": "一首歌跳完",
+    "task": "挑一首3分钟左右的歌，把椅子推一边，在房间里从头跳到尾，不看手机，不看镜子，能动就动。"
   },
   "en": {
-    "title": "Yesterday's Echo",
-    "task": "Recall the last sentence someone said to you yesterday, write it verbatim on a small piece of paper, and draw a simple symbol (√ / ? / ×) showing how you feel about it now."
+    "title": "One-Song Dance",
+    "task": "Pick a 3-minute song, push the chair aside, and dance from start to finish in your room—no phone, no mirror, just move however your body wants."
   }
 }
