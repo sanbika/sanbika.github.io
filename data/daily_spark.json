@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-16",
+  "date": "2026-09-17",
   "tag": {
-    "zh": "健康",
-    "en": "Health"
+    "zh": "探索",
+    "en": "Exploration"
   },
   "zh": {
-    "title": "一首歌跳完",
-    "task": "挑一首3分钟左右的歌，把椅子推一边，在房间里从头跳到尾，不看手机，不看镜子，能动就动。"
+    "title": "路边小拾",
+    "task": "出门捡一样从没留意过的小东西（落叶/石子/瓶盖），捏手心走5分钟再放回去。"
   },
   "en": {
-    "title": "One-Song Dance",
-    "task": "Pick a 3-minute song, push the chair aside, and dance from start to finish in your room—no phone, no mirror, just move however your body wants."
+    "title": "Pocket a Pebble",
+    "task": "Pick up one tiny thing off the ground you've never noticed, carry it in your palm for 5 minutes of walking, then gently set it back."
   }
 }
