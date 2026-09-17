@@ -508,5 +508,20 @@
       "title": "Pocket a Pebble",
       "task": "Pick up one tiny thing off the ground you've never noticed, carry it in your palm for 5 minutes of walking, then gently set it back."
     }
+  },
+  {
+    "date": "2026-09-18",
+    "tag": {
+      "zh": "社交",
+      "en": "Social"
+    },
+    "zh": {
+      "title": "送件闲置的",
+      "task": "翻出一件家里闲置的小物件（钥匙扣/书签/贴纸），今天碰见某个人时直接递过去，不用解释。"
+    },
+    "en": {
+      "title": "Pass On the Idle",
+      "task": "Find a small unused item at home (a keychain, bookmark, or sticker), then hand it to someone you bump into today—no words needed."
+    }
   }
 ]

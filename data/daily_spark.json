@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-17",
+  "date": "2026-09-18",
   "tag": {
-    "zh": "探索",
-    "en": "Exploration"
+    "zh": "社交",
+    "en": "Social"
   },
   "zh": {
-    "title": "路边小拾",
-    "task": "出门捡一样从没留意过的小东西（落叶/石子/瓶盖），捏手心走5分钟再放回去。"
+    "title": "送件闲置的",
+    "task": "翻出一件家里闲置的小物件（钥匙扣/书签/贴纸），今天碰见某个人时直接递过去，不用解释。"
   },
   "en": {
-    "title": "Pocket a Pebble",
-    "task": "Pick up one tiny thing off the ground you've never noticed, carry it in your palm for 5 minutes of walking, then gently set it back."
+    "title": "Pass On the Idle",
+    "task": "Find a small unused item at home (a keychain, bookmark, or sticker), then hand it to someone you bump into today—no words needed."
   }
 }
