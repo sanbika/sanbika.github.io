@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-18",
+  "date": "2026-09-19",
   "tag": {
-    "zh": "社交",
-    "en": "Social"
+    "zh": "探索",
+    "en": "Exploration"
   },
   "zh": {
-    "title": "送件闲置的",
-    "task": "翻出一件家里闲置的小物件（钥匙扣/书签/贴纸），今天碰见某个人时直接递过去，不用解释。"
+    "title": "换个方向走",
+    "task": "选一条从没走过的路走15分钟，专门听三种从没注意过的声音，记住最喜欢那个的位置。"
   },
   "en": {
-    "title": "Pass On the Idle",
-    "task": "Find a small unused item at home (a keychain, bookmark, or sticker), then hand it to someone you bump into today—no words needed."
+    "title": "Walk a New Way",
+    "task": "Pick a route you've never taken, walk 15 minutes, and listen for three sounds you usually ignore, noting where the most pleasant one came from."
   }
 }

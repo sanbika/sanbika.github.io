@@ -523,5 +523,20 @@
       "title": "Pass On the Idle",
       "task": "Find a small unused item at home (a keychain, bookmark, or sticker), then hand it to someone you bump into today—no words needed."
     }
+  },
+  {
+    "date": "2026-09-19",
+    "tag": {
+      "zh": "探索",
+      "en": "Exploration"
+    },
+    "zh": {
+      "title": "换个方向走",
+      "task": "选一条从没走过的路走15分钟，专门听三种从没注意过的声音，记住最喜欢那个的位置。"
+    },
+    "en": {
+      "title": "Walk a New Way",
+      "task": "Pick a route you've never taken, walk 15 minutes, and listen for three sounds you usually ignore, noting where the most pleasant one came from."
+    }
   }
 ]
