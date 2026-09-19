@@ -538,5 +538,20 @@
       "title": "Walk a New Way",
       "task": "Pick a route you've never taken, walk 15 minutes, and listen for three sounds you usually ignore, noting where the most pleasant one came from."
     }
+  },
+  {
+    "date": "2026-09-20",
+    "tag": {
+      "zh": "内省",
+      "en": "Introspection"
+    },
+    "zh": {
+      "title": "挪一挪",
+      "task": "找一件每次拿起都犹豫一下的小物件，今天挪到新位置放，看晚上会不会下意识去找它。"
+    },
+    "en": {
+      "title": "Move One Thing",
+      "task": "Find a small object you hesitate over each time you pick it up — a worn T-shirt, an old mug, a pen. Move it to a new spot today and see if you instinctively go looking for it tonight."
+    }
   }
 ]

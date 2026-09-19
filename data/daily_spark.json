@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-19",
+  "date": "2026-09-20",
   "tag": {
-    "zh": "探索",
-    "en": "Exploration"
+    "zh": "内省",
+    "en": "Introspection"
   },
   "zh": {
-    "title": "换个方向走",
-    "task": "选一条从没走过的路走15分钟，专门听三种从没注意过的声音，记住最喜欢那个的位置。"
+    "title": "挪一挪",
+    "task": "找一件每次拿起都犹豫一下的小物件，今天挪到新位置放，看晚上会不会下意识去找它。"
   },
   "en": {
-    "title": "Walk a New Way",
-    "task": "Pick a route you've never taken, walk 15 minutes, and listen for three sounds you usually ignore, noting where the most pleasant one came from."
+    "title": "Move One Thing",
+    "task": "Find a small object you hesitate over each time you pick it up — a worn T-shirt, an old mug, a pen. Move it to a new spot today and see if you instinctively go looking for it tonight."
   }
 }
