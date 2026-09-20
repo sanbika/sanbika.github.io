@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-20",
+  "date": "2026-09-21",
   "tag": {
-    "zh": "内省",
-    "en": "Introspection"
+    "zh": "健康",
+    "en": "Health"
   },
   "zh": {
-    "title": "挪一挪",
-    "task": "找一件每次拿起都犹豫一下的小物件，今天挪到新位置放，看晚上会不会下意识去找它。"
+    "title": "单脚刷牙",
+    "task": "今天刷牙时单脚站立，左右脚各撑完整套过程，脚一落地就重新计时。"
   },
   "en": {
-    "title": "Move One Thing",
-    "task": "Find a small object you hesitate over each time you pick it up — a worn T-shirt, an old mug, a pen. Move it to a new spot today and see if you instinctively go looking for it tonight."
+    "title": "Brush on One Leg",
+    "task": "Brush your teeth while standing on one foot; switch feet when you change sides, and restart the clock the moment a foot touches the ground."
   }
 }
