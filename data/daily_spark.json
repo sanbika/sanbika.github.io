@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-21",
+  "date": "2026-09-22",
   "tag": {
-    "zh": "健康",
-    "en": "Health"
+    "zh": "社交",
+    "en": "Social"
   },
   "zh": {
-    "title": "单脚刷牙",
-    "task": "今天刷牙时单脚站立，左右脚各撑完整套过程，脚一落地就重新计时。"
+    "title": "发条语音",
+    "task": "找个最近没聊过的朋友，发条30秒语音过去，就说你最近碰到的一件挺有意思的小事。"
   },
   "en": {
-    "title": "Brush on One Leg",
-    "task": "Brush your teeth while standing on one foot; switch feet when you change sides, and restart the clock the moment a foot touches the ground."
+    "title": "Send a Voice Note",
+    "task": "Find a friend you haven't talked to in a while, send them a voice note under 30 seconds about something small and fun that happened to you recently."
   }
 }
