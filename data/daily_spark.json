@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-23",
+  "date": "2026-09-24",
   "tag": {
-    "zh": "健康",
-    "en": "Health"
+    "zh": "内省",
+    "en": "Introspection"
   },
   "zh": {
-    "title": "换只手干活",
-    "task": "挑一件今天必做的小事(拧瓶盖/开抽屉/按电梯), 全程用非惯用手完成, 中途不许换回来"
+    "title": "吃口不爱的",
+    "task": "今天吃饭第一口先吃你最不喜欢的那道配菜或调料，认真嚼完，鼻子呼一口气，看还烦不烦它。"
   },
   "en": {
-    "title": "Opposite Hand Day",
-    "task": "Pick one everyday task—twisting a cap, opening a drawer, pressing an elevator button—and do the whole thing with your non-dominant hand, no switching back."
+    "title": "Taste What You Skip",
+    "task": "At your next meal, take the first bite from the side dish you always push aside. Chew it slowly, then notice if you'd still skip it next time."
   }
 }
