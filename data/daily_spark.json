@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-24",
+  "date": "2026-09-25",
   "tag": {
-    "zh": "内省",
-    "en": "Introspection"
+    "zh": "探索",
+    "en": "Exploration"
   },
   "zh": {
-    "title": "吃口不爱的",
-    "task": "今天吃饭第一口先吃你最不喜欢的那道配菜或调料，认真嚼完，鼻子呼一口气，看还烦不烦它。"
+    "title": "随手翻翻",
+    "task": "找一本家里从没翻过的书或杂志，随手翻一页，读一段你从没注意过的内容。"
   },
   "en": {
-    "title": "Taste What You Skip",
-    "task": "At your next meal, take the first bite from the side dish you always push aside. Chew it slowly, then notice if you'd still skip it next time."
+    "title": "Random Page",
+    "task": "Find a book or magazine at home you've never opened. Flip to a random page and read a paragraph you've never noticed."
   }
 }
