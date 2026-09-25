@@ -628,5 +628,20 @@
       "title": "Random Page",
       "task": "Find a book or magazine at home you've never opened. Flip to a random page and read a paragraph you've never noticed."
     }
+  },
+  {
+    "date": "2026-09-26",
+    "tag": {
+      "zh": "探索",
+      "en": "Exploration"
+    },
+    "zh": {
+      "title": "闭眼闻香",
+      "task": "找一种你常吃但从没单独闻过的调料，撒一点在白纸上，闭眼闻30秒，说出三种你注意到的气味。"
+    },
+    "en": {
+      "title": "Blind Spice Test",
+      "task": "Sprinkle a spice you always use but never smell alone on white paper, close your eyes for 30 seconds, and name three scents you catch."
+    }
   }
 ]

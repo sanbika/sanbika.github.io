@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-25",
+  "date": "2026-09-26",
   "tag": {
     "zh": "探索",
     "en": "Exploration"
   },
   "zh": {
-    "title": "随手翻翻",
-    "task": "找一本家里从没翻过的书或杂志，随手翻一页，读一段你从没注意过的内容。"
+    "title": "闭眼闻香",
+    "task": "找一种你常吃但从没单独闻过的调料，撒一点在白纸上，闭眼闻30秒，说出三种你注意到的气味。"
   },
   "en": {
-    "title": "Random Page",
-    "task": "Find a book or magazine at home you've never opened. Flip to a random page and read a paragraph you've never noticed."
+    "title": "Blind Spice Test",
+    "task": "Sprinkle a spice you always use but never smell alone on white paper, close your eyes for 30 seconds, and name three scents you catch."
   }
 }
