@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-26",
+  "date": "2026-09-27",
   "tag": {
-    "zh": "探索",
-    "en": "Exploration"
+    "zh": "社交",
+    "en": "Social"
   },
   "zh": {
-    "title": "闭眼闻香",
-    "task": "找一种你常吃但从没单独闻过的调料，撒一点在白纸上，闭眼闻30秒，说出三种你注意到的气味。"
+    "title": "聊点没聊过",
+    "task": "走进常去的小店，跟老板问一句从没问过的具体问题，比如'今天什么卖得最快'。"
   },
   "en": {
-    "title": "Blind Spice Test",
-    "task": "Sprinkle a spice you always use but never smell alone on white paper, close your eyes for 30 seconds, and name three scents you catch."
+    "title": "Unasked Question",
+    "task": "Walk into a shop you frequent and ask the owner one specific question you've never asked—like what sells fastest today."
   }
 }
