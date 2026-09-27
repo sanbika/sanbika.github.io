@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-27",
+  "date": "2026-09-28",
   "tag": {
-    "zh": "社交",
-    "en": "Social"
+    "zh": "内省",
+    "en": "Introspection"
   },
   "zh": {
-    "title": "聊点没聊过",
-    "task": "走进常去的小店，跟老板问一句从没问过的具体问题，比如'今天什么卖得最快'。"
+    "title": "挪个位置",
+    "task": "把桌上一件放久的小物件挪到房间另一处，坐下看三秒——它在新位置哪里变了样？"
   },
   "en": {
-    "title": "Unasked Question",
-    "task": "Walk into a shop you frequent and ask the owner one specific question you've never asked—like what sells fastest today."
+    "title": "Move One Thing",
+    "task": "Take a small object that's been sitting on your desk for a while, move it to another spot in the room, sit down, and notice one detail that looks different about it now."
   }
 }
