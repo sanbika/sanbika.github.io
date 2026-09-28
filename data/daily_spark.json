@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-28",
+  "date": "2026-09-29",
   "tag": {
-    "zh": "内省",
-    "en": "Introspection"
+    "zh": "健康",
+    "en": "Health"
   },
   "zh": {
-    "title": "挪个位置",
-    "task": "把桌上一件放久的小物件挪到房间另一处，坐下看三秒——它在新位置哪里变了样？"
+    "title": "光脚踩缝",
+    "task": "把鞋脱了，光脚在家里走一圈，经过每条地板接缝时停一秒再迈，感受脚底哪里最凉。"
   },
   "en": {
-    "title": "Move One Thing",
-    "task": "Take a small object that's been sitting on your desk for a while, move it to another spot in the room, sit down, and notice one detail that looks different about it now."
+    "title": "Barefoot Seams",
+    "task": "Kick off your shoes, walk barefoot through every room, pausing one second at every floor seam—see which spot feels coolest."
   }
 }
