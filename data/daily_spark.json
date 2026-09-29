@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-29",
+  "date": "2026-09-30",
   "tag": {
-    "zh": "健康",
-    "en": "Health"
+    "zh": "探索",
+    "en": "Exploration"
   },
   "zh": {
-    "title": "光脚踩缝",
-    "task": "把鞋脱了，光脚在家里走一圈，经过每条地板接缝时停一秒再迈，感受脚底哪里最凉。"
+    "title": "跺脚听新路",
+    "task": "走一条去老地方的新路,到第一个拐角轻轻跺一脚,听听那一声和家里地板有啥不同。"
   },
   "en": {
-    "title": "Barefoot Seams",
-    "task": "Kick off your shoes, walk barefoot through every room, pausing one second at every floor seam—see which spot feels coolest."
+    "title": "Stomp a new path",
+    "task": "Take an unfamiliar route to a familiar spot, stomp lightly at the first turn, and hear how that thud differs from your floor at home."
   }
 }
