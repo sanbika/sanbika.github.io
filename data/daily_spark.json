@@ -1,15 +1,15 @@
 {
-  "date": "2026-09-30",
+  "date": "2026-10-01",
   "tag": {
-    "zh": "探索",
-    "en": "Exploration"
+    "zh": "社交",
+    "en": "Social"
   },
   "zh": {
-    "title": "跺脚听新路",
-    "task": "走一条去老地方的新路,到第一个拐角轻轻跺一脚,听听那一声和家里地板有啥不同。"
+    "title": "只发图",
+    "task": "挑一个最近没聊的朋友,发一张今天的随手拍过去,只发图不加字,等他先回。"
   },
   "en": {
-    "title": "Stomp a new path",
-    "task": "Take an unfamiliar route to a familiar spot, stomp lightly at the first turn, and hear how that thud differs from your floor at home."
+    "title": "Photo Only",
+    "task": "Pick a friend you haven't chatted with in a while, send them one unedited photo from today with no caption, and wait for them to reply first."
   }
 }
