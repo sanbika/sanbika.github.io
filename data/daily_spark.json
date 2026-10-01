@@ -1,15 +1,15 @@
 {
-  "date": "2026-10-01",
+  "date": "2026-10-02",
   "tag": {
-    "zh": "社交",
-    "en": "Social"
+    "zh": "内省",
+    "en": "Introspection"
   },
   "zh": {
-    "title": "只发图",
-    "task": "挑一个最近没聊的朋友,发一张今天的随手拍过去,只发图不加字,等他先回。"
+    "title": "鞋底会说话",
+    "task": "脱下今天穿的鞋翻过来看，记下磨最深的那一侧。下次出门，刻意先迈另一只脚。"
   },
   "en": {
-    "title": "Photo Only",
-    "task": "Pick a friend you haven't chatted with in a while, send them one unedited photo from today with no caption, and wait for them to reply first."
+    "title": "Read Your Soles",
+    "task": "Flip today's shoes over and note the most-worn side. Next time you head out, step out with the other foot first."
   }
 }
