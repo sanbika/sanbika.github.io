@@ -1,15 +1,15 @@
 {
-  "date": "2026-10-02",
+  "date": "2026-10-03",
   "tag": {
-    "zh": "内省",
-    "en": "Introspection"
+    "zh": "健康",
+    "en": "Health"
   },
   "zh": {
-    "title": "鞋底会说话",
-    "task": "脱下今天穿的鞋翻过来看，记下磨最深的那一侧。下次出门，刻意先迈另一只脚。"
+    "title": "换手吃饭",
+    "task": "挑一顿饭,全程用不常用的那只手夹菜送进嘴里,坚持吃完就算赢。"
   },
   "en": {
-    "title": "Read Your Soles",
-    "task": "Flip today's shoes over and note the most-worn side. Next time you head out, step out with the other foot first."
+    "title": "Swap Hands at the Table",
+    "task": "Pick one meal today and eat the whole thing using your non-dominant hand, no switching back."
   }
 }
