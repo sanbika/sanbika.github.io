@@ -748,5 +748,20 @@
       "title": "Swap Hands at the Table",
       "task": "Pick one meal today and eat the whole thing using your non-dominant hand, no switching back."
     }
+  },
+  {
+    "date": "2026-10-04",
+    "tag": {
+      "zh": "探索",
+      "en": "Exploration"
+    },
+    "zh": {
+      "title": "闭眼猜物",
+      "task": "出门找一样你天天路过但从没摸过的公共物件(邮筒/消防栓/栏杆),闭眼摸三十秒,猜它是什么。"
+    },
+    "en": {
+      "title": "Guess By Touch",
+      "task": "Find a public object you walk past every day but never touched—close your eyes, feel it for 30 seconds, then guess what it is."
+    }
   }
 ]
