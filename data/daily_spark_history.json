@@ -763,5 +763,20 @@
       "title": "Guess By Touch",
       "task": "Find a public object you walk past every day but never touched—close your eyes, feel it for 30 seconds, then guess what it is."
     }
+  },
+  {
+    "date": "2026-10-05",
+    "tag": {
+      "zh": "社交",
+      "en": "Social"
+    },
+    "zh": {
+      "title": "闻到就发",
+      "task": "给一个半年没联系的人发条消息,开头是\"刚闻到___突然想起你\",看他回什么。"
+    },
+    "en": {
+      "title": "Smell and Ping",
+      "task": "Text someone you haven't talked to in half a year, starting with \"Just smelled ___, thought of you,\" and see what they reply."
+    }
   }
 ]
