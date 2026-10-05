@@ -778,5 +778,20 @@
       "title": "Smell and Ping",
       "task": "Text someone you haven't talked to in half a year, starting with \"Just smelled ___, thought of you,\" and see what they reply."
     }
+  },
+  {
+    "date": "2026-10-06",
+    "tag": {
+      "zh": "探索",
+      "en": "Exploration"
+    },
+    "zh": {
+      "title": "数到几",
+      "task": "找一条从没走过的巷子走到底，数数沿街还有几家店亮着灯开着门。"
+    },
+    "en": {
+      "title": "Count the Doors",
+      "task": "Pick an alley you've never walked through, stroll to the end, and count how many shops still have their lights on."
+    }
   }
 ]
