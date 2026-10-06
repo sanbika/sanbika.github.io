@@ -793,5 +793,20 @@
       "title": "Count the Doors",
       "task": "Pick an alley you've never walked through, stroll to the end, and count how many shops still have their lights on."
     }
+  },
+  {
+    "date": "2026-10-07",
+    "tag": {
+      "zh": "健康",
+      "en": "Health"
+    },
+    "zh": {
+      "title": "闭眼走十步",
+      "task": "选一段家里的过道,闭眼慢慢走十步,用脚底感受每块地板。"
+    },
+    "en": {
+      "title": "Ten Blind Steps",
+      "task": "Pick a stretch of hallway at home, close your eyes, and slowly walk ten steps—let your feet feel every seam and tile."
+    }
   }
 ]

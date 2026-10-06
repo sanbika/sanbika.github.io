@@ -1,15 +1,15 @@
 {
-  "date": "2026-10-06",
+  "date": "2026-10-07",
   "tag": {
-    "zh": "探索",
-    "en": "Exploration"
+    "zh": "健康",
+    "en": "Health"
   },
   "zh": {
-    "title": "数到几",
-    "task": "找一条从没走过的巷子走到底，数数沿街还有几家店亮着灯开着门。"
+    "title": "闭眼走十步",
+    "task": "选一段家里的过道,闭眼慢慢走十步,用脚底感受每块地板。"
   },
   "en": {
-    "title": "Count the Doors",
-    "task": "Pick an alley you've never walked through, stroll to the end, and count how many shops still have their lights on."
+    "title": "Ten Blind Steps",
+    "task": "Pick a stretch of hallway at home, close your eyes, and slowly walk ten steps—let your feet feel every seam and tile."
   }
 }
