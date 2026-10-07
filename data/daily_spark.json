@@ -1,15 +1,15 @@
 {
-  "date": "2026-10-07",
+  "date": "2026-10-08",
   "tag": {
-    "zh": "健康",
-    "en": "Health"
+    "zh": "内省",
+    "en": "Introspection"
   },
   "zh": {
-    "title": "闭眼走十步",
-    "task": "选一段家里的过道,闭眼慢慢走十步,用脚底感受每块地板。"
+    "title": "挪一下椅子",
+    "task": "把家里你坐得最多的那把椅子往旁边挪半米，今天就坐在那个新位置。"
   },
   "en": {
-    "title": "Ten Blind Steps",
-    "task": "Pick a stretch of hallway at home, close your eyes, and slowly walk ten steps—let your feet feel every seam and tile."
+    "title": "Nudge Your Chair",
+    "task": "Move your most-used chair half a meter aside and sit in that new spot today."
   }
 }
