@@ -823,5 +823,20 @@
       "title": "Nudge Your Chair",
       "task": "Move your most-used chair half a meter aside and sit in that new spot today."
     }
+  },
+  {
+    "date": "2026-10-09",
+    "tag": {
+      "zh": "探索",
+      "en": "Exploration"
+    },
+    "zh": {
+      "title": "捡片怪叶",
+      "task": "今天路上找一片形状最奇怪的落叶，带回家夹进正在读的那本书里。"
+    },
+    "en": {
+      "title": "Odd-Shaped Leaf",
+      "task": "Spot the weirdest-shaped fallen leaf on your walk, bring it home, and tuck it into the book you're reading."
+    }
   }
 ]

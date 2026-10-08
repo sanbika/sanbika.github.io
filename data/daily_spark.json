@@ -1,15 +1,15 @@
 {
-  "date": "2026-10-08",
+  "date": "2026-10-09",
   "tag": {
-    "zh": "内省",
-    "en": "Introspection"
+    "zh": "探索",
+    "en": "Exploration"
   },
   "zh": {
-    "title": "挪一下椅子",
-    "task": "把家里你坐得最多的那把椅子往旁边挪半米，今天就坐在那个新位置。"
+    "title": "捡片怪叶",
+    "task": "今天路上找一片形状最奇怪的落叶，带回家夹进正在读的那本书里。"
   },
   "en": {
-    "title": "Nudge Your Chair",
-    "task": "Move your most-used chair half a meter aside and sit in that new spot today."
+    "title": "Odd-Shaped Leaf",
+    "task": "Spot the weirdest-shaped fallen leaf on your walk, bring it home, and tuck it into the book you're reading."
   }
 }
