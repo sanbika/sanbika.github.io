@@ -1,15 +1,15 @@
 {
-  "date": "2026-10-09",
+  "date": "2026-10-10",
   "tag": {
-    "zh": "探索",
-    "en": "Exploration"
+    "zh": "社交",
+    "en": "Social"
   },
   "zh": {
-    "title": "捡片怪叶",
-    "task": "今天路上找一片形状最奇怪的落叶，带回家夹进正在读的那本书里。"
+    "title": "开口问一句",
+    "task": "今天遇到楼下常打照面的人,主动开口问他一个具体的小问题。"
   },
   "en": {
-    "title": "Odd-Shaped Leaf",
-    "task": "Spot the weirdest-shaped fallen leaf on your walk, bring it home, and tuck it into the book you're reading."
+    "title": "One Small Question",
+    "task": "Greet someone you often pass but never really talk to, then ask them one specific small question, like where to find the best noodles nearby."
   }
 }
