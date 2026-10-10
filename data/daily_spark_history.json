@@ -853,5 +853,20 @@
       "title": "One Small Question",
       "task": "Greet someone you often pass but never really talk to, then ask them one specific small question, like where to find the best noodles nearby."
     }
+  },
+  {
+    "date": "2026-10-11",
+    "tag": {
+      "zh": "内省",
+      "en": "Introspection"
+    },
+    "zh": {
+      "title": "删掉三张截图",
+      "task": "打开手机相册，翻最近20张截图，挑3张犹豫最久的删掉。"
+    },
+    "en": {
+      "title": "Trim Screenshots",
+      "task": "Open your phone album, scroll through your last 20 screenshots, and delete the 3 you hesitated on longest."
+    }
   }
 ]
