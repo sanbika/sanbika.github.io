@@ -868,5 +868,20 @@
       "title": "Trim Screenshots",
       "task": "Open your phone album, scroll through your last 20 screenshots, and delete the 3 you hesitated on longest."
     }
+  },
+  {
+    "date": "2026-10-12",
+    "tag": {
+      "zh": "健康",
+      "en": "Health"
+    },
+    "zh": {
+      "title": "踮脚等响",
+      "task": "烧水壶时踮起脚尖,水壶响之前放下再踮,循环到响为止。"
+    },
+    "en": {
+      "title": "Heel Raises at the Kettle",
+      "task": "While your kettle boils, rise onto your toes; lower and rise again each time before it whistles."
+    }
   }
 ]

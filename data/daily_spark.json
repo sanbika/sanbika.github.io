@@ -1,15 +1,15 @@
 {
-  "date": "2026-10-11",
+  "date": "2026-10-12",
   "tag": {
-    "zh": "内省",
-    "en": "Introspection"
+    "zh": "健康",
+    "en": "Health"
   },
   "zh": {
-    "title": "删掉三张截图",
-    "task": "打开手机相册，翻最近20张截图，挑3张犹豫最久的删掉。"
+    "title": "踮脚等响",
+    "task": "烧水壶时踮起脚尖,水壶响之前放下再踮,循环到响为止。"
   },
   "en": {
-    "title": "Trim Screenshots",
-    "task": "Open your phone album, scroll through your last 20 screenshots, and delete the 3 you hesitated on longest."
+    "title": "Heel Raises at the Kettle",
+    "task": "While your kettle boils, rise onto your toes; lower and rise again each time before it whistles."
   }
 }
