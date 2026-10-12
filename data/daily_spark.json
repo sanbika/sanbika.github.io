@@ -1,15 +1,15 @@
 {
-  "date": "2026-10-12",
+  "date": "2026-10-13",
   "tag": {
-    "zh": "健康",
-    "en": "Health"
+    "zh": "探索",
+    "en": "Exploration"
   },
   "zh": {
-    "title": "踮脚等响",
-    "task": "烧水壶时踮起脚尖,水壶响之前放下再踮,循环到响为止。"
+    "title": "盲挑零食",
+    "task": "去便利店随手抓一包从没吃过的零食,带回家慢慢尝。"
   },
   "en": {
-    "title": "Heel Raises at the Kettle",
-    "task": "While your kettle boils, rise onto your toes; lower and rise again each time before it whistles."
+    "title": "Snack Roulette",
+    "task": "Grab a snack you've never tried at the convenience store, then slowly taste it at home."
   }
 }

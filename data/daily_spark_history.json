@@ -883,5 +883,20 @@
       "title": "Heel Raises at the Kettle",
       "task": "While your kettle boils, rise onto your toes; lower and rise again each time before it whistles."
     }
+  },
+  {
+    "date": "2026-10-13",
+    "tag": {
+      "zh": "探索",
+      "en": "Exploration"
+    },
+    "zh": {
+      "title": "盲挑零食",
+      "task": "去便利店随手抓一包从没吃过的零食,带回家慢慢尝。"
+    },
+    "en": {
+      "title": "Snack Roulette",
+      "task": "Grab a snack you've never tried at the convenience store, then slowly taste it at home."
+    }
   }
 ]
