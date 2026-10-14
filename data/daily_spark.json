@@ -1,15 +1,15 @@
 {
-  "date": "2026-10-14",
+  "date": "2026-10-15",
   "tag": {
-    "zh": "社交",
-    "en": "Social"
+    "zh": "探索",
+    "en": "Exploration"
   },
   "zh": {
-    "title": "随手一拍",
-    "task": "挑一个超过三个月没联系的朋友，发一张今天路上随手拍的照片，配文不超过五个字。"
+    "title": "倒着拍一张",
+    "task": "把手机倒过来握,对着你每天待得最久的地方拍一张照片。"
   },
   "en": {
-    "title": "Send a Snap",
-    "task": "Text a friend you haven't messaged in three-plus months a candid photo from your day, captioned in five words or fewer."
+    "title": "Shoot Upside Down",
+    "task": "Hold your phone upside down and snap a photo of the spot where you spend the most time each day."
   }
 }
