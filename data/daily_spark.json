@@ -1,15 +1,15 @@
 {
-  "date": "2026-10-15",
+  "date": "2026-10-16",
   "tag": {
-    "zh": "探索",
-    "en": "Exploration"
+    "zh": "健康",
+    "en": "Health"
   },
   "zh": {
-    "title": "倒着拍一张",
-    "task": "把手机倒过来握,对着你每天待得最久的地方拍一张照片。"
+    "title": "杯子搬家",
+    "task": "把常用的杯子挪到桌子或厨房台面的另一端，让每次喝水都多走两步。"
   },
   "en": {
-    "title": "Shoot Upside Down",
-    "task": "Hold your phone upside down and snap a photo of the spot where you spend the most time each day."
+    "title": "Cup Detour",
+    "task": "Move your go-to cup to the opposite end of the counter so every sip means a few extra steps."
   }
 }
