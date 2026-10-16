@@ -1,15 +1,15 @@
 {
-  "date": "2026-10-16",
+  "date": "2026-10-17",
   "tag": {
-    "zh": "健康",
-    "en": "Health"
+    "zh": "探索",
+    "en": "Exploration"
   },
   "zh": {
-    "title": "杯子搬家",
-    "task": "把常用的杯子挪到桌子或厨房台面的另一端，让每次喝水都多走两步。"
+    "title": "数到二十步",
+    "task": "从家门口开始数到第20步,蹲下看地上一个小细节(落叶、裂缝或石子),把它记住。"
   },
   "en": {
-    "title": "Cup Detour",
-    "task": "Move your go-to cup to the opposite end of the counter so every sip means a few extra steps."
+    "title": "Twenty Steps Down",
+    "task": "Count twenty paces from your doorstep, crouch down, and really look at one small detail on the ground — a leaf, a crack, a pebble. Remember its shape."
   }
 }
