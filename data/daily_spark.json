@@ -1,15 +1,15 @@
 {
-  "date": "2026-10-17",
+  "date": "2026-10-18",
   "tag": {
-    "zh": "探索",
-    "en": "Exploration"
+    "zh": "社交",
+    "en": "Social"
   },
   "zh": {
-    "title": "数到二十步",
-    "task": "从家门口开始数到第20步,蹲下看地上一个小细节(落叶、裂缝或石子),把它记住。"
+    "title": "寄一段声音",
+    "task": "录一段窗外的环境音(15秒以内),发给一个朋友,不写一个字。"
   },
   "en": {
-    "title": "Twenty Steps Down",
-    "task": "Count twenty paces from your doorstep, crouch down, and really look at one small detail on the ground — a leaf, a crack, a pebble. Remember its shape."
+    "title": "Send a Sound Clip",
+    "task": "Record 15 seconds of outdoor sounds from your window and send it to a friend — no words."
   }
 }
