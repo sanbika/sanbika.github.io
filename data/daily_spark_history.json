@@ -973,5 +973,20 @@
       "title": "Send a Sound Clip",
       "task": "Record 15 seconds of outdoor sounds from your window and send it to a friend — no words."
     }
+  },
+  {
+    "date": "2026-10-19",
+    "tag": {
+      "zh": "内省",
+      "en": "Introspection"
+    },
+    "zh": {
+      "title": "包里减负",
+      "task": "把每天背的包清空倒在桌上,挑出三个月没碰过的小物件,丢进抽屉或垃圾桶。"
+    },
+    "en": {
+      "title": "Lighten the Load",
+      "task": "Empty your everyday bag onto a table, sort out anything you haven't touched in three months, and move it to a drawer or the bin."
+    }
   }
 ]
