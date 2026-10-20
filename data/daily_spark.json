@@ -1,15 +1,15 @@
 {
-  "date": "2026-10-20",
+  "date": "2026-10-21",
   "tag": {
-    "zh": "健康",
-    "en": "Health"
+    "zh": "探索",
+    "en": "Exploration"
   },
   "zh": {
-    "title": "换只手干活",
-    "task": "挑一件日常小事（拧瓶盖、梳头、系扣子），全程用不常用那只手完成。"
+    "title": "捡一片秋叶",
+    "task": "出门找一棵最近的树,挑一片你觉得最好看的叶子,带回家夹在书里。"
   },
   "en": {
-    "title": "Switch Hands",
-    "task": "Pick one small daily task—twisting a cap, combing your hair, buttoning up—and do it entirely with your non-dominant hand."
+    "title": "Pocket an Autumn Leaf",
+    "task": "Find the nearest tree, pick a leaf you find most striking, and take it home to press in a book."
   }
 }
