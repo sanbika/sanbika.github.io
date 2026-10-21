@@ -36,12 +36,12 @@ macOS: `brew install hugo`, Linux: `snap install hugo --channel=extended`.
 
 The site used to have a "Daily Spark" board —— every day the model generated one small life challenge together with a check-in comment area for that day. **That board was retired on 2026-10-20**: the daily generation and the hourly image scraping were deleted along with the entire `scripts/` directory, and the repository no longer contains any generation / scraping workflow.
 
-The retirement kept **the days that got a response**: the 10 days on which a discussion was really opened in GitHub Discussions (giscus creates lazily —— the existence of a discussion means somebody did comment). 4 of those days additionally have check-in photos.
+The retirement kept **the days that got a response** —— the days on which a discussion was really opened in GitHub Discussions (giscus creates lazily —— the existence of a discussion means somebody did comment). **8 days are published** —— two more that had a discussion were withdrawn on 2026-10-22. 4 of those 8 days additionally have check-in photos.
 
 - **Entry point**: `/quests/` (「回响」 in Chinese / "Echoes" in English; the zh and en sites each have their own path, `/quests/` and `/en/quests/`)
-- **Archive pages**: the 10 days exist as ordinary content pages under `content/quests/<date>.md` (one per language), and each one hooks back to **that year's GitHub Discussion thread** (the `daily-spark` category, term `spark-<date>`)
+- **Archive pages**: the 8 days exist as ordinary content pages under `content/quests/<date>.md` (one per language), and each one hooks back to **that year's GitHub Discussion thread** (the `daily-spark` category, term `spark-<date>`)
 - **Photo wall**: the photo metadata lives in `data/spark_checkins.json` and is a **frozen snapshot** (4 entries: 2026-08-17 / 08-19 / 08-21 / 08-24) that no longer updates on its own. The photos are **also kept in the repository** under `assets/img/checkins/`, so Hugo crops and re-encodes them and the thumbnails are served from this site's own origin — the `image_url` in the data file still points at the full-resolution original on GitHub's CDN and is used only as a fallback
-- **The key property**: comments and photos have always lived on GitHub (Discussions + the `user-attachments` CDN) and the site is only a viewer —— so changing the URL structure loses no comments, and freezing the site side does not stop people from replying in those 10 discussions
+- **The key property**: comments and photos have always lived on GitHub (Discussions + the `user-attachments` CDN) and the site is only a viewer —— so changing the URL structure loses no comments, and freezing the site side does not stop people from replying in those 8 discussions
 
 ## Writing
 
@@ -123,7 +123,7 @@ The repository has only two workflows: `hugo.yml` for deployment, and the read-o
 ```
 .
 ├── content/                  ← all Markdown content
-│   ├── quests/               ← Echoes archive (10 archived days, one page per language)
+│   ├── quests/               ← Echoes archive (8 archived days, one page per language)
 │   └── about/                ← about me
 ├── data/
 │   └── spark_checkins.json   ← check-in photo metadata (frozen snapshot, 4 entries)

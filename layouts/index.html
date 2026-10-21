@@ -8,7 +8,7 @@
         .home-side__card  ("Echoes": the 7 most recent archive pages, whole card omitted when empty)
         .home-side__card  (social icons)
   The "Daily Spark" section was retired in 2026-10: the home page no longer shows
-  a daily quest card and no longer carries any giscus. The 10 days that did get a
+  a daily quest card and no longer carries any giscus. The 8 days that did get a
   discussion opened were promoted to archive pages under content/quests/; the
   sidebar only curates statically, and every comment thread lives on its own
   archive page.
@@ -28,7 +28,7 @@
        mix into the article list. */ -}}
 {{- $posts := where .Site.RegularPages "Section" "in" .Site.Params.mainSections -}}
 {{- $postsSorted := sort $posts "Date" "desc" -}}
-{{- /* Sidebar picks: the 7 most recent archive pages (10 in total); the content pages are the data source here too. */ -}}
+{{- /* Sidebar picks: the 7 most recent archive pages (8 in total); the content pages are the data source here too. */ -}}
 {{- $questPages := where .Site.RegularPages "Section" "quests" -}}
 {{- $echoTop := first 7 (sort $questPages "Date" "desc") -}}
 

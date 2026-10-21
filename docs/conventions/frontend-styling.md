@@ -105,9 +105,9 @@ The stable conventions for the visual layer. Learned from the 2026 frontend styl
 
 ### 4.5 The category badge was removed (2026-10-20)
 
-- **The per-day category badge is gone.** Every archive page carried a category label (`spark_tag`: 探索 / 内省 / 健康 / 社交, en: Exploration / Introspection / Health / Social) rendered as a small Jing-purple chip. Once only 10 days survived, the label no longer carried any meaning, so the `spark_tag` front matter field was removed from every archive content page.
+- **The per-day category badge is gone.** Every archive page carried a category label (`spark_tag`: 探索 / 内省 / 健康 / 社交, en: Exploration / Introspection / Health / Social) rendered as a small Jing-purple chip. Once only 8 days survived, the label no longer carried any meaning, so the `spark_tag` front matter field was removed from every archive content page.
 - **The badge had three render sites** — `.quest-card__kicker` (inside the card on the detail page), `.quests__tag` (on a list page entry) and `.home-side__tag` (in the homepage sidebar) — and all three shared one hard-coded color pair (`rgba(91, 91, 214, 0.14)` / `#5B5BD6` in light mode, `rgba(155, 155, 245, 0.18)` / `#9B9BF5` in dark mode). All three rule sets were deleted together with the `spark_tag` field; none of those class names is in use any more.
-- **Do not bring the badge back.** A category chip over ten archived days is decoration without a function (§4.2), and a category label is a language-dependent front matter value (`docs/conventions/i18n.md` §1).
+- **Do not bring the badge back.** A category chip over eight archived days is decoration without a function (§4.2), and a category label is a language-dependent front matter value (`docs/conventions/i18n.md` §1).
 
 ### 4.6 Cross-language determinism of the quest number
 

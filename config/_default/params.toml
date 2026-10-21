@@ -14,7 +14,7 @@
   mainSections = ["posts"]
   # Feed sections. The "posts" section is currently empty (its only page was a
   # placeholder deleted on 2026-10-20), so a feed bound to mainSections alone
-  # would be empty even though the site still has real content: the 10 archived
+  # would be empty even though the site still has real content: the 8 archived
   # days under content/quests/. mainSections deliberately keeps pointing at
   # "posts" so that the first real post lands in the home page main column and
   # in the feed automatically.
@@ -55,7 +55,7 @@
     # Giscus category dedicated to the "Daily Spark" comments on the archive
     # page, kept separate from the General category used for article comments.
     # Daily generation was retired in 2026-10; the discussions under this
-    # category are the comment threads of the 10 archived days themselves —
+    # category are the comment threads of the 8 archived days themselves —
     # the archive page maps them back with a specific mapping + spark-<date> term.
     [params.comments.spark]
       category = "daily-spark"
