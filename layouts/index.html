@@ -78,22 +78,24 @@
             ($dateParsed.Format "Jan 2")
             (printf "%d月%d日" $dateParsed.Month $dateParsed.Day) -}}
         {{- $titleDisplay := cond (eq $langKey "en") .Title (printf "「%s」" .Title) -}}
-        {{- /* When the day has check-in photos, the thumbnail rides along in the meta row (decorative, alt left empty). */ -}}
-        {{- $thumb := "" -}}
+        {{- /* When the day has check-in photos, a thumbnail rides along in the meta row
+               (decorative, alt left empty). The whole check-in map is kept, not just
+               the URL: the image partial needs the local copy to build a small WebP. */ -}}
+        {{- $thumb := false -}}
         {{- with hugo.Data.spark_checkins -}}
           {{- $matchings := where . "date" $sparkDate -}}
           {{- with $matchings -}}
             {{- $checkins := index (index . 0) "checkins" -}}
             {{- with $checkins -}}
-              {{- $thumb = index (index . 0) "image_url" -}}
+              {{- $thumb = index (index . 0) -}}
             {{- end -}}
           {{- end -}}
         {{- end -}}
       <a class="home-side__link" href="{{ .RelPermalink }}">
         <span class="home-side__title">{{ $titleDisplay }}</span>
         <span class="home-side__meta">
-          {{- with $thumb }}
-          <img class="home-side__thumb" src="{{ . }}" alt="" width="28" height="28" loading="lazy" decoding="async" />
+          {{- if $thumb -}}
+          {{- partial "checkin_image.html" (dict "checkin" $thumb "size" 28 "alt" "" "class" "home-side__thumb") -}}
           {{- end }}
           <time class="home-side__date" datetime="{{ $sparkDate }}">{{ $dateDisplay }}</time>
         </span>

@@ -85,7 +85,7 @@
                       {{- range . -}}
                         <li class="quests__checkin">
                           <a href="{{ .comment_url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ .author }}">
-                            <img loading="lazy" decoding="async" src="{{ .image_url }}" alt="{{ .alt }}" width="64" height="64" />
+                            {{- partial "checkin_image.html" (dict "checkin" . "size" 64 "alt" .alt) -}}
                             <span class="quests__checkin-author">{{ .author }}</span>
                           </a>
                         </li>

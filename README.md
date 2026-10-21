@@ -40,7 +40,7 @@ The retirement kept **the days that got a response**: the 10 days on which a dis
 
 - **Entry point**: `/quests/` (「回响」 in Chinese / "Echoes" in English; the zh and en sites each have their own path, `/quests/` and `/en/quests/`)
 - **Archive pages**: the 10 days exist as ordinary content pages under `content/quests/<date>.md` (one per language), and each one hooks back to **that year's GitHub Discussion thread** (the `daily-spark` category, term `spark-<date>`)
-- **Photo wall**: the photo metadata lives in `data/spark_checkins.json` and is a **frozen snapshot** (4 entries: 2026-08-17 / 08-19 / 08-21 / 08-24) that no longer updates on its own
+- **Photo wall**: the photo metadata lives in `data/spark_checkins.json` and is a **frozen snapshot** (4 entries: 2026-08-17 / 08-19 / 08-21 / 08-24) that no longer updates on its own. The photos are **also kept in the repository** under `assets/img/checkins/`, so Hugo crops and re-encodes them and the thumbnails are served from this site's own origin — the `image_url` in the data file still points at the full-resolution original on GitHub's CDN and is used only as a fallback
 - **The key property**: comments and photos have always lived on GitHub (Discussions + the `user-attachments` CDN) and the site is only a viewer —— so changing the URL structure loses no comments, and freezing the site side does not stop people from replying in those 10 discussions
 
 ## Writing
@@ -83,6 +83,7 @@ discussion: "https://github.com/sanbika/sanbika.github.io/discussions/4"
 - `discussion` holds the direct link to that year's discussion (filling it in adds a "View that day's GitHub discussion ↗" entry below the comment area).
 - Dates are always parsed from the `spark_date` string —— the front matter `date` carries a `+08:00` offset, which rolls back a day when converted to UTC on the build machine.
 - Photos do not go into the front matter: `data/spark_checkins.json` is matched on `spark_date`, photo metadata is language-neutral, and the zh and en versions need not repeat it.
+- **Adding a photo means adding it to the repository too.** The site renders a small locally-generated WebP crop of each photo, never the GitHub CDN original: a 28×28 sidebar thumbnail pointing at the original would pull a 2.6 MB phone photo, and on a slow or filtered network the image never arrives (the browser shows a broken-image icon). So drop a copy under `assets/img/checkins/<date>.jpg` — **shrink it to ≤800px wide first**, the thumbnails never need more — and point the check-in entry's `local_image` at it. `layouts/_partials/checkin_image.html` then crops it to 2× the CSS size for whichever page asks (28px sidebar / 64px list / 96px detail).
 
 See `docs/conventions/giscus.md` for the details of these conventions.
 
@@ -126,6 +127,9 @@ The repository has only two workflows: `hugo.yml` for deployment, and the read-o
 │   └── about/                ← about me
 ├── data/
 │   └── spark_checkins.json   ← check-in photo metadata (frozen snapshot, 4 entries)
+├── assets/                   ← processed by Hugo (images are resized and re-encoded)
+│   ├── css/extended/blank.css ← the site's own styles
+│   └── img/checkins/         ← local copies of the check-in photos (Hugo crops them)
 ├── static/                   ← static assets (copied verbatim to the site root)
 │   ├── images/avatar.jpg     ← avatar
 │   └── favicon.ico           ← browser tab icon

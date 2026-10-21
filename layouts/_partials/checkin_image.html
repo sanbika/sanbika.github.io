@@ -1,0 +1,42 @@
+{{- /*
+  <img> element for one check-in photo.
+
+  Params (dict):
+    checkin — the check-in map from data/spark_checkins.json
+    size    — the CSS pixel size of the square thumbnail
+    alt     — the alt text ("" for a decorative thumbnail)
+    class   — optional extra class on the <img>
+
+  Why this exists: the check-in photos were originally served straight from
+  GitHub's attachment CDN (image_url). That URL redirects to an S3 bucket and
+  serves the FULL-RESOLUTION original — the biggest one was a 3060×4080,
+  2.6 MB phone photo — so a 28×28 sidebar thumbnail used to pull 2.6 MB, and
+  on a slow or filtered network the request never completed and the browser
+  showed a broken-image icon.
+
+  The photos now also live in the repository (assets/img/checkins/, pre-
+  shrunk to ≤800px) and this partial hands them to Hugo's image pipeline,
+  which crops and re-encodes a square WebP at 2× the CSS size. The result is
+  served from the site's own origin, weighs a few kilobytes, and has no
+  third-party dependency at runtime.
+
+  If a check-in has no local copy, the remote image_url is used unchanged, so
+  adding a photo without committing it still renders (just heavier).
+*/ -}}
+{{- $ci := .checkin -}}
+{{- $size := .size -}}
+{{- $alt := .alt -}}
+{{- $class := .class -}}
+{{- $src := "" -}}
+{{- with $ci.local_image -}}
+  {{- $path := . -}}
+  {{- with resources.Get $path -}}
+    {{- $res := . -}}
+    {{- $px := mul $size 2 -}}
+    {{- $src = ($res.Fill (printf "%dx%d center webp q80" $px $px)).RelPermalink -}}
+  {{- end -}}
+{{- end -}}
+{{- if not $src -}}
+  {{- $src = $ci.image_url -}}
+{{- end -}}
+<img{{ with $class }} class="{{ . }}"{{ end }} loading="lazy" decoding="async" src="{{ $src }}" alt="{{ $alt }}" width="{{ $size }}" height="{{ $size }}" />
