@@ -5,22 +5,10 @@
   weight = 5
 
 [[main]]
-  identifier = "posts"
-  name = "文章"
-  url = "/posts/"
-  weight = 10
-
-[[main]]
   identifier = "quests"
-  name = "往期任务"
+  name = "回响"
   url = "/quests/"
   weight = 15
-
-[[main]]
-  identifier = "projects"
-  name = "项目"
-  url = "/projects/"
-  weight = 20
 
 [[main]]
   identifier = "about"

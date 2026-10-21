@@ -1,19 +1,19 @@
-# 约定
+# Conventions
 
-编码、提交、命名等规范（稳定层）。
+Conventions for encoding, commits, naming and the like (the stable layer).
 
-## 内容
-- [[conventions/i18n.md|i18n]] — 双语内容、UI 文案、第三方组件语言、配置文件约定
-- [[conventions/frontend-styling.md|前端样式]] — 品牌色、CSS override 落点、首页任务卡像素描边风
-- [[conventions/giscus.md|Giscus 评论]] — 文章 / spark 双分类分流、`comments.giscus` / `comments.spark` 双配置源、新增评论场景的流程
-- [[conventions/ci.md|CI / GitHub Actions]] — 跨 workflow 触发、permissions、workflow_dispatch
-- （待补充，如 `commit-message.md`）
+## Contents
+- [[conventions/i18n.md|i18n]] — bilingual content, UI copy, third-party component language, configuration file conventions
+- [[conventions/frontend-styling.md|Frontend styling]] — brand color, where CSS overrides land, the homepage two-column layout, the visual language of the archive page quest card (clean modern style)
+- [[conventions/giscus.md|Giscus comments]] — the two-category split between articles and archive pages, the comment hooking rules for archive pages, the two configuration sources `comments.giscus` / `comments.spark`, the process for adding a comment scenario
+- [[conventions/ci.md|CI / GitHub Actions]] — the two workflows for deployment and theme drift detection, cross-workflow triggering, permissions, workflow_dispatch
+- (To be added, e.g. `commit-message.md`)
 
-## 文档链接约定
+## Document linking conventions
 
-文档间相互引用具体文件时，统一使用 wikilink 语法，路径相对 docs/ 根目录（例如指向 `[[architecture/overview.md]]`，从任意位置都写完整路径）。仅引用 docs/ 内已存在的文件，不留死链。文件名模式或占位符（如 `<feature>.md`、`NNNN-短标题.md`）使用行内代码，不写为 wikilink。
+When documents reference a specific file from one another, always use the wikilink syntax, with the path relative to the docs/ root (for example pointing at `[[current-state.md]]` — always write the full path, from any location). Only reference files that actually exist inside docs/, and never leave a dead link. Filename patterns or placeholders (such as `<feature>.md` or `NNNN-short-title.md`) go in inline code and are not written as wikilinks.
 
-> 写法示例：`\[\[architecture/overview.md\]\]` 渲染为可见的 `[[architecture/overview.md]]`，避免在示例文本里被误判为真实链接。
+> Writing example: `\[\[current-state.md\]\]` renders as the visible `[[current-state.md]]`, which avoids the example text being misread as a real link.
 
-## 清单
-- （暂无）
+## Checklist
+- (None yet)

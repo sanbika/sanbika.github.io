@@ -8,9 +8,9 @@ name: Check Theme Drift
 # site-specific re-merging before bumping the submodule.
 #
 # Schedule: every Monday at 02:30 UTC — that's 10:30 Beijing time Monday
-# morning, well clear of daily-spark.yml (16:10 UTC) and spark-checkins.yml
-# (every hour at :17) so we never race those writers for the data files.
-# Weekly cadence matches PaperMod's release pace.
+# morning. The daily-spark / spark-checkins writers were retired in
+# October 2026, so there is no longer a data-file race to avoid; the
+# cadence now simply matches PaperMod's release pace.
 # Manual: workflow_dispatch for an on-demand check right after a PaperMod
 # release, without waiting for the next scheduled tick.
 
@@ -19,13 +19,12 @@ on:
     - cron: '30 2 * * 1'
   workflow_dispatch:
 
-# Single instance per workflow-name kebab (spark-checkins,
-# daily-spark, theme-drift-check). The kebab is derived from the
-# meaningful words of the workflow `name:` — `theme-drift-check`
-# happens to also equal the filename sans `.yml`, but the convention
-# is driven by the workflow name, not the file. cancel-in-progress:
-# false so a long manual run isn't killed by the next scheduled tick
-# while it's still writing its issue body.
+# Single instance per workflow-name kebab (theme-drift-check). The
+# kebab is derived from the meaningful words of the workflow `name:` —
+# `theme-drift-check` happens to also equal the filename sans `.yml`,
+# but the convention is driven by the workflow name, not the file.
+# cancel-in-progress: false so a long manual run isn't killed by the
+# next scheduled tick while it's still writing its issue body.
 concurrency:
   group: theme-drift-check
   cancel-in-progress: false
@@ -41,10 +40,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      # Same checkout shape as spark-checkins.yml / daily-spark.yml:
-      # recursive to materialise themes/PaperMod, fetch-depth 0 so the
-      # submodule's own commit graph is intact (we diff against the
-      # submodule HEAD, not just a snapshot).
+      # Recursive checkout to materialise themes/PaperMod, fetch-depth 0
+      # so the submodule's own commit graph is intact (we diff against
+      # the submodule HEAD, not just a snapshot).
       - name: Checkout
         uses: actions/checkout@v4
         with:

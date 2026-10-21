@@ -1,3 +1,13 @@
+> ⚠️ **The feature was retired on 2026-10-20. This file is kept purely as a historical archive.**
+>
+> The "Daily Spark" board was retired as a whole: the `.github/workflows/spark-checkins.yml`, `scripts/fetch_spark_checkins.py` and `data/.spark_checkins.example.json` created by this plan were all deleted (the `scripts/` directory disappeared as a whole), and the scraped data was frozen into 4 static snapshots in `data/spark_checkins.json` (2026-08-17 / 08-19 / 08-21 / 08-24) that no longer update automatically.
+>
+> The 10 surviving archive days were promoted to `content/quests/<date>.md` content pages, each hooking back to that year's GitHub Discussion thread; the old `/quests/` single-page structure and the homepage check-in scenario described in this document no longer exist.
+>
+> For the current state see [[current-state.md]] and [[conventions/giscus.md]]; the matching design document is [[superpowers/specs/2026-08-18-spark-checkins-design.md]].
+
+---
+
 # Spark 打卡图片墙 Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.

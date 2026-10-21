@@ -1,27 +1,26 @@
-# 项目文档库
+# Documentation
 
-这是项目的知识层。采用 **结构即导航**：本文件是总地图，每个领域有自己的 `README.md` 作为目录页。按需下钻，不要一次性全部加载（渐进式披露）。
+This is the project's knowledge layer. It follows **structure is navigation**: this file is the top-level map, and each area has its own `README.md` as its index page. Drill down on demand — do not load everything at once (progressive disclosure).
 
-## 地图
+## Map
 
-| 领域 | 何时来查 | 入口 |
-|------|---------|------|
-| 当前状态 | 开始任何工作前，先了解进度 / TODO | [[current-state.md]] |
-| 架构 | 理解系统设计、查看架构决策 (ADR) | [[architecture/README.md]] |
-| 约定 | 编码、提交、命名等规范 | [[conventions/README.md]] |
-| 词汇表 | 统一文档库术语含义 | [[glossary.md]] |
-| 需求 (PRD) | 了解某个需求的设计 | [[prds/README.md]] |
-| 任务 | 领取 / 查看开发任务 | [[tasks/README.md]] |
+| Area | When to look here | Entry |
+|------|-------------------|-------|
+| Current state | Before starting any task — read the progress / TODO board first | [[current-state.md]] |
+| Conventions | Encoding, commits, naming and the other stable rules | [[conventions/README.md]] |
+| Historical archives | The design specs and implementation plans of past rounds | `superpowers/specs/` / `superpowers/plans/` |
 
-## 生命周期
+## Conventions
 
-- **稳定层**（很少变）：`architecture/`、`conventions/`、`glossary`
-- **流动层**（随开发变化）：`prds/`、`tasks/`、`current-state.md`
+`conventions/README.md` is the index of the stable rules:
 
-## 开发流
+- [[conventions/i18n.md]] — bilingual content, UI copy, third-party component language, configuration files
+- [[conventions/frontend-styling.md]] — brand color, where CSS overrides land, the homepage two-column layout, the visual language of the archive quest card
+- [[conventions/giscus.md]] — comment routing, the two categories, the hooking rules for the archive pages
+- [[conventions/ci.md]] — the deployment workflow and the theme drift check
 
-```
-PRD → 拆分为任务 → tasks → 执行并更新状态 → current-state 汇总进度
-```
+## Historical archives
 
-详见 [[architecture/overview.md]]。
+`superpowers/specs/` and `superpowers/plans/` keep the design document and the implementation plan of each past round. The two documents dated 2026-08-18 describe the check-in image wall — that feature was retired on 2026-10-20, so both are kept purely as a historical archive rather than as current documentation.
+
+The board in [[current-state.md]] records what each round actually changed; the documents under `superpowers/` are the archive behind that record.

@@ -1,0 +1,115 @@
+{{- /*
+  Single-day archive detail page (layouts/quests/single.html).
+  The retired "Daily Spark" section left behind 10 days that somebody did reply
+  to, and each one becomes a page here:
+    task body + the day's check-in photo wall + that year's GitHub Discussion thread.
+  The data source is the front matter of content/quests/<date>.md (a controlled
+  static content page):
+    title / description / spark_date / discussion.
+  Comments go through layouts/_partials/spark_comments.html — the daily-spark
+  category + specific mapping + the spark-<date> term, the same thread as the
+  old home-page daily check-ins, so not a single old comment is lost.
+  Do not switch to comments.html (General category + pathname mapping): that would
+  attach to the wrong thread, and two giscus would fight each other — see docs/conventions/giscus.md §5.
+*/ -}}
+{{- define "main" -}}
+{{- $langKey := cond (eq .Lang "en") "en" "zh" -}}
+{{- /* spark_date is the only source of the giscus term (data-term="spark-<date>"),
+       mapping one-to-one onto the old discussions under the daily-spark category.
+       If it is missing, fall back to the page's own date so the term is never
+       empty (an empty term would leak onto some other thread). */ -}}
+{{- $sparkDate := .Params.spark_date | default (.Date.Format "2006-01-02") -}}
+{{- /* Dates are always parsed from the spark_date string (never .Date): the front
+       matter's date carries a +08:00 offset and shifts back a day on a UTC
+       machine, while parsing the string is immune to the build machine's time zone. */ -}}
+{{- $dateParsed := time $sparkDate -}}
+{{- $dateDisplay := cond (eq $langKey "en")
+    ($dateParsed.Format "Jan 2")
+    (printf "%d月%d日" $dateParsed.Month $dateParsed.Day) -}}
+{{- /* Quest number #MMDD: drop the dashes from the ISO date and take the last 4
+       digits (same algorithm as the home-page quest card). Derived from
+       spark_date, not the display date — the display date changes with the
+       language, the number does not, so the archive slot stays the same across
+       languages and builds. */ -}}
+{{- $idRaw := replace $sparkDate "-" "" -}}
+{{- $idLast4 := substr $idRaw 4 4 -}}
+{{- /* Brand text on the left of the strip: archive pages keep the "地球ONLINE" brand, and the right-hand side marks it as an Echoes archive. */ -}}
+{{- $stripLabel := cond (eq $langKey "en") "EARTH ONLINE · ECHO ARCHIVE" "地球ONLINE · 回响存档" -}}
+{{- /* zh titles get 「」 quotes, en keeps the bare title (quotes look out of place in English). */ -}}
+{{- $titleDisplay := cond (eq $langKey "en") .Title (printf "「%s」" .Title) -}}
+{{- $photosLabel := cond (eq $langKey "en") "Check-in photos" "打卡照片" -}}
+{{- $commentsLabel := cond (eq $langKey "en") "Discussion" "讨论" -}}
+{{- $ghLabel := cond (eq $langKey "en") "View that day's GitHub discussion ↗" "查看当天的 GitHub 讨论 ↗" -}}
+{{- $backLabel := cond (eq $langKey "en") "← Back to Echoes" "← 回到回响" -}}
+
+<article class="quest">
+  {{- partial "breadcrumbs.html" . -}}
+
+  {{- /* Header card: reuses the retained .quest-card design (strip + title
+         + body) instead of introducing a parallel .quest__header style set. The
+         language switcher is not here — the top header.html already renders the
+         site-level .lang-menu, so a second one on the page would be a duplicate. */ -}}
+  <section class="quest-card" aria-label="{{ $titleDisplay }}">
+    <header class="quest-card__strip">
+      <span class="quest-card__strip-brand">{{ $stripLabel }}</span>
+      <span class="quest-card__strip-right">
+        <time class="quest-card__date" datetime="{{ $sparkDate }}">{{ $dateDisplay }}</time>
+        <span class="quest-card__id">#{{ $idLast4 }}</span>
+      </span>
+    </header>
+    <div class="quest-card__body">
+      <h1 class="quest-card__title">{{ $titleDisplay }}</h1>
+      {{- /* Task body: prefer the page content, fall back to the front matter's
+             description when it is empty. .Content is HTML (<p>…), so it can only
+             live in a div, not a p (that would nest a p inside a p). */ -}}
+      <div class="quest-card__task quest__body post-content">
+        {{- if .Content }}{{ .Content }}{{ else }}{{ .Description }}{{ end -}}
+      </div>
+    </div>
+  </section>
+
+  {{- /* Check-in photo wall: that day's photos from data/spark_checkins.json. The
+         file may theoretically be missing (hugo.Data.spark_checkins is nil), or
+         the day may have no photos — in both cases this block is quietly not
+         rendered, leaving no empty shell behind. */ -}}
+  {{- $data := hugo.Data.spark_checkins -}}
+  {{- if $data -}}
+    {{- $matchings := where $data "date" $sparkDate -}}
+    {{- with $matchings -}}
+      {{- $checkins := index (index . 0) "checkins" -}}
+      {{- with $checkins -}}
+      <section class="quest__photos" aria-label="{{ $photosLabel }}">
+        <h2 class="quest__photos-heading">{{ $photosLabel }}</h2>
+        <ul class="quest__photo-list">
+          {{- range . -}}
+          <li class="quest__photo">
+            <a href="{{ .comment_url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ .author }}">
+              <img loading="lazy" decoding="async" src="{{ .image_url }}" alt="{{ .alt }}" width="96" height="96" />
+              <span class="quest__photo-author">{{ .author }}</span>
+            </a>
+          </li>
+          {{- end -}}
+        </ul>
+      </section>
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- /* Old comment thread: spark_comments.html hard-codes the daily-spark
+         category + specific mapping + the spark-<date> term, so it shares the
+         same discussion as the old home-page daily check-ins. */ -}}
+  <section class="quest__comments">
+    <h2 class="quest__comments-heading">{{ $commentsLabel }}</h2>
+    {{- partial "spark_comments.html" (dict "page" . "date" $sparkDate) -}}
+    {{- with .Params.discussion }}
+    <p class="quest__discussion">
+      <a href="{{ . }}" target="_blank" rel="noopener noreferrer">{{ $ghLabel }}</a>
+    </p>
+    {{- end }}
+  </section>
+
+  <p class="quest__back">
+    <a href="{{ relLangURL "/quests/" }}">{{ $backLabel }}</a>
+  </p>
+</article>
+{{- end -}}

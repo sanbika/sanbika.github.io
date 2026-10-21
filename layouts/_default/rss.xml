@@ -27,7 +27,11 @@
 {{- $pages = $pctx.Pages }}
 {{- end }}
 {{- $pages = where $pages "Params.hiddenInRss" "!=" true -}}
-{{- $pages = where $pages "Section" "in" site.Params.mainSections -}}
+{{- /* Feed section filter. rssSections (config/_default/params.toml) lists the sections that
+       actually hold content: the "posts" section is empty right now, so a feed bound to
+       mainSections alone would produce zero items. The lastBuildDate guard below also
+       requires a non-empty $pages, otherwise indexing it would fail the build. */ -}}
+{{- $pages = where $pages "Section" "in" (site.Params.rssSections | default site.Params.mainSections) -}}
 {{- $limit := site.Config.Services.RSS.Limit }}
 {{- if ge $limit 1 }}
 {{- $pages = $pages | first $limit }}
@@ -49,7 +53,7 @@
     <language>{{ site.Language.LanguageCode }}</language>{{ with $authorEmail }}
     <managingEditor>{{.}}{{ with $authorName }} ({{ . }}){{ end }}</managingEditor>{{ end }}{{ with $authorEmail }}
     <webMaster>{{ . }}{{ with $authorName }} ({{ . }}){{ end }}</webMaster>{{ end }}{{ with site.Copyright }}
-    <copyright>{{ . | markdownify | plainify | strings.TrimPrefix "© " }}</copyright>{{ end }}{{ if not .Date.IsZero }}
+    <copyright>{{ . | markdownify | plainify | strings.TrimPrefix "© " }}</copyright>{{ end }}{{ if and (not .Date.IsZero) $pages }}
     <lastBuildDate>{{ (index $pages.ByLastmod.Reverse 0).Lastmod.Format "Mon, 02 Jan 2006 15:04:05 -0700" | safeHTML }}</lastBuildDate>{{ end }}
     {{- with .OutputFormats.Get "RSS" }}
     {{ printf "<atom:link href=%q rel=\"self\" type=%q />" .Permalink .MediaType | safeHTML }}

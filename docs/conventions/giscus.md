@@ -1,64 +1,79 @@
-# Giscus 评论约定
+# Giscus Comment Conventions
 
-Giscus 接入与多分类分流的稳定约定。学自 2026 年首页改版（HEAD 95757ff 起）+ 每日打卡评论迁移（HEAD 7339b19 起）。
+The stable conventions for the Giscus integration and its multi-category routing. Learned from the 2026 homepage redesign (from HEAD 77887e2) and the daily check-in comment migration (from HEAD 7339b19).
 
-## 1. 两套评论场景与分类
+The "Daily Spark" board was retired on 2026-10-20 (the generation and scraping mechanisms were deleted), but **the comment routing itself still holds**: the 10 surviving archive days (`content/quests/<date>.md`) keep using that year's `daily-spark` category and `spark-<date>` term, each hooking back to that year's discussion.
 
-| 场景 | 渲染位置 | 分类 | mapping | term |
+## 1. The two comment scenarios and their categories
+
+| Scenario | Rendered at | Category | mapping | term |
 |------|---------|------|---------|------|
-| 文章评论 | `themes/PaperMod/layouts/_default/single.html` → `layouts/_partials/comments.html` | `General` | `pathname` | 文章 permalink 路径 |
-| 首页每日打卡 | `layouts/index.html` → `layouts/_partials/spark_comments.html` | `daily-spark` | `specific` | `spark-{YYYY-MM-DD}` |
+| Article comments | `themes/PaperMod/layouts/_default/single.html` → `layouts/_partials/comments.html` | `General` | `pathname` | the article's permalink path |
+| Daily quest on an archive page | `layouts/quests/single.html` → `layouts/_partials/spark_comments.html` | `daily-spark` | `specific` | `spark-{YYYY-MM-DD}` |
 
-- 两套分类在 giscus 仓库侧**物理隔离**：同一篇文章 URL 永远不会出现在 daily-spark 分类下；某天的 spark 评论也永远不会出现在 General 分类下。
-- 这意味着切换分类是**单向、不可逆的**：迁移前的旧 discussion 留在原分类里，迁到新分类后无法回流（见 §4）。
+- The two categories are **physically isolated on the giscus repository side**: the URL of one article will never appear under the daily-spark category, and a given day's spark comments will never appear under the General category either.
+- That means switching categories is **one-way and irreversible**: the old discussions stay in the original category, and once they have been moved to a new category they cannot flow back (see §4).
+- **The homepage has no giscus.** After the daily board's retirement the homepage renders no comment area at all; every comment lives on its own archive page.
 
-## 2. 配置来源分工
+### 1.1 Comment hooking rules for archive pages (stable convention)
 
-`config/_default/params.toml` 的 `[params.comments]` 下：
+- **An archive page must use `specific` mapping + a `spark-<date>` term + the `daily-spark` category** to hook back that year's discussion. giscus looks up by `category + term`, and a difference in either one means **a different thread** — switching to `pathname` (the `comments.html` setup) would hook onto a new thread under the General category, and not a single old comment would show up.
+- **The only source of the term is the front matter's `spark_date`**: the `$date` in `data-term="spark-{{ $date }}"` inside `layouts/quests/single.html` comes from `.Params.spark_date`. When `spark_date` is missing it falls back to the page's own `.Date`, which guarantees the term is never empty (an empty term would bleed into a different thread).
+- **An archive page must not render `comments.html` at the same time.** The theme-switching JS of the two partials each carries a MutationObserver, and having them coexist on one page makes them fight each other (see §5). Article pages currently use only `comments.html` and archive pages only `spark_comments.html`, so there is no same-page case.
+- **The category id lives in exactly one place**: `comments.spark.categoryid` in `config/_default/params.toml`. The scraping script was deleted along with the daily board's retirement, so the "two literals must stay in sync" problem is gone.
+- **A rename does not change the key**: the board was renamed from 「每日隐藏任务」 to 「回响」 / "Echoes", but neither the `/quests/` URL nor the `spark-<date>` term changed — the former is depended on by old external links, the latter by the old comments, and neither may be touched.
+
+## 2. Division of labor between configuration sources
+
+Under `[params.comments]` in `config/_default/params.toml`:
 
 ```toml
 [params.comments]
   enabled = true
   provider = "giscus"
-  [params.comments.giscus]    # 通用字段：repo / repoId / mapping / lang / theme / reactions…
+  [params.comments.giscus]    # shared fields: repo / repoId / mapping / lang / theme / reactions…
     repo = "…"
     repoId = "…"
-    category = "General"       # 文章评论的默认分类
+    category = "General"       # default category for article comments
     categoryid = "DIC_…"
     mapping = "pathname"
     lightTheme = "light"
     darkTheme = "dark_dimmed"
     reactionsEnabled = true
-  [params.comments.spark]      # 首页每日打卡专属：仅分类相关
+  [params.comments.spark]      # archive pages only: category-related fields
     category = "daily-spark"
     categoryid = "DIC_kwDOT2zk8c4DDbVZ"
 ```
 
-- **通用字段**（repo / repoId / lang / theme / reactions）只配在 `comments.giscus`，两个 partial 都从这里读。
-- **`spark` 子表只放分类相关字段**（`category` / `categoryid`）；mapping / term 在 `spark_comments.html` 模板里硬编码为 `specific` + `spark-{date}`，不进配置——它是这一类评论的固有语义，没有第二套取值。
-- `comments.giscus.category` 仍保留 `General` + `categoryid`，因为 `comments.html` 用它；不要因为 `spark` 已有专属分类就把 `comments.giscus.category` 改空。
+- The **general fields** (repo / repoId / lang / theme / reactions) are configured only in `comments.giscus`, and both partials read them from there.
+- The **`spark` sub-table holds only category-related fields** (`category` / `categoryid`); the mapping / term are hard-coded in the `spark_comments.html` template as `specific` + `spark-{date}` and do not enter the configuration — they are the inherent semantics of this comment scenario and have no second set of possible values.
+- **`[params.comments.spark]` is now for the archive**: it is the **home** of the 10 historical discussions, not the companion configuration of "daily scraping". The daily generation and scraping mechanisms were deleted on 2026-10-20 (this repo no longer has a `scripts/` directory and no scraping workflow at all), so this sub-table only serves the giscus embed.
+- `comments.giscus.category` still keeps `General` + `categoryid`, because `comments.html` uses it; do not empty out `comments.giscus.category` just because `spark` has a dedicated category of its own.
 
-## 3. 新增第三类评论场景的流程
+## 3. The process for adding a third comment scenario
 
-需要引入新分类（如「读书笔记」「项目页反馈」等）时，按顺序：
+When a new category has to be introduced (e.g. "reading notes", "project page feedback" etc.), follow this order:
 
-1. **giscus 仓库侧建分类** — 在 sanbika.github.io 仓库的 Discussions 分类里新增分类，记下分类名 + `categoryId`（DIC_ 开头）。
-2. **`params.toml` 加配置** — 在 `[params.comments]` 下新增子表，命名沿用 `<场景名>`（小写连字符）；只放 `category` / `categoryid`，通用字段继续从 `comments.giscus` 继承。
-3. **新建 partial** — 复制 `spark_comments.html` 改名为 `<场景>_comments.html`；`data-mapping` / `data-term` 按场景语义定（特定 → `specific` + 自定义 term；通用 → `pathname`）；主题切换 JS 函数名加场景前缀（如 `setSparkGiscusTheme`）避免与 `comments.html` / 其它 partial 同页时冲突。
-4. **接入调用点** — 在对应 Hugo 模板里 `partial "<场景>_comments.html" (...)` 调用。
-5. **同步本约定文件** — 在 §1 表格新增一行，§2 代码块加新子表示例。
+1. **Create the category on the giscus repository side** — add a category to the Discussions categories of the sanbika.github.io repository, and note down the category name + `categoryId` (starting with DIC_).
+2. **Add the configuration in `params.toml`** — add a sub-table under `[params.comments]`, named following the `<scenario name>` pattern (lowercase, hyphenated); put only `category` / `categoryid` in it, and keep inheriting the general fields from `comments.giscus`.
+3. **Create a new partial** — copy `spark_comments.html` and rename it to `<scenario>_comments.html`; choose `data-mapping` / `data-term` according to the scenario's semantics (specific → `specific` + a custom term; generic → `pathname`); prefix the theme-switching JS function name with the scenario (e.g. `setSparkGiscusTheme`) so it does not collide with `comments.html` / other partials on the same page.
+4. **Wire up the call site** — call it in the matching Hugo template with `partial "<scenario>_comments.html" (...)`.
+5. **Update this conventions file** — add a row to the §1 table and a new sub-table example to the §2 code block.
 
-> 流程顺序不能错：**先建分类，再写配置**。在 giscus 仓库侧未建分类就写 `categoryid` 会得到无效的 Giscus 嵌入（iframe 静默失败，不报错但无评论）。
+> The order of the steps must not be changed: **create the category first, then write the configuration**. Writing a `categoryid` before the category exists on the giscus repository side yields an invalid Giscus embed (the iframe fails silently — no error, but no comments either).
 
-## 4. 迁移历史与卫生说明
+## 4. Migration history and hygiene notes
 
-- **HEAD 95757ff**：首页改版，spark 评论首次接入，走 `comments.giscus` 的 General 分类 + `specific` mapping + `spark-<date>` term。
-- **HEAD 7339b19**：spark 评论迁到独立的 `daily-spark` 分类，与文章 General 物理隔离。
-- **迁移副作用**：切换前（HEAD 95757ff ~ 7339b19 之间）若有人在旧 General 分类下对 `spark-<date>` 留过评论，迁到新分类后**不会显示**——giscus 按 `category + term` 检索，原 discussion 留在 GitHub General 里无法回流到首页。本仓侧无补救动作，这部分历史评论视为放弃。
-- **空 discussion 不再累积**：giscus 是懒创建——term 未匹配到 discussion 时不会预创建，只有用户首次提交评论才真正建一条 discussion。新分类下空评论区不产生任何 GitHub 节点，本仓侧无需清理。
-- 历史详见 [[current-state.md]] TODO 区（giscus spark-<date> 长期累积空 discussion 条目已标 [x]）。
+- **HEAD 77887e2**: homepage redesign, spark comments integrated for the first time, using the General category of `comments.giscus` + `specific` mapping + a `spark-<date>` term.
+- **HEAD 7339b19**: spark comments moved to a dedicated `daily-spark` category, physically isolated from the article General category.
+- **Migration side effect**: before the switch (between HEAD 77887e2 and 7339b19), if somebody left a comment under `spark-<date>` in the old General category, it **will not show up** after the move — giscus looks up by `category + term`, and the original discussion stays behind in GitHub General with no way back. There is no remedial action on this repo's side; that part of the comment history is treated as abandoned.
+- **Empty discussions are created lazily**: giscus creates lazily — when the term matches no discussion nothing is pre-created, and a discussion only really comes into being when a user submits their first comment. An empty comment area under a new category produces no GitHub node at all, so there is nothing to clean up on this repo's side.
+  - **This property became the criterion for the survivor set at the 2026-10-20 retirement**: a discussion existing under the `daily-spark` category ⟺ somebody really did comment that day. The retirement used exactly this criterion to pick 10 days out of 67 and promote them to archive pages (4 of them also have check-in photos).
+- **Board retirement (2026-10-20)**: the generation / scraping mechanisms were deleted, but the `daily-spark` category was **deliberately kept** — the 10 historical discussions live there, and deleting the category would mean deleting the comments themselves. `[params.comments.spark]` in `config/_default/params.toml` is kept accordingly.
+- For the history see [[current-state.md]] (the retirement round in Recent Changes) and the TODO section.
 
-## 5. 已知遗留
+## 5. Known leftovers
 
-- **两个 giscus partial 不可同时渲染在同一页面**（`comments.html` + `spark_comments.html` 的 theme 切换 JS 各有 MutationObserver，同页会冲突）。当前 home 只用 spark_comments、single 只用 comments，无同页场景。如未来要同页混用，需合并函数与 observer。详见 [[current-state.md]] TODO。
-- `comments.giscus` 的 `data-lang` 条件（`cond (eq .Lang "en") "en" "zh-CN"`）对未来第三语言不健壮，详见 [[current-state.md]] TODO。
+- **The two giscus partials must not render on the same page** (the theme-switching JS of `comments.html` + `spark_comments.html` each has a MutationObserver, and they conflict on one page). Article pages currently use only `comments.html` and archive pages only `spark_comments.html`, so there is no same-page case. If they ever have to be mixed on one page, the functions and observers need to be merged. See the TODO in [[current-state.md]].
+- **The `data-lang` condition is not robust for a future third language — fixed.** `comments.html` and `spark_comments.html` are now unified to `cond (eq .Lang "en") "en" (default .Lang .Site.Language.LanguageCode)`: English is forced to `en` (giscus is case-sensitive), and for every other language the **site-level** `languageCode` is the value that gets emitted, with the page-level `.Lang` as the fallback. Note the argument order — Hugo's `default` returns its **second** argument when that argument is non-empty, so `default .Lang .Site.Language.LanguageCode` means "use `LanguageCode`, fall back to `.Lang`". This order is deliberate: the site-level `languageCode` is the code giscus recognises (`zh-CN`, case-sensitive), whereas the page-level `.Lang` is only the lowercased language key (`zh-cn`), which giscus does not recognise. Swapping the two arguments would silently downgrade the Chinese comment UI to English.
+  - Residual edge (giscus behavior, not this repo's responsibility): a language code giscus does not know about silently falls back to English.

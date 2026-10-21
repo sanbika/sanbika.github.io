@@ -12,9 +12,16 @@
   ShowCodeCopyButtons = true
   enableSearch = true
   mainSections = ["posts"]
+  # Feed sections. The "posts" section is currently empty (its only page was a
+  # placeholder deleted on 2026-10-20), so a feed bound to mainSections alone
+  # would be empty even though the site still has real content: the 10 archived
+  # days under content/quests/. mainSections deliberately keeps pointing at
+  # "posts" so that the first real post lands in the home page main column and
+  # in the feed automatically.
+  rssSections = ["quests", "posts"]
   displayFullLangName = true
 
-# 站点资源（favicon / 主题色）
+# Site assets (favicon / theme color)
 [params.assets]
   theme_color = "#5B5BD6"
   favicon = "favicon.ico"
@@ -23,7 +30,7 @@
   apple_touch_icon = "apple-touch-icon.png"
   safari_pinned_tab = "safari-pinned-tab.svg"
 
-# 社交图标（首页侧栏（layouts/index.html）引用）
+# Social icons (referenced by the home page sidebar, layouts/index.html)
 [[params.socialIcons]]
   name = "github"
   url = "https://github.com/sanbika"
@@ -32,7 +39,7 @@
   name = "rss"
   url = "/index.xml"
 
-# 评论（Giscus）
+# Comments (Giscus)
 [params.comments]
   enabled = true
   provider = "giscus"
@@ -45,16 +52,13 @@
     lightTheme = "light"
     darkTheme = "dark_dimmed"
     reactionsEnabled = true
-    # 首页「每日打卡」评论专用 Giscus 分类：与文章评论的 General 分离
+    # Giscus category dedicated to the "Daily Spark" comments on the archive
+    # page, kept separate from the General category used for article comments.
+    # Daily generation was retired in 2026-10; the discussions under this
+    # category are the comment threads of the 10 archived days themselves —
+    # the archive page maps them back with a specific mapping + spark-<date> term.
     [params.comments.spark]
       category = "daily-spark"
-      # ⚠ MUST stay in sync with `scripts/fetch_spark_checkins.py`'s
-      # `CATEGORY_ID` constant — that script does NOT read this toml
-      # (intentionally, to keep it stdlib-only). Replacing only one of
-      # the two will desync: the fetcher will pull from one giscus
-      # category while the embedded iframe below renders against
-      # another, and freshly-fetched check-ins will never appear in
-      # the day's thread.
       categoryid = "DIC_kwDOT2zk8c4DDbVZ"
 
 # Google Analytics

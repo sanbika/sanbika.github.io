@@ -1,11 +1,20 @@
-# CI / GitHub Actions 约定
+# CI / GitHub Actions Conventions
 
-本仓库使用 GitHub Actions 做定时任务与部署。本文件沉淀工作流编写中的稳定约定。学自 2026 年首页 Daily Spark 上线轮（HEAD 6af78a1）。
+This repository uses GitHub Actions for deployment and read-only drift detection. This file distills the stable conventions for writing workflows. Learned from the 2026 homepage Daily Spark launch round (HEAD 6af78a1).
 
-## 1. 跨 workflow 触发
+**Current shape (after the daily board's retirement on 2026-10-20)**: the repository has only **2 workflows** —
 
-- **`GITHUB_TOKEN` 触发的 push 事件不会触发其他 workflow**。这是 GitHub 平台安全策略，防止自动化链无限递归。例如 daily-spark 推 `data/` 后只跑本 workflow，`hugo.yml` 不会被动联动部署。
-- **跨 workflow 触发必须显式调用 `gh workflow run <target>.yml --ref <branch>`**。示例（摘自 `.github/workflows/daily-spark.yml`）：
+| workflow | Trigger | Purpose |
+|----------|------|------|
+| `.github/workflows/hugo.yml` | `push` to `main` + `workflow_dispatch` | build + deploy to GitHub Pages |
+| `.github/workflows/theme-drift-check.yml` | `schedule` (every Monday 02:30 UTC) + `workflow_dispatch` | read-only detection of PaperMod submodule drift, opens/closes the reminder issue |
+
+There is no bot workflow that writes data or pushes commits, and no generation workflow of any kind (the whole `scripts/` directory was deleted along with the daily board's retirement).
+
+## 1. Cross-workflow triggering (historical convention + current shape)
+
+- **Push events triggered by `GITHUB_TOKEN` do not trigger other workflows.** This is a GitHub platform security policy that prevents automation chains from recursing infinitely. **This platform rule still holds**, and any new workflow of the "write data → push to main → expect a deployment" kind has to keep it in mind.
+- **Cross-workflow triggering must call `gh workflow run <target>.yml --ref <branch>` explicitly.** The historical shape (deleted along with the daily board's retirement):
 
   ```yaml
   - name: Trigger Hugo deploy
@@ -15,41 +24,53 @@
     run: gh workflow run hugo.yml --ref main
   ```
 
-- **源 workflow 的 `permissions` 必须包含 `actions: write`**。本仓库 daily-spark 同时需要推 commit（`contents: write`）与触发部署（`actions: write`）：
+- **The `permissions` of the source workflow must include `actions: write`.** The historical shape (deleted):
 
   ```yaml
   permissions:
-    contents: write   # 推 commit
-    actions: write    # 显式触发其他 workflow
+    contents: write   # push commits
+    actions: write    # explicitly trigger other workflows
   ```
 
-  默认 `GITHUB_TOKEN` 是 read-only，两项必须显式声明。
+  The default `GITHUB_TOKEN` is read-only, so both have to be declared explicitly.
 
-- **目标 workflow 必须在 `on:` 中声明 `workflow_dispatch`**。`gh workflow run` 通过 dispatch 触发，没有这一行命令会失败。本仓库 `hugo.yml` 已声明 `push` + `workflow_dispatch`，满足要求。
+- **The target workflow must declare `workflow_dispatch` in its `on:`.** `gh workflow run` triggers through dispatch, and the command fails without that line. This repository's `hugo.yml` already declares `push` + `workflow_dispatch`, so the requirement is met.
+- Both same-event (deploy after a push) and cross-event (deploy after a cron) triggering use the same pattern; if the target also needs other triggers (e.g. `push: branches: [main]`), the two sources (a manual push vs. a workflow trigger) both take effect, and idempotency has to be guaranteed inside the workflow (the historical shape guarded against a repeated trigger with `if: steps.push.outputs.pushed == 'true'`).
+- **Current shape**: this repo has **no workflow that pushes commits**, so the "cross-workflow triggering" scenario has disappeared — `hugo.yml` only runs when triggered manually (or when some future writer workflow dispatches it explicitly). The rules above are kept as **accumulated history**: if an auto-writing workflow is ever reintroduced, these lines are a ready-made template to copy.
 
-- 同事件（push 后部署）或跨事件（cron 后部署）的触发都使用同一模式；若目标还需要其他触发（如 `push: branches: [main]`），两种来源（人工 push vs workflow 触发）会同时生效，幂等性需在工作流内部保证（daily-spark 用 `if: steps.push.outputs.pushed == 'true'` 守卫避免重复触发）。
+## 2. Cron scheduling and disabling
 
-## 2. Cron 排程与停用
+- **There is only one scheduled workflow**: `theme-drift-check.yml` (`cron: '30 2 * * 1'`, every Monday 02:30 UTC). The daily board's `daily-spark.yml` (`cron: '10 16 * * *'`) and `spark-checkins.yml` (`cron: '17 * * * *'`) were deleted along with the board's retirement.
+- **GitHub automatically disables scheduled workflows after 60 days of inactivity in the repository.** Everyday pushes heal it; long-term inactivity requires manually hitting Re-enable on the Actions page. This rule **still applies** to `theme-drift-check.yml`.
+- **The trigger precondition has changed**: before the daily board's retirement this repo had two bot writer workflows committing every day as a safety net, so "long-term inactivity" was never an ops risk worth watching on its own in this repo's context. The bot pushes are gone and the safety net with them — **"the repo sits still for a long time → the schedule gets silently disabled" is a real ops item again**, and it takes nothing more than glancing at the Actions page every now and then.
+- **If scheduled jobs are ever reintroduced** (generating content / scraping data), keep in mind at the same time: ① a scheduled workflow is subject to the same 60-day disabling rule; ② the commits it pushes go through `GITHUB_TOKEN` and therefore **do not** automatically trigger `hugo.yml` — an explicit `gh workflow run hugo.yml --ref main` is required (see §1); ③ `permissions` needs `contents: write` + `actions: write`; ④ prefer "write nothing when nothing changed" to avoid empty commits triggering a deployment storm.
 
-- 当前 `.github/workflows/daily-spark.yml` 使用 `cron: '10 16 * * *'`（UTC 16:10 = 北京 00:10）。
-- **GitHub 会在仓库 60 天无活动后自动停用 schedule workflow**。日常 push 自愈，长期闲置需在 Actions 页手动 Re-enable。
+## 3. The theme-drift-check workflow (theme drift detection)
 
-## 3. theme-drift-check workflow（主题漂移检测）
+Learned from the 2026-08-22 bulk optimization round (see Recent Changes in [[current-state.md]]).
 
-学自 2026-08-22 批量优化轮（见 [[current-state.md]] 最近变更）。
-
-- **存在性**：`.github/workflows/theme-drift-check.yml` 是**只读 + 提醒型** workflow——**不开 PR、不推 commit、不触发布署**。它只做一件事：盯 `themes/PaperMod` 子模块上游是否改动到了本站点级覆盖的两处主题模板，避免"升级子模块时忘 diff 导致覆盖静默失效"。
-- **盯的两个文件**（站点级覆盖列表）：
-  - `layouts/_partials/header.html` — PaperMod 顶栏
-  - `layouts/_partials/translation_list.html` — PaperMod 语言切换列表
-- **触发**：每周一 02:30 UTC（cron）+ `workflow_dispatch`（手动）。**非 push 触发**——push 触发会和升级子模块的 commit 撞车，造成噪声。
-- **流程**：checkout 含子模块 → 在 `themes/PaperMod` 内 `git fetch` 上游 → diff pinned SHA vs `origin/HEAD` 中这两处覆盖 → 有 drift 开 issue（标题带短 hash、body 含站点级覆盖清单 + 100 行截断的 `diff` 输出、随机唯一 heredoc 分隔符防脚本注入），无 drift 自动关闭旧的同主题提醒 issue。
-- **permissions 边界**：
+- **Existence**: `.github/workflows/theme-drift-check.yml` is a **read-only + reminder-style** workflow — **it opens no PR, pushes no commit, and triggers no deployment**. It does exactly one thing: watch whether the upstream of the `themes/PaperMod` submodule has changed the two theme templates that this site overrides, so that "upgrading the submodule and forgetting to diff makes the override fail silently" cannot happen.
+- **The two files it watches** (the site-level override list):
+  - `layouts/_partials/header.html` — PaperMod top bar
+  - `layouts/_partials/translation_list.html` — PaperMod language switcher list
+- **Trigger**: every Monday 02:30 UTC (cron) + `workflow_dispatch` (manual). **Not a push trigger** — a push trigger would collide with the commits that upgrade the submodule, producing noise.
+  - **The rationale for the schedule has changed**: the earlier schedule existed to avoid the time slots of the two writer workflows `daily-spark` (daily at 16:10 UTC) and `spark-checkins` (hourly at :17), so that data file writes would not collide with the build. Both workflows were deleted along with the daily board's retirement, and **the only remaining reason for the schedule is to match PaperMod's release rhythm**.
+- **Flow**: checkout including submodules → `git fetch` the upstream inside `themes/PaperMod` → diff the pinned SHA against `origin/HEAD` for those two overrides → if there is drift, open an issue (the title carries a short hash, the body carries the site-level override list + the `diff` output truncated to 100 lines, and a random unique heredoc separator to prevent script injection); if there is no drift, automatically close the old reminder issue on the same topic.
+- **The permissions boundary**:
   ```yaml
   permissions:
     contents: read    # checkout + diff
-    issues: write     # 开/关 issue
+    issues: write     # open / close issues
   ```
-  **没有** `contents: write`（不开 PR / 不推 commit）、**没有** `actions: write`（不触发布署）、**没有** `pull-requests: write`。这是有意取舍：workflow 只提醒、不修复，避免半自动改动 PR 混进正常 review 节奏。
-- **issue 生命周期设计**：上游回到 pinned SHA → 无 drift → workflow 自动 close 旧 issue → 静默绿；上游继续漂移 → issue 保持 open 直到人工升级并复核。**失败 job 模式被舍弃**（每次失败红一次需要 mute 机制）；**PR 模式被舍弃**（单人博客仓库无 PR review 流程对接）。
-- **不替代**：升级子模块时的全面 review。Workflow 只盯这两处，theme 其它文件的改动由 PR review 流程兜底。
+  There is **no** `contents: write` (no PR / no commit push), **no** `actions: write` (no deployment trigger), and **no** `pull-requests: write`. This is a deliberate trade-off: the workflow only reminds, it never fixes, so that semi-automatic change PRs cannot sneak into the normal review rhythm.
+- **Issue lifecycle design**: the upstream returns to the pinned SHA → no drift → the workflow automatically closes the old issue → silent green; the upstream keeps drifting → the issue stays open until somebody upgrades manually and reviews. **The failing-job pattern was abandoned** (failing red every time would need a mute mechanism); **the PR pattern was abandoned** (a single-author blog repo has no PR review process to hook into).
+- **Not a replacement** for a full review when upgrading the submodule. The workflow only watches those two files; changes to other theme files are covered by the PR review process.
+
+## 4. The boundary of the deployment workflow's responsibilities
+
+- **`hugo.yml` now only does build + deploy**: checkout (`submodules: recursive` + `fetch-depth: 0`) → Setup Hugo (`0.164.0` extended) → `hugo --minify --gc --buildFuture` → `actions/upload-pages-artifact` uploads `./public` → `actions/deploy-pages` drives Pages.
+- **The former spark date validation steps were deleted along with the daily board's retirement.** Those steps validated the dates / structure of the card of the day and of the history entries — the corresponding data files (`data/daily_spark.json` / `data/daily_spark_history.json`) no longer exist, so the validation lost the thing it was supposed to validate.
+  - **One convention distilled from that**: before adding a validation step to `hugo.yml`, first confirm the data being validated **still exists**; otherwise you end up writing a validation that always passes, which looks like it is guarding something while guarding nothing at all.
+- **Least privilege**: the `build` job is `contents: read` + `pages: write` + `id-token: write`; the `deploy` job only has `pages: write` + `id-token: write`. The deployment workflow does not hold `contents: write` — it has no business writing to the repository.
+- **Concurrency**: the global concurrency group is `pages` with `cancel-in-progress: false` — when a new push arrives mid-deployment, it waits for the in-flight run to finish instead of starting a parallel deployment from a stale artifact.
+- **Repository settings**: Settings → Pages → Source must be **GitHub Actions**, otherwise the deploy job fails (see the header comment in `hugo.yml`).

@@ -2,10 +2,10 @@
  * Site-level overrides for PaperMod
  * Kept intentionally small: brand color, CJK font stack, headline rhythm,
  * a slightly narrower reading width for CJK content, and the home-page
- * two-column layout (Daily Spark hero + sidebar).
+ * two-column layout (article list + sidebar).
  * --------------------------------------------------------------------------- */
 
-/* --- Brand color (靖紫 / Quiet purple) ---------------------------------------
+/* --- Brand color (Quiet purple) ------------------------------------------------
  * Light mode:  #5B5BD6  (quiet purple)
  * Dark mode:   #9B9BF5  (lighter, AA-readable on PaperMod dark background)
  * ------------------------------------------------------------------------- */
@@ -57,8 +57,8 @@ h3 {
 
 /* --- Home page: two-column layout ------------------------------------------
  * .home-layout      grid: main column flexible, sidebar ~280px
- * .home-main        Daily Spark hero + check-in comment block
- * .home-side        Recent Posts + social icons
+ * .home-main        article list (regular posts from mainSections)
+ * .home-side        "Echoes" picks + social icons
  * On viewports <768px the sidebar collapses below the main column.
  * Uses theme tokens (--gap / --border / --radius / --secondary / --primary)
  * so light/dark mode is handled by PaperMod without extra overrides.
@@ -91,14 +91,85 @@ h3 {
   top: calc(var(--header-height, 60px) + var(--gap) + 0.5rem);
 }
 
-/* --- Home Spark "quest card" ------------------------------------------------
- * Reads site.Data.daily_spark via layouts/index.html. A clean, modern card:
- * a thin secondary-color label row at the top (brand + localized date +
- * #MMDD id), a 1px border separator, then a kicker / title / task / meta
- * body. Rounded corners (var(--radius)), 1px var(--border) frame,
- * var(--theme) background. On hover the border tints to --primary and the
- * background nudges toward a barely-there indigo (4% / 6% alpha in light /
- * dark mode) — the entire affordance is restrained color, no motion.
+/* --- Home article list ------------------------------------------------------
+ * Home main column: the article list. Each entry = date + title (linking to the
+ * article) + a description summary.
+ * Titles use --primary and fall back to --secondary on hover (same tone as
+ * .home-side__title); summaries use --secondary with a 1.6 line-height, which
+ * gives CJK text room to breathe.
+ * ------------------------------------------------------------------------- */
+.home-posts__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.home-post {
+  padding: 0.9em 0.4em;
+  border-bottom: 1px solid var(--border);
+}
+
+.home-post:last-child {
+  border-bottom: 0;
+}
+
+.home-post__date {
+  display: block;
+  margin: 0 0 0.3em;
+  color: var(--secondary);
+  font-size: 0.8em;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.home-post__title {
+  margin: 0 0 0.3em;
+  font-size: 1.2em;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--primary);
+}
+
+.home-post__title a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.home-post__title a:hover,
+.home-post__title a:focus-visible {
+  color: var(--secondary);
+}
+
+.home-post__title a:focus-visible {
+  outline: 2px dashed var(--secondary);
+  outline-offset: 2px;
+}
+
+.home-post__desc {
+  margin: 0;
+  color: var(--secondary);
+  font-size: 0.95em;
+  line-height: 1.6;
+}
+
+.home-posts__empty {
+  margin: 0;
+  color: var(--secondary);
+  font-size: 0.95em;
+  line-height: 1.6;
+}
+
+/* --- Quest card (pixel-outline quest card) -----------------------------------------
+ * The pixel-outline look is a visual asset of this site — retiring the
+ * "Daily Spark" section does not mean throwing the design away: the rules are
+ * kept as a whole and renamed to .quest-card*, for the archive pages and any
+ * future quest pages to keep using.
+ * Card structure: a top strip (brand + localized date + #MMDD id) + a 1px
+ * divider + the title / task body. Rounded corners (var(--radius)) +
+ * a 1px var(--border) frame + a var(--theme) background. On hover the border
+ * takes --primary and the background shifts slightly toward indigo
+ * (4% alpha light / 6% alpha dark) — restrained color, no displacement.
  * border-color / background-color transition at 0.25s ease. Light/dark
  * handled by reading --primary / --secondary / --border / --theme / --radius
  * from PaperMod's theme-vars.css; the hover background needs an explicit
@@ -112,7 +183,7 @@ h3 {
  * transition covers the hover color shifts only — no transform / motion
  * is involved, so prefers-reduced-motion is a non-issue here.
  */
-.home-spark {
+.quest-card {
   position: relative;
   overflow: hidden;
   border: 1px solid var(--border);
@@ -126,22 +197,22 @@ h3 {
  * Kept extremely restrained (4% alpha light / 6% alpha dark) — at this
  * density it's a tone-on-tone warmth, not a fill.
  */
-.home-spark:hover {
+.quest-card:hover {
   border-color: var(--primary);
   background: rgba(91, 91, 214, 0.04);
 }
 
-[data-theme="dark"] .home-spark:hover {
+[data-theme="dark"] .quest-card:hover {
   background: rgba(155, 155, 245, 0.06);
 }
 
 /* Strip header: a plain typography row, not a solid brand bar. Brand
- * label on the left ("地球ONLINE · 每日任务" / "EARTH ONLINE · DAILY
- * QUEST", uppercased on English pages), localized date + #MMDD id on
+ * label on the left ("地球ONLINE · 回响存档" / "EARTH ONLINE · ECHO
+ * ARCHIVE", uppercased on English pages), localized date + #MMDD id on
  * the right. A 1px border-bottom separates it from the body; the card's
  * overflow: hidden keeps that line flush with the rounded corners.
  */
-.home-spark__strip {
+.quest-card__strip {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -154,20 +225,20 @@ h3 {
   border-bottom: 1px solid var(--border);
 }
 
-.home-spark__strip-brand {
-  /* "地球ONLINE · 每日任务" / "EARTH ONLINE · DAILY QUEST" — fixed label
+.quest-card__strip-brand {
+  /* "地球ONLINE · 回响存档" / "EARTH ONLINE · ECHO ARCHIVE" — fixed label
    * so the brand always shows up top, regardless of which quest loads. */
   white-space: normal;
 }
 
-.home-spark__strip-brand:lang(en) {
+.quest-card__strip-brand:lang(en) {
   text-transform: uppercase;
 }
 
 /* Right group: localized date + task id (e.g. #0815 from MMDD). tabular-nums
  * keeps the digits aligned so the id feels "machine-stamped".
  */
-.home-spark__strip-right {
+.quest-card__strip-right {
   display: inline-flex;
   align-items: baseline;
   gap: 0.7em;
@@ -175,44 +246,33 @@ h3 {
   letter-spacing: 0.06em;
 }
 
+/* The two readouts on the right of the strip: localized date + #MMDD id. Both
+ * are "archive slots", so both use tabular-nums to keep the digits aligned; the
+ * id is dimmed a little further so it reads like a machine-stamped mark
+ * (same wording as the number on the home-page quest card). */
+.quest-card__date {
+  font-variant-numeric: tabular-nums;
+}
+
+.quest-card__id {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+}
+
 /* Body: var(--gap) padding matches the surrounding grid rhythm. Explicit
- * margins (no flex gap) so the kicker sits close to the title, the title
- * + task + meta share a comfortable rhythm, and the spec's "small
- * margin-bottom" on the kicker lands as written.
+ * margins on the children (no flex gap) so the title sits close to the task
+ * text and the title + task + meta share a comfortable rhythm.
  */
-.home-spark__body {
+.quest-card__body {
   padding: var(--gap);
-}
-
-/* Kicker: the tag (e.g. "创造" / "Creating") becomes a small brand-purple
- * badge above the title — a translucent chip with rounded corners, not
- * an outlined pill. Light / dark each get an explicit rgba so the tint
- * reads on both backgrounds (a single --primary mix wouldn't, because
- * the chip sits on --theme which is white in light, dark gray in dark).
- * Colors are hard-coded to the brand swatches for the same reason.
- */
-.home-spark__kicker {
-  display: inline-block;
-  margin: 0 0 0.35em;
-  padding: 0.15em 0.6em;
-  border-radius: 4px;
-  background: rgba(91, 91, 214, 0.14);
-  color: #5B5BD6;
-  font-size: 0.8em;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-}
-
-[data-theme="dark"] .home-spark__kicker {
-  background: rgba(155, 155, 245, 0.18);
-  color: #9B9BF5;
 }
 
 /* Title: zh gets 「」 quotes via the template, en stays bare. Brand-color
  * text wraps with text-wrap: balance so long Chinese titles don't end on
  * a single orphan character.
  */
-.home-spark__title {
+.quest-card__title {
   margin: 0 0 0.5em;
   font-size: 1.55em;
   font-weight: 700;
@@ -222,83 +282,19 @@ h3 {
   -webkit-text-wrap: balance;
 }
 
-.home-spark__task {
+.quest-card__task {
   margin: 0 0 0.5em;
   color: var(--secondary);
   font-size: 1.02em;
   line-height: 1.65;
 }
 
-
-
-/* Empty-state card: keeps the strip frame but trims the right side
- * (no date / no id without a real quest). Title is slightly smaller so
- * it doesn't shout "your daily is missing" any louder than the copy.
- * Rounded frame + themed background come from the shared .home-spark
- * rules above — this class only tweaks the title size.
- */
-.home-spark--empty .home-spark__title {
-  font-size: 1.3em;
-}
-
-.home-spark--empty .home-spark__task {
-  /* No __meta follows in the empty state, so the shared 0.5em margin-bottom
-   * would leave an off-rhythm gap at the bottom of the card. Collapse it
-   * so the body's padding-bottom is the only spacing below the task. */
-  margin-bottom: 0;
-}
-
-/* --- Spark check-in block ---------------------------------------------------
- * Sits below the hero. Thin top divider + small kicker heading; the
- * Giscus iframe inherits PaperMod's own responsive figure styling.
- * The heading is intentionally a "label" (smaller, wide letter-spacing,
- * uppercase on English pages) to layer visually underneath the hero.
- * ------------------------------------------------------------------------- */
-.spark-checkin {
-  padding-top: 1em;
-  border-top: 1px solid var(--border);
-}
-
-.spark-checkin__heading {
-  margin: 0 0 0.8em;
-  font-size: 0.78em;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  color: var(--secondary);
-}
-
-.spark-checkin__heading:lang(en) {
-  text-transform: uppercase;
-}
-
-/* GitHub fallback link below the Giscus iframe. A small, secondary-color
- * line that mirrors .quests__discussion's visual register so the two
- * surfaces (home spark card + /quests/ entries) read as the same family.
- * Hover lifts to brand color; the arrow ↗ is part of the link text and is
- * wrapped by the colour transition naturally.
- */
-.spark-checkin__ghlink {
-  /* PaperMod 的 reset.css 已把 <p> 的 margin 清零, 这里手动补上与上方
-   * Giscus iframe 的呼吸距离 (1em), 让两者不挤在一起. */
-  margin: 1em 0 0;
-  font-size: 0.82em;
-  line-height: 1.5;
-}
-
-.spark-checkin__ghlink a {
-  color: var(--secondary);
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
-
-.spark-checkin__ghlink a:hover,
-.spark-checkin__ghlink a:focus-visible {
-  color: var(--primary);
-}
-
-.spark-checkin__ghlink a:focus-visible {
-  outline: 2px dashed var(--secondary);
-  outline-offset: 2px;
+/* The body sits on .quest-card__task (post-content handles the paragraph
+ * typography), but PaperMod gives .post-content a 30px margin — inside the card
+ * that pushes out an empty gap, so it is cancelled here to keep the body flush
+ * with the card's inner padding. */
+.quest-card__task.post-content {
+  margin: 0;
 }
 
 /* --- Home sidebar ----------------------------------------------------------
@@ -318,7 +314,7 @@ h3 {
   color: var(--secondary);
 }
 
-/* Heading row used by the Past Quests card: title on the left + small
+/* Heading row used by the "Echoes" card: title on the left + small
  * "查看全部 → / All →" link on the right. The row replaces the heading's
  * own margin-bottom so spacing matches the rest of the card surface
  * (.home-side__heading no longer drives spacing when wrapped here).
@@ -397,6 +393,26 @@ h3 {
   font-variant-numeric: tabular-nums;
 }
 
+/* Meta row of an "Echoes" entry: optional check-in thumbnail +
+ * localized date, all on one line under the title. */
+.home-side__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+/* 28×28 thumbnail: decorative (alt left empty), visually balanced against the
+ * date text next to it. */
+.home-side__thumb {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--theme);
+}
+
 .home-side__social .social-icons {
   margin: 0;
 }
@@ -405,8 +421,8 @@ h3 {
  * Below 768px the sidebar stacks under the main column.
  * sticky is also disabled: a single-column page has nowhere for the
  * sidebar to "stick" relative to, and inherited top offsets would leave
- * a visible gap above the cards. The quest card's strip header and meta
- * row already use flex-wrap; nothing extra is needed there — the items
+ * a visible gap above the cards. The article list rows and the sidebar
+ * meta row use flex-wrap; nothing extra is needed there — the items
  * just fall to a second line as the column narrows.
  * ------------------------------------------------------------------------- */
 @media (max-width: 768px) {
@@ -420,10 +436,12 @@ h3 {
 }
 
 /* --- Quests page -------------------------------------------------------------
- * /quests/ 往期任务存档. 月份标题小字 + 1px --border 分割线; 条目用 --border
- * 底边线分隔; tag 徽章复用 .home-spark__kicker 的靖紫色块 (亮 14% / 暗 18%);
- * 条目行不加 hover 背景 — 整行不可点, 只有「打卡讨论」链接可点, 整行变色
- * 会误导. 一律走 theme 变量, 不写死背景色, 暗色自适应.
+ * /quests/ archive of the Past Quests. Small month headings + a 1px --border
+ * divider; entries are separated by a --border bottom line; entry rows get no
+ * hover background: the whole row is not clickable (only the title link is),
+ * so tinting the whole row would mislead.
+ * Everything goes through theme variables, no hard-coded background color, so
+ * dark mode adapts on its own.
  * ------------------------------------------------------------------------- */
 .quests__title {
   margin: 0 0 0.4em;
@@ -467,14 +485,15 @@ h3 {
 
 .quests__item {
   /* No hover background: the row itself is not clickable, only the inner
-   * 打卡讨论 link is. Tinting the whole row on hover would falsely imply
+   * title link is. Tinting the whole row on hover would falsely imply
    * the entire item is interactive. The link keeps its own :hover /
-   * :focus-visible affordance via .quests__discussion below.
+   * :focus-visible affordance via .quests__item-title below.
    * transition / background-color pair removed together with the old
    * :hover rule, so no dead styles linger.
    *
-   * 锚点目标上方留一点呼吸空间：避免标题行紧贴 (或被遮挡在) sticky header
-   * 下方, 尤其是从首页侧栏的 /quests/#spark-<date> 链接跳过来时.
+   * Breathing room above the anchor target: keeps the title row from hugging
+   * (or hiding under) the sticky header, especially when jumping over from
+   * the home sidebar.
    */
   padding: 0.9em 0.4em;
   border-bottom: 1px solid var(--border);
@@ -495,28 +514,32 @@ h3 {
   color: var(--secondary);
 }
 
-.quests__tag {
-  display: inline-block;
-  padding: 0.1em 0.55em;
-  border-radius: 4px;
-  background: rgba(91, 91, 214, 0.14);
-  color: #5B5BD6;
-  font-size: 0.85em;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-
-[data-theme="dark"] .quests__tag {
-  background: rgba(155, 155, 245, 0.18);
-  color: #9B9BF5;
-}
-
 .quests__item-title {
   margin: 0 0 0.3em;
   font-size: 1.1em;
   font-weight: 700;
   line-height: 1.35;
   color: var(--primary);
+}
+
+/* The entry title links to that archive page (the archive page carries the task
+   body / photo wall / old comment thread). The color inherits from the title
+   itself and falls back to --secondary on hover — same tone as
+   .home-side__link. */
+.quests__item-title a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.quests__item-title a:hover,
+.quests__item-title a:focus-visible {
+  color: var(--secondary);
+}
+
+.quests__item-title a:focus-visible {
+  outline: 2px dashed var(--secondary);
+  outline-offset: 2px;
 }
 
 .quests__task {
@@ -526,31 +549,13 @@ h3 {
   line-height: 1.6;
 }
 
-.quests__discussion {
-  font-size: 0.82em;
-  color: var(--primary);
-  text-decoration: none;
-  opacity: 0.85;
-  transition: opacity 0.15s ease;
-}
-
-.quests__discussion:hover,
-.quests__discussion:focus-visible {
-  opacity: 1;
-}
-
-/* --- Spark check-in photo wall (home page) -------------------------------
- * 复用 quests 页 .quests__checkins* 视觉, 仅调整间距: 顶贴 heading,
- * 底给 giscus 1em 距离 (giscus fallback 已有独立 .spark-checkin__ghlink
- * margin-top, 这里给墙体的下边距就够了).
- * ------------------------------------------------------------------------- */
-.spark-checkin__photos { margin: 0 0 1em; }
-
 /* --- Spark check-in image wall ---------------------------------------------
- * 出现在 /quests/ 每条 quest item 内部、__task 之后、__discussion 链接之前.
- * 设计目标: 64×64 缩略图 + 用户名, 与现有 .quests__tag 视觉重量匹配;
- * flex-wrap 在窄屏自动换行; 移动端通过缩小缩略图到 56×56 维持节奏.
- * loading="lazy" 由模板加, 这里只管布局; 图裂时 alt 文案兜底.
+ * Appears inside each quest item on /quests/, after __task.
+ * Design goal: a 64×64 thumbnail + user name sized to sit comfortably in the
+ * entry's meta row; flex-wrap makes it wrap on narrow screens; on mobile
+ * the rhythm is kept by shrinking the thumbnail to 56×56.
+ * loading="lazy" is added by the template, this block only handles layout; the
+ * alt text is the fallback when an image fails to load.
  * ------------------------------------------------------------------------- */
 .quests__checkins {
   display: flex;
@@ -594,7 +599,8 @@ h3 {
   font-variant-numeric: tabular-nums;
 }
 
-/* 小屏缩到 56×56 维持节奏, 不缩太小防止图看不清 */
+/* Shrink to 56×56 on small screens to keep the rhythm, but not so small that
+   the photos become hard to read */
 @media (max-width: 480px) {
   .quests__checkin img {
     width: 56px;
@@ -603,4 +609,173 @@ h3 {
   .quests__checkin-author {
     max-width: 56px;
   }
+}
+
+/* --- Quest single page (single archive day) --------------------------------------
+ * /quests/<date>/ : the quest card (.quest-card, see the Quest card section
+ * above) + the check-in photo wall + the old comment thread. The card's own
+ * visuals live in the Quest card section; this block only covers the parts of
+ * the archive page outside the card (photo wall / comments / back link).
+ * ------------------------------------------------------------------------- */
+.quest {
+  margin: 24px auto 0;
+}
+
+.quest__body {
+  color: var(--content);
+}
+
+/* Check-in photo wall: 96×96 thumbnails + user names, of the same family as the
+ * 64×64 wall on the list page but more relaxed (the detail page is the main
+ * event, so the images can be one size larger). */
+.quest__photos {
+  margin: 0 0 var(--gap);
+}
+
+.quest__photos-heading {
+  margin: 0 0 0.6em;
+  font-size: 0.78em;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--secondary);
+}
+
+.quest__photos-heading:lang(en) {
+  text-transform: uppercase;
+}
+
+.quest__photo-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.quest__photo a {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3em;
+  text-decoration: none;
+  color: var(--secondary);
+  font-size: 0.78em;
+  transition: color 0.15s ease;
+}
+
+.quest__photo a:hover,
+.quest__photo a:focus-visible {
+  color: var(--primary);
+}
+
+.quest__photo a:focus-visible {
+  outline: 2px dashed var(--secondary);
+  outline-offset: 2px;
+}
+
+.quest__photo img {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--theme);
+}
+
+.quest__photo-author {
+  max-width: 96px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Old comment thread: a divider on top, a small heading (uppercase on English
+ * pages), and the giscus iframe below. The GitHub fallback link under the
+ * iframe (rendered by spark_comments.html) shares this block's typography with
+ * the page's own discussion link. */
+.quest__comments {
+  padding-top: 1em;
+  border-top: 1px solid var(--border);
+}
+
+.quest__comments-heading {
+  margin: 0 0 0.8em;
+  font-size: 0.78em;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--secondary);
+}
+
+.quest__comments-heading:lang(en) {
+  text-transform: uppercase;
+}
+
+.quest__comments p {
+  margin: 1em 0 0;
+  font-size: 0.82em;
+  line-height: 1.5;
+}
+
+.quest__comments p a {
+  color: var(--secondary);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.quest__comments p a:hover,
+.quest__comments p a:focus-visible {
+  color: var(--primary);
+}
+
+.quest__comments p a:focus-visible {
+  outline: 2px dashed var(--secondary);
+  outline-offset: 2px;
+}
+
+/* Two outbound links with different meanings live in this block:
+ *   .quest__ghlink      —— giscus' own fallback, pointing at the GitHub
+ *                           Discussions search page (在 GitHub 上评论 · 可传图 ↗).
+ *                           Deliberately has no rule of its own and simply
+ *                           inherits the muted tone of .quest__comments p a above.
+ *   .quest__discussion  —— the link to that year's specific discussion, more
+ *                           precise than the fallback; it uses the brand color
+ *                           and a semibold weight to tell itself apart from the
+ *                           fallback, so the two do not look alike.
+ * The selector still carries .quest__comments so that it overrides
+ * .quest__comments p a above (the muted color).
+ * Hover goes through opacity, same tone as the other outbound links on the
+ * site. */
+.quest__comments .quest__discussion a {
+  color: var(--primary);
+  font-weight: 600;
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
+}
+
+.quest__comments .quest__discussion a:hover,
+.quest__comments .quest__discussion a:focus-visible {
+  opacity: 1;
+}
+
+.quest__back {
+  margin: 1.6em 0 0;
+  font-size: 0.85em;
+}
+
+.quest__back a {
+  color: var(--secondary);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.quest__back a:hover,
+.quest__back a:focus-visible {
+  color: var(--primary);
+}
+
+.quest__back a:focus-visible {
+  outline: 2px dashed var(--secondary);
+  outline-offset: 2px;
 }

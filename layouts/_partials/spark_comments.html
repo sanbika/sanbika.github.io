@@ -60,11 +60,14 @@
        embedded thread that lets readers jump to the GitHub Discussions
        search for `spark-<date>` — useful when giscus is blocked, when
        someone wants to attach images, or when reading prefers a real
-       forum thread. Same route shape as .quests__discussion in
-       layouts/quests.html (the search URL never 404s regardless of whether
-       a discussion exists; giscus is lazy-create so no nodes are wasted
-       when nobody uses this fallback). Opens in a new tab. */ -}}
-<p class="spark-checkin__ghlink">
+       forum thread. The search URL never 404s regardless of whether a
+       discussion exists, so this is a safe link even for archive days
+       that never got a reply. Opens in a new tab.
+
+       The class is .quest__ghlink (not a "spark-checkin__*" name): the
+       daily-checkin block it was born in is gone, and this partial now
+       renders only on the archive pages under layouts/quests/single.html. */ -}}
+<p class="quest__ghlink">
   <a href="https://github.com/sanbika/sanbika.github.io/discussions?discussions_q=spark-{{ $date }}" target="_blank" rel="noopener noreferrer">
     {{- if eq $page.Lang "en" -}}
     Comment on GitHub · images supported ↗

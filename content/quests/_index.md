@@ -1,5 +1,5 @@
 ---
-title: "往期任务"
+title: "回响"
 layout: quests
-description: "过往每日任务的存档，点「打卡讨论」可跳到当天的讨论。"
+description: "曾经在这里发布过的每日小挑战，以及它们收到的那几句回应。"
 ---

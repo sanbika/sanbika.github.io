@@ -1,5 +1,5 @@
 ---
-title: "Past Quests"
+title: "Echoes"
 layout: quests
-description: "Archive of past daily quests — click “Check in” to jump to that day's discussion."
+description: "Daily quests that once lived here, and the few replies they gathered."
 ---

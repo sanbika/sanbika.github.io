@@ -1,3 +1,13 @@
+> ⚠️ **The feature was retired on 2026-10-20. This file is kept purely as a historical archive.**
+>
+> The "Daily Spark" board was retired as a whole: `.github/workflows/spark-checkins.yml` and `scripts/fetch_spark_checkins.py` (along with the whole `scripts/` directory) were deleted, and the scraped data was frozen into 4 static snapshots in `data/spark_checkins.json` (2026-08-17 / 08-19 / 08-21 / 08-24) that no longer update automatically.
+>
+> The 10 surviving archive days —— that is, the 10 days on which a discussion was really opened under the `daily-spark` category in GitHub Discussions (giscus creates lazily, so the existence of a discussion means somebody did comment) —— were promoted to `content/quests/<date>.md` content pages, each hooking back to that year's discussion thread; the old `/quests/` single-page structure and the homepage check-in scenario described in this document no longer exist.
+>
+> For the current state see [[current-state.md]] and [[conventions/giscus.md]].
+
+---
+
 # Spark 打卡图片墙 设计 spec
 
 **作者**：sanbika

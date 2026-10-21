@@ -3,185 +3,100 @@
   Layout:
     .home-layout
       .home-main
-        .home-spark     (Daily Spark "quest card" with strip header + body)
-        .spark-checkin  (Giscus per-day check-in thread)
+        .home-posts    (article list: regular posts from mainSections, newest first)
       .home-side
-        .home-side__card  (Past Quests, top 7 from site.Data.daily_spark_history
-                           minus today's date; whole card omitted if empty)
+        .home-side__card  ("Echoes": the 7 most recent archive pages, whole card omitted when empty)
         .home-side__card  (social icons)
+  The "Daily Spark" section was retired in 2026-10: the home page no longer shows
+  a daily quest card and no longer carries any giscus. The 10 days that did get a
+  discussion opened were promoted to archive pages under content/quests/; the
+  sidebar only curates statically, and every comment thread lives on its own
+  archive page.
   Only affects the home page (Hugo resolves home kind → index.html first);
-  /posts/, /about/, etc. continue to use themes/PaperMod/layouts/list.html.
+  /quests/ uses the site-level layouts/quests.html, /about/ and /search/ keep
+  using the theme's own templates.
 */ -}}
 
 {{- define "main" -}}
-{{- $spark := hugo.Data.daily_spark -}}
-{{- /*
-  $sparkOK requires every nested field the template indexes below:
-    .date, .tag, .tag.zh, .tag.en,
-    .zh.title, .zh.task, .en.title, .en.task.
-  Without these guards a malformed data file produces blank tags or
-  panics. We also hide the .spark-checkin section entirely when invalid,
-  so the empty hero state doesn't render an orphan Giscus thread.
-*/ -}}
-{{- $sparkOK := and $spark
-    (isset $spark "date")
-    (isset $spark "tag")
-    (isset $spark "zh") (isset (index $spark "zh") "title") (isset (index $spark "zh") "task")
-    (isset $spark "en") (isset (index $spark "en") "title") (isset (index $spark "en") "task")
-    (isset (index $spark "tag") "zh") (isset (index $spark "tag") "en") -}}
 {{- $langKey := cond (eq .Lang "en") "en" "zh" -}}
-{{- $headline := cond (eq $langKey "en") "Daily Spark" "地球Online · 今日隐藏任务" -}}
-{{- $checkinLabel := cond (eq $langKey "en") "Check in Today" "今日打卡" -}}
-{{- $pastLabel := cond (eq $langKey "en") "Past Quests" "往期任务" -}}
-{{- $pastMoreLabel := cond (eq $langKey "en") "All →" "查看全部 →" -}}
-{{- /* Strip + meta copy is constant per language; compute once so both
-       the data and the empty-state branches reuse the same strings. */ -}}
-{{- $stripLabel := cond (eq $langKey "en") "EARTH ONLINE · DAILY QUEST" "地球ONLINE · 每日任务" -}}
+{{- $postsLabel := cond (eq $langKey "en") "Posts" "文章" -}}
+{{- $echoesLabel := cond (eq $langKey "en") "Echoes" "有回响的日子" -}}
+{{- $moreLabel := cond (eq $langKey "en") "All →" "查看全部 →" -}}
+{{- $emptyText := cond (eq $langKey "en") "No posts yet." "还没有文章。" -}}
+{{- /* The main column only takes posts from mainSections (config/_default/params.toml: ["posts"]);
+       archive pages (section = quests) are excluded by construction and never
+       mix into the article list. */ -}}
+{{- $posts := where .Site.RegularPages "Section" "in" .Site.Params.mainSections -}}
+{{- $postsSorted := sort $posts "Date" "desc" -}}
+{{- /* Sidebar picks: the 7 most recent archive pages (10 in total); the content pages are the data source here too. */ -}}
+{{- $questPages := where .Site.RegularPages "Section" "quests" -}}
+{{- $echoTop := first 7 (sort $questPages "Date" "desc") -}}
 
 <div class="home-layout">
   <div class="home-main">
-    {{- if $sparkOK -}}
-      {{- $tag := index $spark.tag $langKey -}}
-      {{- $titleRaw := index (index $spark $langKey) "title" -}}
-      {{- $task := index (index $spark $langKey) "task" -}}
-      {{- $dateParsed := time $spark.date -}}
-
-      {{- /* 任务编号：日期去横线取末 4 位（YYYY-MM-DD → MMDD）。
-             跨语言/构建结果一致，方便玩家「存档位」感。 */ -}}
-      {{- $idRaw := replace $spark.date "-" "" -}}
-      {{- $idLast4 := substr $idRaw 4 4 -}}
-
-      {{- /* zh 用「」包裹标题；en 保持裸标题（英文带引号会很怪）。 */ -}}
-      {{- $titleDisplay := cond (eq $langKey "en") $titleRaw (printf "「%s」" $titleRaw) -}}
-
-      <section class="home-spark" aria-label="{{ $headline }}">
-        <header class="home-spark__strip">
-          <span class="home-spark__strip-brand">{{ $stripLabel }}</span>
-          <span class="home-spark__strip-right">
-            <time class="home-spark__date" datetime="{{ $spark.date }}">
-              {{- if eq $langKey "en" -}}
-              {{ $dateParsed.Format "Jan 2" }}
-              {{- else -}}
-              {{ printf "%d月%d日" $dateParsed.Month $dateParsed.Day }}
-              {{- end -}}
-            </time>
-            <span class="home-spark__id">#{{ $idLast4 }}</span>
-          </span>
-        </header>
-        <div class="home-spark__body">
-          <p class="home-spark__kicker">{{ $tag }}</p>
-          <h2 class="home-spark__title">{{ $titleDisplay }}</h2>
-          <p class="home-spark__task">{{ $task }}</p>
-        </div>
-      </section>
-    {{- else -}}
-      {{- /* 空态：套用新 strip 结构（仅品牌在左，无日期/编号），正文保留旧文案。 */ -}}
-      <section class="home-spark home-spark--empty" aria-label="{{ $headline }}">
-        <header class="home-spark__strip">
-          <span class="home-spark__strip-brand">{{ $stripLabel }}</span>
-        </header>
-        <div class="home-spark__body">
-          <h2 class="home-spark__title">
-            {{- if eq $langKey "en" -}}No quest today{{- else -}}今日任务未刷新{{- end -}}
-          </h2>
-          <p class="home-spark__task">
-            {{- if eq $langKey "en" -}}
-            The quest system is taking a day off — check back tomorrow.
-            {{- else -}}
-            今日任务打盹中，明天再来接单。
-            {{- end -}}
-          </p>
-        </div>
-      </section>
-    {{- end -}}
-
-    {{- if $sparkOK -}}
-    <section class="spark-checkin" aria-label="{{ $checkinLabel }}">
-      <h3 class="spark-checkin__heading">{{ $checkinLabel }}</h3>
-      {{- /* Today's check-in photo wall (reuses the .quests__checkins*
-             visual from layouts/quests.html, scoped with a modifier
-             .spark-checkin__photos). Four guards so dirty data (missing
-             spark_checkins, no match for $spark.date, no checkins field,
-             malformed types) silently falls through to rendering just
-             the Giscus iframe below — never an empty <ul>. */ -}}
-      {{- $sparkCheckins := hugo.Data.spark_checkins -}}
-      {{- if $sparkCheckins -}}
-        {{- $todays := where $sparkCheckins "date" $spark.date -}}
-        {{- if gt (len $todays) 0 -}}
-          {{- /* Layer 3 guard: $todays 0 might exist but not be a map — split the
-                 nested `index` call so a non-map item falls through cleanly
-                 instead of crashing the build with "can't index item of type
-                 string/nil by map". $todaysList then stays undefined and the
-                 `if $todaysList` layer 4 guard skips rendering. */ -}}
-          {{- $firstItem := index $todays 0 -}}
-          {{- if $firstItem -}}
-            {{- $todaysList := index $firstItem "checkins" -}}
-            {{- if $todaysList -}}
-              {{- $photosLabel := cond (eq $langKey "en") "Check-in photos" "打卡照片" -}}
-              <ul class="quests__checkins spark-checkin__photos" aria-label="{{ $photosLabel }}">
-                {{- range $todaysList -}}
-                  <li class="quests__checkin">
-                    <a href="{{ .comment_url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ .author }}">
-                      <img loading="lazy" decoding="async" src="{{ .image_url }}" alt="{{ .alt }}" width="64" height="64" />
-                      <span class="quests__checkin-author">{{ .author }}</span>
-                    </a>
-                  </li>
-                {{- end -}}
-              </ul>
-            {{- end -}}
+    <section class="home-posts" aria-label="{{ $postsLabel }}">
+      {{- if not $postsSorted -}}
+      <p class="home-posts__empty">{{ $emptyText }}</p>
+      {{- else -}}
+      <ul class="home-posts__list">
+        {{- range $postsSorted -}}
+          {{- $d := .Date -}}
+          {{- $dateDisplay := cond (eq $langKey "en")
+              ($d.Format "Jan 2, 2006")
+              (printf "%d年%d月%d日" $d.Year $d.Month $d.Day) -}}
+          {{- $desc := .Description | default (.Summary | plainify | htmlUnescape) -}}
+        <li class="home-post">
+          <time class="home-post__date" datetime="{{ $d.Format "2006-01-02" }}">{{ $dateDisplay }}</time>
+          <h2 class="home-post__title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+          {{- with $desc }}
+          <p class="home-post__desc">{{ . }}</p>
           {{- end -}}
+        </li>
         {{- end -}}
+      </ul>
       {{- end -}}
-      {{- partial "spark_comments.html" (dict "page" . "date" $spark.date) -}}
     </section>
-    {{- end -}}
   </div>
 
   <aside class="home-side" aria-label="{{ cond (eq $langKey "en") "sidebar" "侧栏" }}">
     {{- /*
-      Sidebar Past Quests card (replaces the previous Recent Posts card).
-      Source: site.Data.daily_spark_history, minus the main-card date so
-      it doesn't double up, desc-sorted, top 7. Same pre-filter shape as
-      layouts/quests.html (zh/en title required for current language),
-      kept minimal because we only read title + date here, not tag/task.
-      When the filtered list is empty the entire card is omitted (the
-      sidebar collapses down to just the social-icons card).
+      "Echoes" card: the 7 most recent archive pages. Links use .RelPermalink so
+      the zh and en sites each point at their own language path (/quests/ and
+      /en/quests/) without assembling relLangURL by hand. When the list is empty
+      the whole card is omitted (the sidebar keeps only the social icons card).
     */ -}}
-    {{- $today := "" -}}
-    {{- if $sparkOK -}}{{- $today = $spark.date -}}{{- end -}}
-    {{- $pastList := slice -}}
-    {{- $history := hugo.Data.daily_spark_history -}}
-    {{- /* 日期格式守卫: 与 layouts/quests.html 的 $datePattern 同形, 防止
-           "2026-13-01" 这类会让 Hugo time() 崩掉的脏数据混进内层渲染循环. */ -}}
-    {{- $datePattern := `^(19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$` -}}
-    {{- if $history -}}
-      {{- range $history -}}
-        {{- $pastOK := and (not (eq .date $today))
-                          (findRE $datePattern .date)
-                          (isset . "tag") (isset (index . "tag") $langKey)
-                          (isset . $langKey)
-                          (isset (index . $langKey) "title") -}}
-        {{- if $pastOK -}}
-          {{- $pastList = $pastList | append . -}}
-        {{- end -}}
-      {{- end -}}
-    {{- end -}}
-    {{- $pastTop := first 7 (sort $pastList "date" "desc") -}}
-    {{- if gt (len $pastTop) 0 -}}
-    <section class="home-side__card" aria-label="{{ $pastLabel }}">
+    {{- if gt (len $echoTop) 0 -}}
+    <section class="home-side__card" aria-label="{{ $echoesLabel }}">
       <div class="home-side__heading-row">
-        <h3 class="home-side__heading">{{ $pastLabel }}</h3>
-        <a class="home-side__more" href="{{ relLangURL `/quests/` }}">{{ $pastMoreLabel }}</a>
+        <h3 class="home-side__heading">{{ $echoesLabel }}</h3>
+        <a class="home-side__more" href="{{ relLangURL "/quests/" }}">{{ $moreLabel }}</a>
       </div>
-      {{- range $pastTop -}}
-        {{- $dateParsed := time .date -}}
+      {{- range $echoTop -}}
+        {{- $sparkDate := .Params.spark_date | default (.Date.Format "2006-01-02") -}}
+        {{- $dateParsed := time $sparkDate -}}
         {{- $dateDisplay := cond (eq $langKey "en")
             ($dateParsed.Format "Jan 2")
             (printf "%d月%d日" $dateParsed.Month $dateParsed.Day) -}}
-        {{- $questURL := relLangURL (printf `/quests/#spark-%s` .date) -}}
-      <a class="home-side__link" href="{{ $questURL }}">
-        <span class="home-side__title">{{ index (index . $langKey) "title" }}</span>
-        <time class="home-side__date" datetime="{{ .date }}">{{ $dateDisplay }}</time>
+        {{- $titleDisplay := cond (eq $langKey "en") .Title (printf "「%s」" .Title) -}}
+        {{- /* When the day has check-in photos, the thumbnail rides along in the meta row (decorative, alt left empty). */ -}}
+        {{- $thumb := "" -}}
+        {{- with hugo.Data.spark_checkins -}}
+          {{- $matchings := where . "date" $sparkDate -}}
+          {{- with $matchings -}}
+            {{- $checkins := index (index . 0) "checkins" -}}
+            {{- with $checkins -}}
+              {{- $thumb = index (index . 0) "image_url" -}}
+            {{- end -}}
+          {{- end -}}
+        {{- end -}}
+      <a class="home-side__link" href="{{ .RelPermalink }}">
+        <span class="home-side__title">{{ $titleDisplay }}</span>
+        <span class="home-side__meta">
+          {{- with $thumb }}
+          <img class="home-side__thumb" src="{{ . }}" alt="" width="28" height="28" loading="lazy" decoding="async" />
+          {{- end }}
+          <time class="home-side__date" datetime="{{ $sparkDate }}">{{ $dateDisplay }}</time>
+        </span>
       </a>
       {{- end -}}
     </section>
