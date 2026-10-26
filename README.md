@@ -116,7 +116,7 @@ The workflow is `.github/workflows/hugo.yml` (`build` + `deploy`; the build outp
 
 > Repository settings: Settings → Pages → Source must be **GitHub Actions** (not "Deploy from a branch"), otherwise the deploy job fails.
 
-The repository has only two workflows: `hugo.yml` for deployment, and the read-only `theme-drift-check.yml` (every Monday it checks whether the PaperMod submodule has drifted the two templates this site overrides; if it has, it opens an issue to remind, and it never changes code on its own).
+The repository has only two workflows: `hugo.yml` for deployment, and the read-only `theme-drift-check.yml` (every Monday it checks whether the PaperMod submodule has drifted the three templates this site watches — the one template the site overrides plus the two it still depends on; if it has, it opens an issue to remind, and it never changes code on its own).
 
 ## Directory structure
 

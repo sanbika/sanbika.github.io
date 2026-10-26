@@ -49,13 +49,15 @@ There is no bot workflow that writes data or pushes commits, and no generation w
 
 Learned from the 2026-08-22 bulk optimization round (see Recent Changes in [[current-state.md]]).
 
-- **Existence**: `.github/workflows/theme-drift-check.yml` is a **read-only + reminder-style** workflow — **it opens no PR, pushes no commit, and triggers no deployment**. It does exactly one thing: watch whether the upstream of the `themes/PaperMod` submodule has changed the two theme templates that this site overrides, so that "upgrading the submodule and forgetting to diff makes the override fail silently" cannot happen.
-- **The two files it watches** (the site-level override list):
-  - `layouts/_partials/header.html` — PaperMod top bar
-  - `layouts/_partials/translation_list.html` — PaperMod language switcher list
+- **Existence**: `.github/workflows/theme-drift-check.yml` is a **read-only + reminder-style** workflow — **it opens no PR, pushes no commit, and triggers no deployment**. It does exactly one thing: watch whether the upstream of the `themes/PaperMod` submodule has changed the theme templates this site overrides or depends on, so that "upgrading the submodule and forgetting to diff makes the override fail silently" cannot happen.
+- **The three files it watches** (the watched-template list):
+  - `layouts/_partials/comments.html` — the one template the site **overrides outright** (the Giscus integration; upstream's version is a 3-line stub)
+  - `layouts/_partials/header.html` — PaperMod top bar; **no longer overridden** — upstream absorbed the `.Language.Label` change on 2026-10-27, so the site-level copy was deleted and the theme's own version is used directly — but still depended on
+  - `layouts/_partials/translation_list.html` — PaperMod language switcher list; **no longer overridden** for the same reason, but still depended on
+  - **Why the two no-longer-overridden templates stay on the list**: the site still depends on them, so an upstream change there is worth a look before the next bump; the check's mechanism is "upstream moved past our pin", which is useful whether or not the site overrides the file.
 - **Trigger**: every Monday 02:30 UTC (cron) + `workflow_dispatch` (manual). **Not a push trigger** — a push trigger would collide with the commits that upgrade the submodule, producing noise.
   - **The rationale for the schedule has changed**: the earlier schedule existed to avoid the time slots of the two writer workflows `daily-spark` (daily at 16:10 UTC) and `spark-checkins` (hourly at :17), so that data file writes would not collide with the build. Both workflows were deleted along with the daily board's retirement, and **the only remaining reason for the schedule is to match PaperMod's release rhythm**.
-- **Flow**: checkout including submodules → `git fetch` the upstream inside `themes/PaperMod` → diff the pinned SHA against `origin/HEAD` for those two overrides → if there is drift, open an issue (the title carries a short hash, the body carries the site-level override list + the `diff` output truncated to 100 lines, and a random unique heredoc separator to prevent script injection); if there is no drift, automatically close the old reminder issue on the same topic.
+- **Flow**: checkout including submodules → `git fetch` the upstream inside `themes/PaperMod` → diff the pinned SHA against `origin/HEAD` for those three watched templates → if there is drift, open an issue (the title carries a short hash, the body opens with "The watched PaperMod templates need to be re-checked against upstream before bumping the submodule.", lists all three watched files under **Files in scope:**, and carries the `diff` output truncated to 100 lines behind a random unique heredoc separator to prevent script injection); if there is no drift, automatically close the old reminder issue on the same topic with a note that starts "Closing: no drift detected for the watched templates."
 - **The permissions boundary**:
   ```yaml
   permissions:
@@ -64,7 +66,7 @@ Learned from the 2026-08-22 bulk optimization round (see Recent Changes in [[cur
   ```
   There is **no** `contents: write` (no PR / no commit push), **no** `actions: write` (no deployment trigger), and **no** `pull-requests: write`. This is a deliberate trade-off: the workflow only reminds, it never fixes, so that semi-automatic change PRs cannot sneak into the normal review rhythm.
 - **Issue lifecycle design**: the upstream returns to the pinned SHA → no drift → the workflow automatically closes the old issue → silent green; the upstream keeps drifting → the issue stays open until somebody upgrades manually and reviews. **The failing-job pattern was abandoned** (failing red every time would need a mute mechanism); **the PR pattern was abandoned** (a single-author blog repo has no PR review process to hook into).
-- **Not a replacement** for a full review when upgrading the submodule. The workflow only watches those two files; changes to other theme files are covered by the PR review process.
+- **Not a replacement** for a full review when upgrading the submodule. The workflow only watches those three files; changes to other theme files are covered by the PR review process.
 
 ## 4. The boundary of the deployment workflow's responsibilities
 

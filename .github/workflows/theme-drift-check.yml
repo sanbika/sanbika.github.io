@@ -1,11 +1,19 @@
 name: Check Theme Drift
 
-# Warns when the two site-level PaperMod overrides have moved past the
-# pinned submodule SHA. The overrides live at
-#   layouts/_partials/header.html         — search box / theme switcher / breadcrumbs
+# Warns when upstream PaperMod has moved past the pinned submodule SHA
+# in ways that touch the templates this site depends on.
+#
+# The site no longer overrides these two templates:
+#   layouts/_partials/header.html         — top bar: search box / theme switcher / breadcrumbs
 #   layouts/_partials/translation_list.html — language picker
-# both of which are routinely touched upstream and routinely need a
-# site-specific re-merging before bumping the submodule.
+# Upstream absorbed the `.Language.Label` change on 2026-10-27, so the
+# site-level copies were deleted and the theme's own versions are used
+# directly. The site still depends on both templates, so an upstream
+# change to either is still worth a look before bumping the submodule.
+#
+# The one template the site does override outright is:
+#   layouts/_partials/comments.html        — giscus comments integration
+# (upstream's version is a 3-line stub), so it is watched for drift too.
 #
 # Schedule: every Monday at 02:30 UTC — that's 10:30 Beijing time Monday
 # morning. The daily-spark / spark-checkins writers were retired in
@@ -49,9 +57,9 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      # Diff our two site-level overrides between the currently-pinned
+      # Diff the watched templates between the currently-pinned
       # submodule SHA and upstream HEAD. Non-empty output ⇒ upstream has
-      # moved in ways that touch at least one of the overridden files;
+      # moved in ways that touch at least one of the watched files;
       # empty output ⇒ either the submodule is already at HEAD or
       # upstream's changes don't touch these files.
       #
@@ -61,7 +69,7 @@ jobs:
       # branch — `master` for PaperMod at time of writing, but we don't
       # hardcode that here so this keeps working if PaperMod renames its
       # default branch.
-      - name: Diff overridden templates against upstream
+      - name: Diff watched templates against upstream
         id: diff
         env:
           # Cap the snippet we paste into the issue body so a huge
@@ -82,6 +90,7 @@ jobs:
 
           diff_out=$(git -C themes/PaperMod diff \
                        "$pinned" "$upstream" -- \
+                       layouts/_partials/comments.html \
                        layouts/_partials/header.html \
                        layouts/_partials/translation_list.html \
                      || true)
@@ -133,13 +142,14 @@ jobs:
 
           body_file="$(mktemp)"
           {
-            echo "The two site-level PaperMod overrides need to be re-checked"
-            echo "against upstream before bumping the submodule."
+            echo "The watched PaperMod templates need to be re-checked against"
+            echo "upstream before bumping the submodule."
             echo
             echo "**Files in scope:**"
             echo
-            echo "- \`layouts/_partials/header.html\`"
-            echo "- \`layouts/_partials/translation_list.html\`"
+            echo "- \`layouts/_partials/comments.html\` — overridden by this site (Giscus integration; upstream's version is a 3-line stub)"
+            echo "- \`layouts/_partials/header.html\` — not overridden any more, but still depended on (top bar)"
+            echo "- \`layouts/_partials/translation_list.html\` — not overridden any more, but still depended on (language picker)"
             echo
             echo "**Submodule SHA:**"
             echo
@@ -152,10 +162,10 @@ jobs:
             echo
             echo "---"
             echo
-            echo "_Upgrading the submodule is a deliberate manual step — diff and"
-            echo "adapt the two files above, then bump \`themes/PaperMod\`. This"
-            echo "issue will close automatically on the next run that reports"
-            echo "no drift._"
+            echo "_Upgrading the submodule is a deliberate manual step — review the"
+            echo "watched templates above and adapt them where needed, then bump"
+            echo "\`themes/PaperMod\`. This issue will close automatically on the"
+            echo "next run that reports no drift._"
           } > "$body_file"
 
           # Match by exact title via --json + jq — more robust than
@@ -196,7 +206,7 @@ jobs:
 
           note_file="$(mktemp)"
           {
-            echo "Closing: no drift detected for the two site-level overrides."
+            echo "Closing: no drift detected for the watched templates."
             echo
             echo "- pinned:   \`${PINNED}\`"
             echo "- upstream: \`${UPSTREAM}\`"
